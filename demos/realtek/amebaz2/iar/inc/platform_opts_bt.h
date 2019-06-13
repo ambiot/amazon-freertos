@@ -1,0 +1,16 @@
+#ifndef __PLATFORM_OPTS_BT_H__
+#define __PLATFORM_OPTS_BT_H__
+
+#define CONFIG_BT			0
+
+#if CONFIG_BT
+#define CONFIG_FTL_ENABLED
+#define CONFIG_BT_CONFIG			0
+#define CONFIG_BT_PERIPHERAL		0
+#define CONFIG_BT_BEACON			0
+#define CONFIG_BT_MESH_PROVISIONER	0
+#define CONFIG_BT_MESH_DEVICE		0
+#endif // CONFIG_BT
+
+#endif // __PLATFORM_OPTS_BT_H__
+
