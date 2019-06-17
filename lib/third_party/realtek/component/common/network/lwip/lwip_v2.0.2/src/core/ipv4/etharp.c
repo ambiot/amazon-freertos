@@ -132,12 +132,7 @@ static u8_t etharp_cached_entry;
 
 
 static err_t etharp_request_dst(struct netif *netif, const ip4_addr_t *ipaddr, const struct eth_addr* hw_dst_addr);
-/* Added by Realtek */
-#if !LWIP_AUTOIP
-static
-#endif /* LWIP_AUTOIP */
-/* Added by Realtek end */
-err_t etharp_raw(struct netif *netif,
+static err_t etharp_raw(struct netif *netif,
                         const struct eth_addr *ethsrc_addr, const struct eth_addr *ethdst_addr,
                         const struct eth_addr *hwsrc_addr, const ip4_addr_t *ipsrc_addr,
                         const struct eth_addr *hwdst_addr, const ip4_addr_t *ipdst_addr,
@@ -720,13 +715,6 @@ etharp_input(struct pbuf *p, struct netif *netif)
       LWIP_DEBUGF(ETHARP_DEBUG | LWIP_DBG_TRACE, ("etharp_input: we are unconfigured, ARP request ignored.\n"));
     /* request was not directed to us */
     } else {
-/* Added by Realtek */
-#ifdef CONFIG_DONT_CARE_TP
-      if(netif->flags & NETIF_FLAG_IPSWITCH)
-        netif->linkoutput(netif, p);
-      else
-#endif
-/* Added by Realtek end */
       /* { for_us == 0 and netif->ip_addr.addr != 0 } */
       LWIP_DEBUGF(ETHARP_DEBUG | LWIP_DBG_TRACE, ("etharp_input: ARP request was not for us.\n"));
     }
@@ -741,12 +729,6 @@ etharp_input(struct pbuf *p, struct netif *netif)
      * @todo How should we handle redundant (fail-over) interfaces? */
     dhcp_arp_reply(netif, &sipaddr);
 #endif /* (LWIP_DHCP && DHCP_DOES_ARP_CHECK) */
-/* Added by Realtek */
-#ifdef CONFIG_DONT_CARE_TP
-    if(netif->flags & NETIF_FLAG_IPSWITCH)
-      netif->linkoutput(netif, p);
-#endif
-/* Added by Realtek end */
     break;
   default:
     LWIP_DEBUGF(ETHARP_DEBUG | LWIP_DBG_TRACE, ("etharp_input: ARP unknown opcode type %"S16_F"\n", lwip_htons(hdr->opcode)));
@@ -1116,12 +1098,8 @@ etharp_query(struct netif *netif, const ip4_addr_t *ipaddr, struct pbuf *q)
  *         ERR_MEM if the ARP packet couldn't be allocated
  *         any other err_t on failure
  */
-/* Added by Realtek */
-#if !LWIP_AUTOIP
-static
-#endif /* LWIP_AUTOIP */
-/* Added by Realtek end */
-err_t etharp_raw(struct netif *netif, const struct eth_addr *ethsrc_addr,
+static err_t
+etharp_raw(struct netif *netif, const struct eth_addr *ethsrc_addr,
            const struct eth_addr *ethdst_addr,
            const struct eth_addr *hwsrc_addr, const ip4_addr_t *ipsrc_addr,
            const struct eth_addr *hwdst_addr, const ip4_addr_t *ipdst_addr,
@@ -1172,21 +1150,11 @@ err_t etharp_raw(struct netif *netif, const struct eth_addr *ethsrc_addr,
    * 'sender IP address' MUST be sent using link-layer broadcast instead of
    * link-layer unicast. (See RFC3927 Section 2.5, last paragraph) */
   if(ip4_addr_islinklocal(ipsrc_addr)) {
-    /* Added by Realtek */
-    if((opcode == RARP_REQUEST) | (opcode == RARP_REPLY))
-      ethernet_output(netif, p, ethsrc_addr, &ethbroadcast, ETHTYPE_RARP);
-    else
-    /* Added by Realtek end */
-      ethernet_output(netif, p, ethsrc_addr, &ethbroadcast, ETHTYPE_ARP);
+    ethernet_output(netif, p, ethsrc_addr, &ethbroadcast, ETHTYPE_ARP);
   } else
 #endif /* LWIP_AUTOIP */
   {
-    /* Added by Realtek */
-    if((opcode == RARP_REQUEST) | (opcode == RARP_REPLY))
-      ethernet_output(netif, p, ethsrc_addr, ethdst_addr, ETHTYPE_RARP);
-    else
-    /* Added by Realtek end */
-      ethernet_output(netif, p, ethsrc_addr, ethdst_addr, ETHTYPE_ARP);
+    ethernet_output(netif, p, ethsrc_addr, ethdst_addr, ETHTYPE_ARP);
   }
 
   ETHARP_STATS_INC(etharp.xmit);

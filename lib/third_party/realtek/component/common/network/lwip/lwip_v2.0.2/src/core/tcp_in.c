@@ -1151,9 +1151,7 @@ tcp_receive(struct tcp_pcb *pcb)
           }
           LWIP_DEBUGF(TCP_CWND_DEBUG, ("tcp_receive: slow start cwnd %"TCPWNDSIZE_F"\n", pcb->cwnd));
         } else {
-          // Workaround to prevent compiler did not handle 16bit calculation correctly. By RTK.
-          u32_t new_cwnd = (pcb->cwnd + pcb->mss * pcb->mss / pcb->cwnd);
-          new_cwnd = new_cwnd & 0xFFFF;
+          tcpwnd_size_t new_cwnd = (pcb->cwnd + pcb->mss * pcb->mss / pcb->cwnd);
           if (new_cwnd > pcb->cwnd) {
             pcb->cwnd = new_cwnd;
           }
@@ -1395,8 +1393,7 @@ tcp_receive(struct tcp_pcb *pcb)
           if (TCPH_FLAGS(inseg.tcphdr) & TCP_FIN) {
             /* Must remove the FIN from the header as we're trimming
              * that byte of sequence-space from the packet */
-            /* TCPH_FLAGS_SET(inseg.tcphdr, TCPH_FLAGS(inseg.tcphdr) & ~(unsigned int)TCP_FIN); */
-            TCPH_FLAGS_SET(inseg.tcphdr, TCPH_FLAGS(inseg.tcphdr) & (u16_t)(~(unsigned int)TCP_FIN)); /*Realtek add, to fix implicit cast warnings in IAR 8.30*/
+            TCPH_FLAGS_SET(inseg.tcphdr, TCPH_FLAGS(inseg.tcphdr) & ~(unsigned int)TCP_FIN);
           }
           /* Adjust length of segment to fit in the window. */
           TCPWND_CHECK16(pcb->rcv_wnd);
@@ -1652,8 +1649,7 @@ tcp_receive(struct tcp_pcb *pcb)
                     if (TCPH_FLAGS(next->next->tcphdr) & TCP_FIN) {
                       /* Must remove the FIN from the header as we're trimming
                        * that byte of sequence-space from the packet */
-                      /* TCPH_FLAGS_SET(next->next->tcphdr, TCPH_FLAGS(next->next->tcphdr) & ~TCP_FIN); */
-                      TCPH_FLAGS_SET(next->next->tcphdr, TCPH_FLAGS(next->next->tcphdr) & (u16_t)(~TCP_FIN)); /*Realtek add, to fix implicit cast warnings in IAR 8.30*/
+                      TCPH_FLAGS_SET(next->next->tcphdr, TCPH_FLAGS(next->next->tcphdr) & ~TCP_FIN);
                     }
                     /* Adjust length of segment to fit in the window. */
                     next->next->len = (u16_t)(pcb->rcv_nxt + pcb->rcv_wnd - seqno);

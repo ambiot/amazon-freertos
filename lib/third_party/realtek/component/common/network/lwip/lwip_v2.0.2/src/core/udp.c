@@ -118,25 +118,6 @@ again:
   return udp_port;
 }
 
-//Realtek add
-#if LWIP_RANDOMIZE_INITIAL_LOCAL_PORTS
-/**
- * Randomize a new local UDP port once.
- */
-void 
-udp_randomize_local_port(void)
-{
-  static int done = 0;
-
-  if (!done) {
-    done = 1;    
-    LWIP_SRAND();
-    udp_port = LWIP_RAND() % (UDP_LOCAL_PORT_RANGE_END - UDP_LOCAL_PORT_RANGE_START) + UDP_LOCAL_PORT_RANGE_START;
-  }
-}
-#endif  /* LWIP_RANDOMIZE_INITIAL_LOCAL_PORTS */
-//Realtek add end
-
 /** Common code to see if the current input packet matches the pcb
  * (current input packet is accessed via ip(4/6)_current_* macros)
  *

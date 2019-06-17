@@ -15,6 +15,8 @@
 
 #include <platform/platform_stdlib.h>
 
+#include "lwip_def.h"
+
 #if defined(CONFIG_FAST_DHCP) && CONFIG_FAST_DHCP
 #include "wlan_fast_connect/example_wlan_fast_connect.h"
 #endif

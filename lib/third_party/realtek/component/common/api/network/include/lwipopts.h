@@ -355,7 +355,7 @@ Certain platform allows computing and verifying the IP, UDP, TCP and ICMP checks
 #define ETHARP_SUPPORT_STATIC_ENTRIES   1	 
 
 /* Added by Realtek start */
-#define LWIP_RANDOMIZE_INITIAL_LOCAL_PORTS 1
+#define LWIP_RANDOMIZE_INITIAL_LOCAL_PORTS 0
 #define LWIP_DNS_LEGACY_SUPPORT 0
 /* Added by Realtek end */
 
@@ -385,6 +385,7 @@ Certain platform allows computing and verifying the IP, UDP, TCP and ICMP checks
 #undef LWIP_SOCKET_SET_ERRNO
 #define LWIP_TCPIP_CORE_LOCKING         1
 #define LWIP_SOCKET_SET_ERRNO           1
+#define LWIP_TIMEVAL_PRIVATE  1
 #endif
 #include "lwip/init.h"                  //for version control
 

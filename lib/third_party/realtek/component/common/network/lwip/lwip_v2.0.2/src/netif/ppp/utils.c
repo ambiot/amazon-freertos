@@ -58,9 +58,7 @@
 #endif
 #endif /* UNUSED */
 
-#if 0// Realtek
 #include <ctype.h>  /* isdigit() */
-#endif
 
 #include "netif/ppp/ppp_impl.h"
 

@@ -340,16 +340,12 @@ tcpip_send_msg_wait_sem(tcpip_callback_fn fn, void *apimsg, sys_sem_t* sem)
   LWIP_ASSERT("semaphore not initialized", sys_sem_valid(sem));
   LWIP_ASSERT("Invalid mbox", sys_mbox_valid_val(mbox));
 
-  UBaseType_t prio = uxTaskPriorityGet(NULL);       //Realtek add: add to prevent switch to tcpip thread between mbox post and sem wait
-  if((TCPIP_THREAD_PRIO + 1) > prio)
-    vTaskPrioritySet(NULL, TCPIP_THREAD_PRIO + 1);  //Realtek add: set priority higher than tcpip thread
   TCPIP_MSG_VAR_ALLOC(msg);
   TCPIP_MSG_VAR_REF(msg).type = TCPIP_MSG_API;
   TCPIP_MSG_VAR_REF(msg).msg.api_msg.function = fn;
   TCPIP_MSG_VAR_REF(msg).msg.api_msg.msg = apimsg;
   sys_mbox_post(&mbox, &TCPIP_MSG_VAR_REF(msg));
   sys_arch_sem_wait(sem, 0);
-  vTaskPrioritySet(NULL, prio);                     //Realtek add: restore to original priority
   TCPIP_MSG_VAR_FREE(msg);
   return ERR_OK;
 #endif /* LWIP_TCPIP_CORE_LOCKING */
@@ -358,7 +354,7 @@ tcpip_send_msg_wait_sem(tcpip_callback_fn fn, void *apimsg, sys_sem_t* sem)
 /**
  * Synchronously calls function in TCPIP thread and waits for its completion.
  * It is recommended to use LWIP_TCPIP_CORE_LOCKING (preferred) or
- * LWIP_NETCONN_SEM_PER_THREAD. 
+ * LWIP_NETCONN_SEM_PER_THREAD.
  * If not, a semaphore is created and destroyed on every call which is usually
  * an expensive/slow operation.
  * @param fn Function to call
@@ -477,13 +473,8 @@ tcpip_init(tcpip_init_done_fn initfunc, void *arg)
     LWIP_ASSERT("failed to create lock_tcpip_core", 0);
   }
 #endif /* LWIP_TCPIP_CORE_LOCKING */
-//Realtek add
-#if defined(CONFIG_USE_TCM_HEAP) && (CONFIG_USE_TCM_HEAP)
-  sys_thread_new_tcm(TCPIP_THREAD_NAME, tcpip_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
-#else
+
   sys_thread_new(TCPIP_THREAD_NAME, tcpip_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
-#endif
-//Realtek add end
 }
 
 /**

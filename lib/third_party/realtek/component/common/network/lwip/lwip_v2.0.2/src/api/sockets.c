@@ -1779,15 +1779,6 @@ lwip_getpeername(int s, struct sockaddr *name, socklen_t *namelen)
   return lwip_getaddrname(s, name, namelen, 0);
 }
 
-/* Added by Realtek start */
-int
-lwip_getsocklasterr(int s)
-{
-  struct lwip_sock *sock = get_socket(s);
-  return sock->err;
-}
-/* Added by Realtek end */
-
 int
 lwip_getsockname(int s, struct sockaddr *name, socklen_t *namelen)
 {
@@ -1961,18 +1952,6 @@ lwip_getsockopt_impl(int s, int level, int optname, void *optval, socklen_t *opt
       if (((sock->err == 0) || (sock->err == EINPROGRESS)) && (sock->conn != NULL)) {
         sock_set_errno(sock, err_to_errno(sock->conn->last_err));
       }
-/* Added by Realtek start */	  
-#if 1
-      //SO_ERROR returns only "pending errors", and EWOULDBLOCK is not one of them
-      //Check https://savannah.nongnu.org/bugs/?func=detailitem&item_id=49848#options
-      //Once you are aware of this, you can remove this warning message
-      static u8_t warning = 0;
-      if(!sock->err && !warning){
-        printf("WARNING(lwip_getsockopt): EWOULDBLOCK(EAGAIN) IS NOT SO_ERROR(sockets.c:%d)\r\n", __LINE__);
-        warning = 1;
-      }
-#endif
-/* Added by Realtek end */
       *(int *)optval = (sock->err == 0xFF ? (int)-1 : (int)sock->err);
       sock->err = 0;
       LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_getsockopt(%d, SOL_SOCKET, SO_ERROR) = %d\n",
@@ -2447,8 +2426,7 @@ lwip_setsockopt_impl(int s, int level, int optname, const void *optval, socklen_
       if (*(const int*)optval) {
         udp_setflags(sock->conn->pcb.udp, udp_flags(sock->conn->pcb.udp) | UDP_FLAGS_NOCHKSUM);
       } else {
-        /*udp_setflags(sock->conn->pcb.udp, udp_flags(sock->conn->pcb.udp) & ~UDP_FLAGS_NOCHKSUM);*/
-        udp_setflags(sock->conn->pcb.udp, udp_flags(sock->conn->pcb.udp) & (u8_t)(~(UDP_FLAGS_NOCHKSUM)&0xff));/*Realtek add, to fix implicit cast warnings in IAR 8.30*/
+        udp_setflags(sock->conn->pcb.udp, udp_flags(sock->conn->pcb.udp) & ~UDP_FLAGS_NOCHKSUM);
       }
       break;
 #endif /* LWIP_UDP */
@@ -2493,8 +2471,7 @@ lwip_setsockopt_impl(int s, int level, int optname, const void *optval, socklen_
       if (*(const u8_t*)optval) {
         udp_setflags(sock->conn->pcb.udp, udp_flags(sock->conn->pcb.udp) | UDP_FLAGS_MULTICAST_LOOP);
       } else {
-        /*udp_setflags(sock->conn->pcb.udp, udp_flags(sock->conn->pcb.udp) & ~UDP_FLAGS_MULTICAST_LOOP);*/
-        udp_setflags(sock->conn->pcb.udp, udp_flags(sock->conn->pcb.udp) & (u8_t)(~(UDP_FLAGS_MULTICAST_LOOP)&0xff));/*Realtek add, to fix implicit cast warnings in IAR 8.30*/
+        udp_setflags(sock->conn->pcb.udp, udp_flags(sock->conn->pcb.udp) & ~UDP_FLAGS_MULTICAST_LOOP);
       }
       break;
 #endif /* LWIP_MULTICAST_TX_OPTIONS */
@@ -2903,98 +2880,4 @@ lwip_socket_drop_registered_memberships(int s)
   }
 }
 #endif /* LWIP_IGMP */
-
-
-/**************************************************************
-*                           Added  by Realtek       Begin                     *
-**************************************************************/
-int lwip_allocsocketsd(void)
-{
-  struct netconn *conn;
-  int i;
-  
-  /*new a netconn due to avoid some socket->conn check*/
-  conn = netconn_new_with_proto_and_callback(NETCONN_RAW, 0, NULL);
-  if (!conn) {
-    printf("\r\n could not create netconn");
-    return -1;
-  }
-  
-  /*alloc a socket*/
-  i = alloc_socket(conn, 1);
-  if (i == -1) {
-    netconn_delete(conn);
-    printf("\r\n alloc socket fail!");
-    return -1;
-  }
-  
-  conn->socket = i;
-  return i;
-}
-void lwip_setsockrcvevent(int fd, int rcvevent)
-{
-	struct lwip_sock *sock = get_socket(fd);
-
-	if(sock){
-		if(rcvevent)
-			sock->rcvevent = 1;
-		else
-			sock->rcvevent = 0;
-	}
-}
-void lwip_selectevindicate(int fd)
-{
-  struct lwip_select_cb *scb;
-  struct lwip_sock *sock;
-  
-  sock = get_socket(fd);
-  SYS_ARCH_DECL_PROTECT(lev);
-  while (1) {
-    SYS_ARCH_PROTECT(lev);
-    for (scb = select_cb_list; scb; scb = scb->next) {
-      if (scb->sem_signalled == 0) {
-        /* Test this select call for our socket */
-        if (scb->readset && FD_ISSET(fd, scb->readset))
-          if (sock->rcvevent > 0)
-            break;
-        if (scb->writeset && FD_ISSET(fd, scb->writeset))
-          if (sock->sendevent)
-            break;
-      }
-    }
-    if (scb) {
-      scb->sem_signalled = 1;
-      sys_sem_signal(&scb->sem);
-      SYS_ARCH_UNPROTECT(lev);
-    } else {
-      SYS_ARCH_UNPROTECT(lev);
-      break;
-    }
-  }
-}
-
-int lwip_gettcpstatus(int s, uint32_t *seqno, uint32_t *ackno, uint16_t *wnd)
-{
-  struct lwip_sock *sock;
-  sock = get_socket(s);
-  if (!sock) {
-    return -1;
-  }
-
-  if (NETCONNTYPE_GROUP(netconn_type(sock->conn)) == NETCONN_TCP) {
-	struct tcp_pcb *pcb = sock->conn->pcb.tcp;
-    *seqno = pcb->snd_lbb;
-	*ackno = pcb->rcv_nxt;
-	*wnd = pcb->rcv_wnd;
-  }
-  else {
-    return -1;
-  }
-
-  return 0;
-}
-/**************************************************************
-*                           Added  by Realtek        end                    *
-**************************************************************/
-
 #endif /* LWIP_SOCKET */

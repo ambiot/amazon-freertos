@@ -46,7 +46,7 @@
 
 #include "sntp.h"
 
-#include "lwip/lwip_timers.h"
+#include "timeouts.h"
 #include "lwip/udp.h"
 #include "lwip/dns.h"
 #include "lwip/ip_addr.h"

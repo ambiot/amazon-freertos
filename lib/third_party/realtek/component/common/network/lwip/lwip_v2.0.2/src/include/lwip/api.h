@@ -53,11 +53,6 @@
 extern "C" {
 #endif
 
-//Realtek add
-#define port_netconn_recv(conn , buf, ret)  do{ret = netconn_recv(conn, &buf);}while(0);
-#define port_netconn_accept(conn , newconn, ret) do{ret = netconn_accept(conn, &newconn);}while(0);
-//Realtek add end
-
 /* Throughout this file, IP addresses and port numbers are expected to be in
  * the same byte order as in the corresponding pcb.
  */
@@ -329,8 +324,6 @@ err_t   netconn_write_partly(struct netconn *conn, const void *dataptr, size_t s
           netconn_write_partly(conn, dataptr, size, apiflags, NULL)
 err_t   netconn_close(struct netconn *conn);
 err_t   netconn_shutdown(struct netconn *conn, u8_t shut_rx, u8_t shut_tx);
-
-err_t   netconn_abort(struct netconn *conn);		//Realtek add
 
 #if LWIP_IGMP || (LWIP_IPV6 && LWIP_IPV6_MLD)
 err_t   netconn_join_leave_group(struct netconn *conn, const ip_addr_t *multiaddr,

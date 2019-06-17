@@ -66,7 +66,8 @@
 #include <stdlib.h> /* for malloc()/free() */
 #endif
 
-#if MEM_LIBC_MALLOC || MEM_USE_POOLS
+
+#if MEM_LIBC_MALLOC || MEM_USE_POOLS || MEM_USE_EXTERNAL_MGMT
 
 /** mem_init is not used when using pools instead of a heap or using
  * C library malloc().
@@ -87,6 +88,7 @@ mem_trim(void *mem, mem_size_t size)
   return mem;
 }
 #endif /* MEM_LIBC_MALLOC || MEM_USE_POOLS */
+
 
 #if MEM_LIBC_MALLOC
 /* lwIP heap implemented using C library malloc() */
@@ -251,6 +253,25 @@ mem_free(void *rmem)
 
   /* and put it in the pool we saved earlier */
   memp_free(hmem->poolnr, hmem);
+}
+
+#elif MEM_USE_EXTERNAL_MGMT
+/**
+ * Use external memory management (FreeRTOS)
+ */
+void *
+mem_malloc(mem_size_t size)
+{
+    return pvPortMalloc(size);
+}
+
+/**
+ * Use external memory management (FreeRTOS)
+ */
+void
+mem_free(void *rmem)
+{
+    vPortFree(rmem);
 }
 
 #else /* MEM_USE_POOLS */

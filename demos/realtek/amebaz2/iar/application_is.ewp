@@ -394,8 +394,8 @@
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\http2\nghttp2-1.31.0\includes</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\include\lwip</state>
-                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek</state>
-                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek\freertos</state>
+                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek</state>
+                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek\freertos</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\wifi\rtw_wpa_supplicant\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\ssl\ssl_ram_map\rom</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\drivers\wlan\realtek\include</state>
@@ -1349,8 +1349,8 @@
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\http2\nghttp2-1.31.0\includes</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\include</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\include\lwip</state>
-                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek</state>
-                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek\freertos</state>
+                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek</state>
+                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek\freertos</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\wifi\rtw_wpa_supplicant\src</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\ssl\ssl_ram_map\rom</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\drivers\wlan\realtek\include</state>
@@ -2271,7 +2271,7 @@
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\src\data_uart\data_uart.c</name>
             </file>
             <file>
-		<name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\file_system\ftl\ftl.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\file_system\ftl\ftl.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\src\hci\hci_board.c</name>
@@ -2777,13 +2777,13 @@
             <group>
                 <name>port</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek\freertos\ethernetif.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek\freertos\ethernetif.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\drivers\wlan\realtek\src\osdep\lwip_intf.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek\freertos\sys_arch.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek\freertos\sys_arch.c</name>
                 </file>
             </group>
             <file>
@@ -3211,6 +3211,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\example\rarp\example_rarp.c</name>
+                <excluded>
+                    <configuration>Debug</configuration>
+                </excluded>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\example\secure_boot\example_secure_boot.c</name>

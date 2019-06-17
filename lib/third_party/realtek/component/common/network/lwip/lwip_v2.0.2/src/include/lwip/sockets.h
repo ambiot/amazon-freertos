@@ -358,7 +358,6 @@ typedef struct ip_mreq {
 #define IOC_INOUT       (IOC_IN|IOC_OUT)
                                         /* 0x20000000 distinguishes new &
                                            old ioctl's */
-#undef _IO  /* Added by Realtek */
 #define _IO(x,y)        (IOC_VOID|((x)<<8)|(y))
 
 #define _IOR(x,y,t)     (IOC_OUT|(((long)sizeof(t)&IOCPARM_MASK)<<16)|((x)<<8)|(y))
@@ -434,7 +433,7 @@ typedef struct fd_set
 /** LWIP_TIMEVAL_PRIVATE: if you want to use the struct timeval provided
  * by your system, set this to 0 and include <sys/time.h> in cc.h */
 #ifndef LWIP_TIMEVAL_PRIVATE
-#define LWIP_TIMEVAL_PRIVATE 1
+#define LWIP_TIMEVAL_PRIVATE 0
 #endif
 
 #if LWIP_TIMEVAL_PRIVATE
@@ -488,7 +487,6 @@ int lwip_getpeername (int s, struct sockaddr *name, socklen_t *namelen);
 int lwip_getsockname (int s, struct sockaddr *name, socklen_t *namelen);
 int lwip_getsockopt (int s, int level, int optname, void *optval, socklen_t *optlen);
 int lwip_setsockopt (int s, int level, int optname, const void *optval, socklen_t optlen);
-int lwip_getsocklasterr(int s);			//Realtek add
 int lwip_close(int s);
 int lwip_connect(int s, const struct sockaddr *name, socklen_t namelen);
 int lwip_listen(int s, int backlog);

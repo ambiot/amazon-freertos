@@ -648,7 +648,7 @@ struct netconn*
 netconn_alloc(enum netconn_type t, netconn_callback callback)
 {
   struct netconn *conn;
-  int size = 0;					//Realtek add: add the initial value
+  int size;
 
   conn = (struct netconn *)memp_malloc(MEMP_NETCONN);
   if (conn == NULL) {

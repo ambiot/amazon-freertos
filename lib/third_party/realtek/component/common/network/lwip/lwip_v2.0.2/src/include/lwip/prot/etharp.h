@@ -71,10 +71,7 @@ PACK_STRUCT_END
 #endif
 
 #define SIZEOF_ETHARP_HDR 28
-/* Added by Realtek start */
-#define SIZEOF_ETHARP_PACKET (SIZEOF_ETH_HDR + SIZEOF_ETHARP_HDR)
-/* Added by Realtek end */
-  
+
 /* ARP hwtype values */
 enum etharp_hwtype {
   HWTYPE_ETHERNET = 1
@@ -86,13 +83,6 @@ enum etharp_opcode {
   ARP_REQUEST = 1,
   ARP_REPLY   = 2
 };
-
-/* Added by Realtek start */
-#define ETHTYPE_RARP      0x8035U
-#define RARP_REQUEST      3
-#define RARP_REPLY        4
-void rarp_retrieve_hook_callback(void (*callback)(u8_t *, u8_t *));
-/* Added by Realtek end */
 
 #ifdef __cplusplus
 }

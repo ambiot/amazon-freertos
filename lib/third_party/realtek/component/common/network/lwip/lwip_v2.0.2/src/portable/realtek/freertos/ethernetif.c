@@ -55,7 +55,7 @@
 #include "ethernetif.h"
 #include "queue.h"
 #include "lwip_netconf.h"
-
+#include "lwip_def.h"
 #include "lwip/ethip6.h" //Add for ipv6
 
 #include <platform/platform_stdlib.h>

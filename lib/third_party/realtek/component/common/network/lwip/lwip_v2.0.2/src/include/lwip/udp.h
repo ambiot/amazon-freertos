@@ -155,12 +155,6 @@ void             udp_input      (struct pbuf *p, struct netif *inp);
 
 void             udp_init       (void);
 
-//Realtek add
-#if LWIP_RANDOMIZE_INITIAL_LOCAL_PORTS
-void             udp_randomize_local_port   (void);
-#endif
-//Realtek add end
-
 /* for compatibility with older implementation */
 #define udp_new_ip6() udp_new_ip_type(IPADDR_TYPE_V6)
 

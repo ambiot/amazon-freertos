@@ -100,12 +100,6 @@ extern "C" {
  * Set by the netif driver in its init function. */
 #define NETIF_FLAG_MLD6         0x40U
 
-//Realtek add
-#ifdef CONFIG_DONT_CARE_TP
-#define NETIF_FLAG_IPSWITCH       0x100U
-#endif
-//Realtek add end
-
 /**
  * @}
  */

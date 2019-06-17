@@ -1007,16 +1007,4 @@ netconn_thread_cleanup(void)
 }
 #endif /* LWIP_NETCONN_SEM_PER_THREAD */
 
-//Realtek add
-err_t netconn_abort(struct netconn *conn)
-{
-  if (conn->acceptmbox != SYS_MBOX_NULL) {
-    /* Register event with callback */
-    API_EVENT(conn, NETCONN_EVT_RCVPLUS, 0);
-    sys_mbox_post(&conn->acceptmbox, NULL);
-  }
-  return ERR_OK;
-}
-//Realtek add end
-
 #endif /* LWIP_NETCONN */

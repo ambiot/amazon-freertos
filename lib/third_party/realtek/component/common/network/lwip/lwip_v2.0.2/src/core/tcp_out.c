@@ -110,10 +110,6 @@ tcp_output_alloc_header(struct tcp_pcb *pcb, u16_t optlen, u16_t datalen,
 {
   struct tcp_hdr *tcphdr;
   struct pbuf *p = pbuf_alloc(PBUF_IP, TCP_HLEN + optlen + datalen, PBUF_RAM);
-  if (p == NULL) {
-    p = pbuf_alloc(PBUF_IP, TCP_HLEN + optlen + datalen, PBUF_POOL);		//Realtek add
-  }
-  
   if (p != NULL) {
     LWIP_ASSERT("check that first pbuf can hold struct tcp_hdr",
                  (p->len >= TCP_HLEN + optlen));

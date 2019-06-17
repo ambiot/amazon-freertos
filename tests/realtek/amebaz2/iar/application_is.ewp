@@ -396,8 +396,8 @@
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\http2\nghttp2-1.31.0\includes</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\include\lwip</state>
-                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek</state>
-                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek\freertos</state>
+                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek</state>
+                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek\freertos</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\wifi\rtw_wpa_supplicant\src</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\ssl\ssl_ram_map\rom</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\drivers\wlan\realtek\include</state>
@@ -1352,8 +1352,8 @@
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\http2\nghttp2-1.31.0\includes</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\include</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\include\lwip</state>
-                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek</state>
-                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek\freertos</state>
+                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek</state>
+                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek\freertos</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\wifi\rtw_wpa_supplicant\src</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\ssl\ssl_ram_map\rom</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\drivers\wlan\realtek\include</state>
@@ -2235,57 +2235,57 @@
                 <group>
                     <name>framework</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\tests\common\framework\aws_test_framework.c</name>
+                        <name>$PROJ_DIR$\..\..\..\common\framework\aws_test_framework.c</name>
                     </file>
                 </group>
                 <group>
                     <name>freertos_tcp</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\tests\common\freertos_tcp\aws_test_freertos_tcp.c</name>
+                        <name>$PROJ_DIR$\..\..\..\common\freertos_tcp\aws_test_freertos_tcp.c</name>
                     </file>
                 </group>
                 <group>
                     <name>mqtt</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\tests\common\mqtt\aws_test_mqtt_agent.c</name>
+                        <name>$PROJ_DIR$\..\..\..\common\mqtt\aws_test_mqtt_agent.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\tests\common\mqtt\aws_test_mqtt_lib.c</name>
+                        <name>$PROJ_DIR$\..\..\..\common\mqtt\aws_test_mqtt_lib.c</name>
                     </file>
                 </group>
                 <group>
                     <name>pkcs11</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\tests\common\pkcs11\aws_test_pkcs11.c</name>
+                        <name>$PROJ_DIR$\..\..\..\common\pkcs11\aws_test_pkcs11.c</name>
                     </file>
                 </group>
                 <group>
                     <name>secure_sockets</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\tests\common\secure_sockets\aws_test_tcp.c</name>
+                        <name>$PROJ_DIR$\..\..\..\common\secure_sockets\aws_test_tcp.c</name>
                     </file>
                 </group>
                 <group>
                     <name>test_runner</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\tests\common\test_runner\aws_test_runner.c</name>
+                        <name>$PROJ_DIR$\..\..\..\common\test_runner\aws_test_runner.c</name>
                     </file>
                 </group>
                 <group>
                     <name>tls</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\tests\common\tls\aws_test_tls.c</name>
+                        <name>$PROJ_DIR$\..\..\..\common\tls\aws_test_tls.c</name>
                     </file>
                 </group>
                 <group>
                     <name>wifi</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\tests\common\wifi\aws_test_wifi.c</name>
+                        <name>$PROJ_DIR$\..\..\..\common\wifi\aws_test_wifi.c</name>
                     </file>
                 </group>
             </group>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\tests\realtek\amebaz2\common\application_code\aws_test_main.c</name>
+                <name>$PROJ_DIR$\..\common\application_code\aws_test_main.c</name>
             </file>
         </group>
     </group>
@@ -2809,13 +2809,13 @@
             <group>
                 <name>port</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek\freertos\ethernetif.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek\freertos\ethernetif.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\drivers\wlan\realtek\src\osdep\lwip_intf.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\port\realtek\freertos\sys_arch.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\network\lwip\lwip_v2.0.2\src\portable\realtek\freertos\sys_arch.c</name>
                 </file>
             </group>
             <file>
@@ -3246,6 +3246,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\example\rarp\example_rarp.c</name>
+                <excluded>
+                    <configuration>Debug</configuration>
+                </excluded>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\example\sntp_showtime\example_sntp_showtime.c</name>
