@@ -12,6 +12,8 @@
 #include <wifi/wifi_util.h>
 #endif
 
+#include "lwip_def.h"
+
 #if ATCMD_VER == ATVER_2
 #include "flash_api.h"
 #include "device_lock.h"

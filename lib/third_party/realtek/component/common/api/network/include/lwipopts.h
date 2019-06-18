@@ -173,7 +173,7 @@ a lot of data that needs to be copied, this should be set high. */
 #define LWIP_UPNP		0
 
 /* ---------- SO_SNDRCVTIMEO_NONSTANDARD options --------- */
-#define LWIP_SO_SNDRCVTIMEO_NONSTANDARD 1
+#define LWIP_SO_SNDRCVTIMEO_NONSTANDARD 0
 
 /* ---------- SO_REUSE options --------- */
 #define SO_REUSE                        1

@@ -16,6 +16,10 @@ extern "C" {
 /* Added by Realtek start */
 #define ip_addr ip4_addr
 /* Added by Realtek end */
+#else
+/* Added by Realtek start */
+#define ip_addr ip6_addr
+/* Added by Realtek end */
 #endif
 
 //Realtek add 

@@ -242,9 +242,6 @@ int ipaddr_aton(const char *cp, ip_addr_t *addr);
 #if LWIP_IPV4
 
 typedef ip4_addr_t ip_addr_t;
-/* Added by Realtek start */
-#define ip_addr ip4_addr
-/* Added by Realtek end */
 #define IPADDR4_INIT(u32val)                    { u32val }
 #define IPADDR4_INIT_BYTES(a,b,c,d)             IPADDR4_INIT(PP_HTONL(LWIP_MAKEU32(a,b,c,d)))
 #define IP_IS_V4_VAL(ipaddr)                    1
@@ -291,9 +288,6 @@ typedef ip4_addr_t ip_addr_t;
 #else /* LWIP_IPV4 */
 
 typedef ip6_addr_t ip_addr_t;
-/* Added by Realtek start */
-#define ip_addr ip6_addr
-/* Added by Realtek end */
 #define IPADDR6_INIT(a, b, c, d)                { { a, b, c, d } }
 #define IPADDR6_INIT_HOST(a, b, c, d)           { { PP_HTONL(a), PP_HTONL(b), PP_HTONL(c), PP_HTONL(d) } }
 #define IP_IS_V4_VAL(ipaddr)                    0
