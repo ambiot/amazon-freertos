@@ -38,7 +38,6 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-#include "def.h"
 
 #ifndef __cplusplus
 #  include <stdbool.h>
