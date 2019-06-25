@@ -49,8 +49,6 @@
 #include "lwip/pbuf.h"
 #include "lwip/stats.h"
 
-#include "lwip_def.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif

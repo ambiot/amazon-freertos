@@ -31,6 +31,7 @@
  */
 
 /* lwIP includes. */
+#include "lwip_def.h"
 #include "lwip/debug.h"
 #include "lwip/def.h"
 #include "lwip/sys.h"
@@ -41,7 +42,7 @@
 #include "queue.h"
 #include "lwip/timeouts.h"
 #include "autoconf.h"
-#include "lwip_def.h"
+
 #if defined(CONFIG_USE_TCM_HEAP) && CONFIG_USE_TCM_HEAP
 #include "tcm_heap.h"
 #endif

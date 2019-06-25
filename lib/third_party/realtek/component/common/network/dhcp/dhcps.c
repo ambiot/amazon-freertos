@@ -1,7 +1,7 @@
-
+#include "lwip_def.h"
 #include "dhcps.h"
 #include "tcpip.h"
-#include "lwip_def.h"
+
 //static struct dhcp_server_state dhcp_server_state_machine;
 static uint8_t dhcp_server_state_machine = DHCP_SERVER_STATE_IDLE;
 /* recorded the client MAC addr(default sudo mac) */
