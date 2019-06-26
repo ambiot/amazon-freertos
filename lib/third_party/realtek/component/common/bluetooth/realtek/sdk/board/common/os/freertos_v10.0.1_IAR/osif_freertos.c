@@ -819,7 +819,7 @@ bool osif_timer_create(void **pp_handle, const char *p_timer_name, uint32_t time
     if (*pp_handle == NULL)
     {
         *pp_handle = xTimerCreate(p_timer_name, timer_ticks, (BaseType_t)reload,
-                                  (void *)timer_id, p_timer_callback);
+                                  (void *)timer_id, (TimerCallbackFunction_t)p_timer_callback);
         if (*pp_handle == NULL)
         {
             return false;

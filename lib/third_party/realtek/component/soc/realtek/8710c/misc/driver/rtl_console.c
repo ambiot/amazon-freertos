@@ -25,6 +25,9 @@
 //#include "diag.h"
 
 #include "stdio_port_func.h"
+#if defined(configUSE_TICKLESS_IDLE) && (configUSE_TICKLESS_IDLE > 0)
+#include "freertos_pmu.h"
+#endif
 
 extern hal_uart_adapter_t log_uart;
 
@@ -128,7 +131,7 @@ static void uart_irq(u32 id,u32 event)
 				stdio_port_putc(KEY_ENTER);
 				memset(log_buf,'\0',LOG_SERVICE_BUFLEN);
 				strncpy(log_buf,(char *)&temp_buf[0],buf_count);
-				rtw_up_sema_from_isr(&log_rx_interrupt_sema);
+				rtw_up_sema_from_isr((_sema*)&log_rx_interrupt_sema);
 				memset(temp_buf,'\0',buf_count);
 
 				/* save command */
@@ -138,6 +141,9 @@ static void uart_irq(u32 id,u32 event)
 				buf_count=0;
 			}else{
 				uart_send_string(STR_END_OF_MP_FORMAT);
+#if defined(configUSE_TICKLESS_IDLE) && (configUSE_TICKLESS_IDLE > 0)
+				pmu_acquire_wakelock(PMU_LOGUART_DEVICE);
+#endif
 			}
 		}
 		else if (rc == KEY_BS) {

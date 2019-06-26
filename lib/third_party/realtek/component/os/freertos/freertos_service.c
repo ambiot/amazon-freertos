@@ -420,7 +420,7 @@ static int _freertos_deinit_xqueue( _xqueue* queue )
 {
     int result = 0;
 
-	  if( uxQueueMessagesWaiting( queue ) )
+	  if( uxQueueMessagesWaiting( *queue ) )
 	  {
 	  	  result = -1;
 	  }
@@ -734,7 +734,7 @@ static int _freertos_create_task(struct task_struct *ptask, const char *name,
 				stack_size,
 				task_ctx,
 				priority,
-				&ptask->task);
+				(TaskHandle_t*)&ptask->task);
 #endif
 	}
 	else
@@ -746,7 +746,7 @@ static int _freertos_create_task(struct task_struct *ptask, const char *name,
 				stack_size,
 				task_ctx,
 				priority,
-				&ptask->task);
+				(TaskHandle_t*)&ptask->task);
 
 	}
 	if(ret != pdPASS){
@@ -793,7 +793,7 @@ _timerHandle _freertos_timerCreate( const signed char *pcTimerName,
 	if(xTimerPeriodInTicks == TIMER_MAX_DELAY) {
 		xTimerPeriodInTicks = portMAX_DELAY;
 	}
-	return xTimerCreate((const char *)pcTimerName, xTimerPeriodInTicks, uxAutoReload, pvTimerID, pxCallbackFunction);	
+	return xTimerCreate((const char *)pcTimerName, xTimerPeriodInTicks, uxAutoReload, pvTimerID, (TimerCallbackFunction_t)pxCallbackFunction);	
 }
 
 u32 _freertos_timerDelete( _timerHandle xTimer, 

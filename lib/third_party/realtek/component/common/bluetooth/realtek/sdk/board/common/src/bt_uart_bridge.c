@@ -179,7 +179,7 @@ static void _bt_uart_bridge_irq(u32 id,u32 event)
 				strncpy(log_buf,close_cmd_buf,strlen(close_cmd_buf));
 				check_byte_num=0;
 				set_hci_uart_out(false);
-				rtw_up_sema_from_isr(&log_rx_interrupt_sema);
+				rtw_up_sema_from_isr((_sema*)&log_rx_interrupt_sema);
 			}
 
 		}

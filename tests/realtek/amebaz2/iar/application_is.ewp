@@ -229,7 +229,6 @@
                     <state>__ARM_ARCH_8M_MAIN__=1</state>
                     <state>CONFIG_BUILD_RAM=1</state>
                     <state>_NO_DEFINITIONS_IN_HEADER_FILES</state>
-                    <state>V8M_STKOVF</state>
                     <state>__IEEE_LITTLE_ENDIAN</state>
                     <state>__ORDER_LITTLE_ENDIAN__</state>
                     <state>__BYTE_ORDER__=__ORDER_LITTLE_ENDIAN__</state>
@@ -373,8 +372,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\app\stdio_port</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\misc\utilities\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos</state>
-                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\portable\IAR\ARM_RTL8710C</state>
+                    <state>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\portable\IAR\ARM_RTL8710C</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\at_cmd</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\platform</state>
@@ -704,8 +702,7 @@
                     <state>$PROJ_DIR$\inc</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\cmsis</state>
                     <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\os_dep\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\portable\IAR\ARM_RTL8710C</state>
+                    <state>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\portable\IAR\ARM_RTL8710C</state>
                 </option>
                 <option>
                     <name>AExtraOptionsCheckV2</name>
@@ -1329,8 +1326,7 @@
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\app\stdio_port</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\misc\utilities\include</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos</state>
-                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\include</state>
-                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\portable\IAR\ARM_RTL8710C</state>
+                        <state>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\portable\IAR\ARM_RTL8710C</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\at_cmd</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\platform</state>
@@ -1681,8 +1677,7 @@
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\app\stdio_port</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\misc\utilities\include</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos</state>
-                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\include</state>
-                        <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\portable\IAR\ARM_RTL8710C</state>
+                        <state>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\portable\IAR\ARM_RTL8710C</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\at_cmd</state>
                         <state>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\common\api\platform</state>
@@ -2995,35 +2990,38 @@
             <group>
                 <name>portable</name>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\portable\MemMang\heap_5.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\portable\MemMang\heap_5.c</name>
+                    <excluded>
+                        <configuration>Debug</configuration>
+                    </excluded>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\portable\IAR\ARM_RTL8710C\port.c</name>
+                    <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\portable\IAR\ARM_RTL8710C\heap_rtk.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\portable\IAR\ARM_RTL8710C\portasm.s</name>
+                    <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\portable\IAR\ARM_RTL8710C\port.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\portable\IAR\ARM_RTL8710C\portasm.s</name>
                 </file>
             </group>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\croutine.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\event_groups.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\event_groups.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\list.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\list.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\queue.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\queue.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\stream_buffer.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\stream_buffer.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\tasks.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\tasks.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\realtek\component\os\freertos\freertos_v10.0.1\Source\timers.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\lib\FreeRTOS\timers.c</name>
             </file>
         </group>
         <file>
