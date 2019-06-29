@@ -8,7 +8,7 @@
 #include <lwip/inet_chksum.h>
 #include <platform/platform_stdlib.h>
 
-#define BSD_STACK_SIZE		    256
+#define BSD_STACK_SIZE		    512
 #define DEFAULT_PORT            5001
 #define DEFAULT_TIME            10
 #define SERVER_BUF_SIZE         1500
