@@ -6,8 +6,8 @@
 ::pause
 cd /D %2
 
-set tooldir=%2\..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\misc\iar_utility
-set libdir=%2\..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\misc\bsp
+set tooldir=%2\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\iar_utility
+set libdir=%2\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp
 set cfgdir=%3
 set iartooldir=%4
 

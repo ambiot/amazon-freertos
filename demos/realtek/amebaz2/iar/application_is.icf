@@ -325,5 +325,5 @@ place in XIP_FLASH_C_region
     readonly,
 };
 
-include "..\..\..\..\lib\third_party\realtek\component\soc\realtek\8710c\misc\bsp\ROM\romsym_iar_is.so";
+include "..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\ROM\romsym_iar_is.so";
 define exported symbol Reset_Handler = 0x1001;
