@@ -1,0 +1,39 @@
+[
+  {
+    "id": "amebaz2",
+    "sku": "8710C",
+    "features": [
+      {
+        "name": "WIFI",
+        "value": "Yes"
+      },
+      {
+        "name": "OTA",
+        "value": "No"
+      },
+      {
+        "name": "TCP/IP",
+        "value": "On-chip"
+      },
+      {
+        "name": "TLS",
+        "value": "On-chip"
+      }
+    ],
+    "devices": [
+      {
+        "id": "device_amebaz",
+        "connectivity": {
+          "protocol": "uart",
+          "serialPort": "COM32"
+        },
+        "identifiers": [
+          {
+            "name": "serialNo",
+            "value": "serial_uart"
+          }
+        ]
+      }
+    ]
+  }
+]

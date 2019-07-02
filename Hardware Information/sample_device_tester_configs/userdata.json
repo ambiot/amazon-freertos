@@ -1,0 +1,36 @@
+{
+  "sourcePath": "E:/amazon-freertos",
+  "buildTool": {
+    "name": "IAR",
+    "version": "8.3",
+    "command": [
+      "E:/devicetester_afreertos_win/configs/build.bat {{testData.sourcePath}}"
+    ]
+  },
+  "flashTool":{
+    "name": "IAR_download",
+    "version": "7.5",
+    "command": [
+      "E:/devicetester_afreertos_win/configs/flash.bat {{testData.sourcePath}}"
+    ]
+  },
+  "clientWifiConfig": {
+    "wifiSSID": "SSID1",
+    "wifiPassword": "Pw1",
+    "wifiSecurityType": "eWiFiSecurityWPA2"
+  },
+  "testWifiConfig": {
+    "wifiSSID": "SSID2",
+    "wifiPassword": "Pw2",
+    "wifiSecurityType": "eWiFiSecurityWPA2"
+  },
+   "otaConfiguration":{  
+      "otaFirmwareFilePath":"<path-to-the-device-binary>",
+      "deviceFirmwareFileName":"ota_all.bin",
+      "awsSignerPlatform":"AmazonFreeRTOS-Default",
+      "awsSignerCertificateArn":"arn:aws:acm:us-west-2:257857661933:certificate/2dbff723-fd82-44ad-a853-cca42de2d2f8",
+      "awsUntrustedSignerCertificateArn":"arn:aws:acm:us-east-1:1000000001:certificate/0c81e2c6-f85e-46b1-9ed1-2c404309b210",
+      "awsSignerCertificateFileName":"ecdsa-sha256-signer.crt.pem",
+      "compileCodesignerCertificate":true
+   }
+}
