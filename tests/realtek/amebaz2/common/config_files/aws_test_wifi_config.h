@@ -33,7 +33,7 @@
 /**
  * @brief The task stack size used in all Wi-Fi multi-task tests.
  */
-#define testwifiTASK_STACK_SIZE             ( configMINIMAL_STACK_SIZE * 4 )
+#define testwifiTASK_STACK_SIZE             ( configMINIMAL_STACK_SIZE * 6 )
 
 /**
  * @brief The task priority used in all Wi-Fi mulit-task tests. 
@@ -50,6 +50,5 @@
  */
 #define testwifiTASK_SYNC_TIMEOUT           pdMS_TO_TICKS( 60000 )
 
-#define testwifiCONNECTION_DELAY    pdMS_TO_TICKS( 10000 )
 
 #endif /* _AWS_TEST_WIFI_CONFIG_H_ */

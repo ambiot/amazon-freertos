@@ -544,7 +544,7 @@ int wifi_connect(
 
 			if(password_len == 10) {
 
-				u32 p[5] = {0};
+				unsigned int p[5] = {0};
 				u8 i = 0; 
 				sscanf((const char*)password, "%02x%02x%02x%02x%02x", &p[0], &p[1], &p[2], &p[3], &p[4]);
 				for(i=0; i< 5; i++)
@@ -553,7 +553,7 @@ int wifi_connect(
 				password_len = 5;
 				wep_hex = 1;
 			} else if (password_len == 26) {
-				u32 p[13] = {0};
+				unsigned int p[13] = {0};
 				u8 i = 0;
 				sscanf((const char*)password, "%02x%02x%02x%02x%02x%02x%02x"\
 					 "%02x%02x%02x%02x%02x%02x", &p[0], &p[1], &p[2], &p[3], &p[4],\
@@ -1009,7 +1009,7 @@ int wifi_get_ap_info(rtw_bss_info_t * ap_info, rtw_security_t* security)
 
 	snprintf(buf, 24, "get_security");
 	ret = wext_private_command_with_retval(ifname, buf, buf, 24);
-	sscanf(buf, "%d", security);
+	sscanf(buf, "%d", (int *)security);
 
 	return ret;
 }
@@ -1133,26 +1133,13 @@ int wifi_on(rtw_mode_t mode)
 	int idx;
 	int devnum = 1;
 	static int event_init = 0;
-	static int wifi_on_in_progress = 0;
-	while(wifi_on_in_progress != 0){
-		if(timeout == 0) {
-			RTW_API_INFO("\n\rERROR: wifi_on() is in progress in another thread!");
-			return -1;
-		}
 
-		rtw_msleep_os(1000);
-		timeout --;
-	}
-
+	device_mutex_lock(RT_DEV_LOCK_WLAN);
 	if(rltk_wlan_running(WLAN0_IDX)) {
-		if(mode == wifi_mode){
-			RTW_API_INFO("\n\rWIFI is already running");
-			return 0;
-		}
-		else
-			wifi_off();
+		RTW_API_INFO("\n\rWIFI is already running");
+		device_mutex_unlock(RT_DEV_LOCK_WLAN);
+		return 1;
 	}
-	wifi_on_in_progress = 1;
 
 	if(event_init == 0){
 		init_event_callback_list();
@@ -1171,25 +1158,23 @@ int wifi_on(rtw_mode_t mode)
 		ret = rltk_wlan_init(idx, mode);
 		if(ret <0){
 			wifi_mode = RTW_MODE_NONE;
-			wifi_on_in_progress = 0;
+			device_mutex_unlock(RT_DEV_LOCK_WLAN);
 			return ret;
 		}
 	}
 	for(idx=0;idx<devnum;idx++){
-		device_mutex_lock(RT_DEV_LOCK_WLAN);
 		ret = rltk_wlan_start(idx);
 		if(ret == 0) _wifi_is_on = 1;
-		device_mutex_unlock(RT_DEV_LOCK_WLAN);
 		if(ret <0){
 			RTW_API_INFO("\n\rERROR: Start WIFI Failed!");
 			rltk_wlan_deinit();
 			wifi_mode = RTW_MODE_NONE;
-			wifi_on_in_progress = 0;
+			device_mutex_unlock(RT_DEV_LOCK_WLAN);
 			return ret;
 		}
 	}
+	device_mutex_unlock(RT_DEV_LOCK_WLAN);
 
-	timeout = 20;
 	while(1) {
 		if(rltk_wlan_running(devnum-1)) {
 			RTW_API_INFO("\n\rWIFI initialized\n");
@@ -1224,7 +1209,6 @@ int wifi_on(rtw_mode_t mode)
 	inic_start();
 #endif
 
-	wifi_on_in_progress = 0;
 	return ret;
 }
 

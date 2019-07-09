@@ -589,6 +589,7 @@ extern unsigned int g_ap_sta_num;
 		#endif
 		#undef CONFIG_EAP
 		#undef CONFIG_ADAPTOR_INFO_CACHING_FLASH
+		#undef CHECK_FLASH_VALID_MASK
 		#undef NOT_SUPPORT_40M
 		#define NOT_SUPPORT_40M
 		#define CONFIG_ADAPTOR_INFO_CACHING_FLASH 0
@@ -598,7 +599,7 @@ extern unsigned int g_ap_sta_num;
 		//#define CONFIG_EFUSE_SEPARATE
 		#define CONFIG_TRAFFIC_PROTECT	
 		#ifdef CONFIG_POWER_SAVING
-			//#define CONFIG_WOWLAN
+			#define CONFIG_WOWLAN
 			//#define CONFIG_LPS_LCLK
 			#ifdef CONFIG_LPS_LCLK
 				//#define CONFIG_DETECT_CPWM_BY_POLLING
