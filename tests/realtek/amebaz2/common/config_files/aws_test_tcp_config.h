@@ -75,12 +75,12 @@
 /**
  * @brief The stack size of the tasks created in all TCP echo multi-task tests.
  */
-#define         tcptestTCP_ECHO_TASKS_STACK_SIZE                   ( configMINIMAL_STACK_SIZE * 4 )
+#define         tcptestTCP_ECHO_TASKS_STACK_SIZE                   ( configMINIMAL_STACK_SIZE * 8 )
 
 /**
  * @brief The priority of the tasks created in all TCP echo multi-task tests.
  */
-#define         tcptestTCP_ECHO_TASKS_PRIORITY                     ( tskIDLE_PRIORITY + 5 )
+#define         tcptestTCP_ECHO_TASKS_PRIORITY                     ( tskIDLE_PRIORITY + 1 )
 #define         tcptestECHO_TEST_RXTX_TIMEOUT                      50000
 
 #endif /*AWS_INTEGRATION_TEST_TCP_CONFIG_H */
