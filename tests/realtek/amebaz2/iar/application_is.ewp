@@ -1497,19 +1497,10 @@
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\driver\flash_api_ext.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\file_system\fatfs\disk_if\src\flash_fatfs.c</name>
-            <excluded>
-                <configuration>Debug</configuration>
-            </excluded>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram_ns\hal_flash.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram_ns\hal_spic.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\power_mode_api.c</name>
         </file>
         <configuration>
             <name>Debug</name>
@@ -2285,141 +2276,6 @@
         </group>
     </group>
     <group>
-        <name>bluetooth</name>
-        <group>
-            <name>board</name>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\src\hci\bt_fwconfig.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\common\src\cycle_queue.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\src\data_uart\data_uart.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\file_system\ftl\ftl.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\src\hci\hci_board.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\src\hci\hci_uart.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\common\os\freertos_v10.0.1_IAR\osif_freertos.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\src\platform_utils.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\src\rtk_coex.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\src\trace_uart.c</name>
-            </file>
-        </group>
-        <group>
-            <name>common</name>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\client\ancs_client.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\server\bas.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\client\bas_client.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\common\src\bt_uart_bridge.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\server\dis.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\client\gaps_client.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\common\src\hci_adapter.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\common\src\hci_process.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\server\hids.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\server\hids_kb.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\server\hids_rmc.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\client\simple_ble_client.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\src\ble\profile\server\simple_ble_service.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\common\src\trace_task.c</name>
-            </file>
-        </group>
-        <group>
-            <name>example</name>
-            <group>
-                <name>ble_peripheral</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\ble_peripheral\app_task.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\ble_peripheral\ble_app_main.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\ble_peripheral\peripheral_app.c</name>
-                </file>
-            </group>
-            <group>
-                <name>bt_beacon</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\bt_beacon\bt_beacon_app.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\bt_beacon\bt_beacon_app_main.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\bt_beacon\bt_beacon_app_task.c</name>
-                </file>
-            </group>
-            <group>
-                <name>bt_config</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\bt_config\bt_config_app_main.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\bt_config\bt_config_app_task.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\bt_config\bt_config_peripheral_app.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\bt_config\bt_config_service.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\example\bt_config\bt_config_wifi.c</name>
-                </file>
-            </group>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\bt_example_entry.c</name>
-            </file>
-        </group>
-    </group>
-    <group>
         <name>cmsis</name>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\cmsis\rtl8710c\source\ram_s\app_start.c</name>
@@ -2434,28 +2290,7 @@
     <group>
         <name>console</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_bt.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_isp.c</name>
-            <excluded>
-                <configuration>Debug</configuration>
-            </excluded>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_lwip.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_media.c</name>
-            <excluded>
-                <configuration>Debug</configuration>
-            </excluded>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_mp.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_mp_ext2.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_sys.c</name>
@@ -2473,20 +2308,11 @@
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\log_service.c</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\driver\low_level_io.c</name>
-            <excluded>
-                <configuration>Debug</configuration>
-            </excluded>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\driver\rtl_console.c</name>
         </file>
     </group>
     <group>
         <name>lib</name>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\bluetooth\realtek\sdk\board\amebaz2\lib\btgap.a</name>
-        </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\lib\lib\hal_pmc.a</name>
         </file>
@@ -2564,45 +2390,6 @@
         </group>
         <group>
             <name>app</name>
-            <group>
-                <name>mqtt</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTClient\MQTTClient.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTConnectClient.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTConnectServer.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTDeserializePublish.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTFormat.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTClient\MQTTFreertos.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTPacket.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTSerializePublish.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTSubscribeClient.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTSubscribeServer.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTUnsubscribeClient.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\mqtt\MQTTPacket\MQTTUnsubscribeServer.c</name>
-                </file>
-            </group>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\platform\ota_8710c.c</name>
             </file>
@@ -2610,49 +2397,7 @@
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\network\src\ping_test.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\utilities\ssl_client.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\utilities\ssl_client_ext.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\utilities\tcptest.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\network\src\wlan_network.c</name>
-            </file>
-        </group>
-        <group>
-            <name>coap</name>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\coap\sn_coap_ameba_port.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\coap\sn_coap_builder.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\coap\sn_coap_header_check.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\coap\sn_coap_parser.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\coap\sn_coap_protocol.c</name>
-            </file>
-        </group>
-        <group>
-            <name>googlenest</name>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\application\google\google_tls.c</name>
-            </file>
-        </group>
-        <group>
-            <name>http</name>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\httpc\httpc_tls.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\httpd\httpd_tls.c</name>
             </file>
         </group>
         <group>
@@ -2820,168 +2565,6 @@
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\sntp\sntp.c</name>
             </file>
         </group>
-        <group>
-            <name>mdns</name>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\mDNS\mDNSPlatform.c</name>
-            </file>
-        </group>
-        <group>
-            <name>ssl</name>
-            <group>
-                <name>mbedtls</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\aesni.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\blowfish.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\camellia.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\ccm.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\certs.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\cipher.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\cipher_wrap.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\cmac.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\debug.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\error.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\gcm.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\havege.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\md2.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\md4.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\memory_buffer_alloc.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\net_sockets.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\padlock.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\pkcs11.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\pkcs12.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\pkcs5.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\pkparse.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\platform.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\ripemd160.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\ssl_cache.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\ssl_ciphersuites.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\ssl_cli.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\ssl_cookie.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\ssl_srv.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\ssl_ticket.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\ssl_tls.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\threading.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\timing.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\version.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\version_features.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\x509.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\x509_create.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\x509_crl.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\x509_crt.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\x509_csr.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\x509write_crt.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\x509write_csr.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\mbedtls-2.4.0\library\xtea.c</name>
-                </file>
-            </group>
-            <group>
-                <name>ssl_ram_map</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\ssl_ram_map\rom\rom_ssl_ram_map.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\ssl\ssl_func_stubs\ssl_func_stubs.c</name>
-                    <excluded>
-                        <configuration>Debug</configuration>
-                    </excluded>
-                </file>
-            </group>
-        </group>
-        <group>
-            <name>websocket</name>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\websocket\wsclient_tls.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\websocket\wsserver_tls.c</name>
-            </file>
-        </group>
     </group>
     <group>
         <name>os</name>
@@ -3045,55 +2628,10 @@
         <group>
             <name>api</name>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\crypto_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\dma_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\efuse_api.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\gpio_api.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\gpio_irq_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\i2c_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\pinmap.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\pinmap_common.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\port_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\pwmout_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\serial_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\spdio_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\spi_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\sys_api.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\timer_api.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\us_ticker.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\us_ticker_api.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\mbed\targets\hal\rtl8710c\wait_api.c</name>
@@ -3135,27 +2673,6 @@
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram\hal_uart.c</name>
             </file>
         </group>
-        <group>
-            <name>wlan</name>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\drivers\wlan\realtek\src\core\option\rtw_opt_power_by_rate.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\drivers\wlan\realtek\src\core\option\rtw_opt_power_limit.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\drivers\wlan\realtek\src\core\option\rtw_opt_skbuf.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-        </group>
     </group>
     <group>
         <name>user</name>
@@ -3171,31 +2688,7 @@
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\amazon_afqp_tests\example_amazon_afqp_tests.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\amazon_awsiot\example_amazon_awsiot.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\amazon_freertos\example_amazon_freertos.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\bcast\example_bcast.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\cJSON\example_cJSON.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\coap\example_coap.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\dct\example_dct.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\eap\example_eap.c</name>
                 <excluded>
                     <configuration>Debug</configuration>
                 </excluded>
@@ -3203,144 +2696,6 @@
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\example_entry.c</name>
             </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\get_beacon_frame\example_get_beacon_frame.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\googlenest\example_google.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\high_load_memory_use\example_high_load_memory_use.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\http_client\example_http_client.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\http_download\example_http_download.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\httpc\example_httpc.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\httpd\example_httpd.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\mcast\example_mcast.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\mqtt\example_mqtt.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\nonblock_connect\example_nonblock_connect.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\ota_http\example_ota_http.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\rarp\example_rarp.c</name>
-                <excluded>
-                    <configuration>Debug</configuration>
-                </excluded>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\sntp_showtime\example_sntp_showtime.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\socket_select\example_socket_select.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\socket_tcp_trx\example_socket_tcp_trx_1.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\socket_tcp_trx\example_socket_tcp_trx_2.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\ssl_download\example_ssl_download.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\ssl_server\example_ssl_server.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\tcp_keepalive\example_tcp_keepalive.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\uart_atcmd\example_uart_atcmd.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\wifi_mac_monitor\example_wifi_mac_monitor.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\wifi_roaming\example_wifi_roaming.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\wlan_fast_connect\example_wlan_fast_connect.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\wlan_scenario\example_wlan_scenario.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\websocket_client\example_wsclient.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\example\xml\example_xml.c</name>
-            </file>
         </group>
-        <group>
-            <name>FatFs</name>
-            <excluded>
-                <configuration>Debug</configuration>
-            </excluded>
-            <group>
-                <name>disk_if</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\file_system\fatfs\disk_if\src\sdcard.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\drivers\sdio\realtek\sdio_host\src\sdio_combine.c</name>
-                    <excluded>
-                        <configuration>Debug</configuration>
-                    </excluded>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\file_system\fatfs\disk_if\src\usbdisk.c</name>
-                </file>
-            </group>
-            <group>
-                <name>fatfs_ext</name>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\file_system\fatfs\fatfs_ext\src\ff_driver.c</name>
-                </file>
-            </group>
-            <group>
-                <name>r0.10c</name>
-                <group>
-                    <name>option</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\file_system\fatfs\r0.10c\src\option\ccsbcs.c</name>
-                    </file>
-                </group>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\file_system\fatfs\r0.10c\src\diskio.c</name>
-                </file>
-                <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\file_system\fatfs\r0.10c\src\ff.c</name>
-                </file>
-            </group>
-        </group>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\utilities\cJSON.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\utilities\http_client.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\utilities\xml.c</name>
-        </file>
     </group>
 </project>
