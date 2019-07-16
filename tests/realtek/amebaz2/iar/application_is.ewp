@@ -2290,58 +2290,19 @@
     <group>
         <name>console</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_lwip.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_sys.c</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\atcmd_wifi.c</name>
         </file>
         <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\app\shell\cmd_shell.c</name>
         </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\app\shell\ram_s\consol_cmds.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\at_cmd\log_service.c</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\driver\rtl_console.c</name>
-        </file>
     </group>
     <group>
         <name>lib</name>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\lib\lib\hal_pmc.a</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\lib\common\IAR\lib_dct.a</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\lib\common\IAR\lib_eap.a</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\lib\common\IAR\lib_googlenest.a</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\lib\common\IAR\lib_http.a</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\lib\common\IAR\lib_p2p.a</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\lib\common\IAR\lib_soc_is.a</name>
         </file>
         <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\lib\common\IAR\lib_websocket.a</name>
-        </file>
-        <file>
             <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\lib\common\IAR\lib_wlan.a</name>
-        </file>
-        <file>
-            <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\bsp\lib\common\IAR\lib_wps.a</name>
         </file>
     </group>
     <group>
@@ -2353,19 +2314,7 @@
                 <group>
                     <name>rtw_wpa_supplicant</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\wifi\rtw_wpa_supplicant\src\crypto\tls_polarssl.c</name>
-                        <excluded>
-                            <configuration>Debug</configuration>
-                        </excluded>
-                    </file>
-                    <file>
                         <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\wifi\rtw_wpa_supplicant\wpa_supplicant\wifi_eap_config.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\wifi\rtw_wpa_supplicant\wpa_supplicant\wifi_p2p_config.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\wifi\rtw_wpa_supplicant\wpa_supplicant\wifi_wps_config.c</name>
                     </file>
                 </group>
                 <file>
@@ -2378,9 +2327,6 @@
                     <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\wifi\wifi_promisc.c</name>
                 </file>
                 <file>
-                    <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\wifi\wifi_simple_config.c</name>
-                </file>
-                <file>
                     <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\wifi\wifi_util.c</name>
                 </file>
             </group>
@@ -2390,12 +2336,6 @@
         </group>
         <group>
             <name>app</name>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\misc\platform\ota_8710c.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\network\src\ping_test.c</name>
-            </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\api\network\src\wlan_network.c</name>
             </file>
@@ -2561,9 +2501,6 @@
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\dhcp\dhcps.c</name>
             </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\common\network\sntp\sntp.c</name>
-            </file>
         </group>
     </group>
     <group>
@@ -2646,28 +2583,7 @@
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram_s\hal_efuse.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram\hal_gdma.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram\hal_gpio.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram_ns\hal_i2c.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram\hal_misc.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram_s\hal_pinmux_nsc.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram_ns\hal_pwm.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram_ns\hal_sdio_dev.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram_ns\hal_ssi.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\lib\third_party\mcu_vendor\realtek\component\soc\realtek\8710c\fwlib\source\ram\hal_uart.c</name>
