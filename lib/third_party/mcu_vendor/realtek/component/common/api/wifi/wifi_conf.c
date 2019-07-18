@@ -917,6 +917,11 @@ int wifi_enable_powersave(void)
 	return wext_enable_powersave(WLAN0_NAME, 1, 1);
 }
 
+int wifi_resume_powersave(void)
+{
+	return wext_resume_powersave(WLAN0_NAME);
+}
+
 int wifi_disable_powersave(void)
 {
 	return wext_disable_powersave(WLAN0_NAME);
@@ -1284,6 +1289,60 @@ int wifi_off_fastly(void)
 	return 0;
 }
 
+
+int wifi_set_mode(rtw_mode_t mode)
+{
+	int ret = 0;
+	int timeout = 20;
+
+	if((rltk_wlan_running(WLAN0_IDX) == 0) &&
+		(rltk_wlan_running(WLAN1_IDX) == 0)) {
+		RTW_API_INFO("\n\r[%s] WIFI is not running",__FUNCTION__);
+		return -1;
+	}
+
+	if((wifi_mode == RTW_MODE_STA) && (mode == RTW_MODE_AP)){
+		RTW_API_INFO("\n\r[%s] WIFI Mode Change: STA-->AP",__FUNCTION__);
+		
+		//wifi_disconnect();
+		//must add this delay, because this API may have higher priority, wifi_disconnect will rely RTW_CMD task, may not be excuted immediately.	
+		vTaskDelay(50);	
+
+#if CONFIG_LWIP_LAYER	
+		netif_set_link_up(&xnetif[0]);	
+#endif	
+
+		wifi_mode = mode;
+	}else if((wifi_mode == RTW_MODE_AP) && (mode ==RTW_MODE_STA)){
+		RTW_API_INFO("\n\r[%s] WIFI Mode Change: AP-->STA",__FUNCTION__);
+	
+		ret = wext_set_mode(WLAN0_NAME, IW_MODE_INFRA);
+		if(ret < 0) return -1;
+
+		vTaskDelay(50);	
+		
+#if CONFIG_LWIP_LAYER			
+		netif_set_link_down(&xnetif[0]);	
+#endif	
+
+		wifi_mode = mode;
+
+	}else if ((wifi_mode == RTW_MODE_AP) && (mode == RTW_MODE_AP)){
+		RTW_API_INFO("\n\rWIFI Mode Change: AP-->AP");
+		ret = wext_set_mode(WLAN0_NAME, IW_MODE_INFRA);
+		if(ret < 0) return -1;
+		
+		vTaskDelay(50);	
+
+	}else if ((wifi_mode == RTW_MODE_STA) && (mode == RTW_MODE_STA)){
+		RTW_API_INFO("\n\rWIFI Mode No Need To Change: STA -->STA");
+	}else{
+		RTW_API_INFO("\n\rWIFI Mode Change: not support");
+		return -1;
+	}
+
+	return 0;
+}
 
 int wifi_set_power_mode(unsigned char ips_mode, unsigned char lps_mode)
 {

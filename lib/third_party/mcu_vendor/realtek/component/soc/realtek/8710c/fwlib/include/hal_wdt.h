@@ -29,6 +29,7 @@
 #ifndef _HAL_WDT_H_
 #define _HAL_WDT_H_
 #include "cmsis.h"
+#include "hal_sys_ctrl.h"
 
 #ifdef  __cplusplus
 extern "C"
@@ -74,6 +75,7 @@ void hal_misc_wdt_refresh (void);
 __STATIC_INLINE
 void hal_misc_rst_by_wdt (void)
 {
+    rtl8710c_reset_reason_set(HAL_RESET_REASON_SOFTWARE);
     hal_misc_stubs.hal_misc_rst_by_wdt ();
 }
 

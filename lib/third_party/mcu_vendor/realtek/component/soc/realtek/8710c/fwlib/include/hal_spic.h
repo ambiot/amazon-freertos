@@ -70,7 +70,7 @@ extern "C"
 #define FLASH_D3_PIN_SEL1 PA_12
 #define FLASH_D3_PIN_SEL2 PA_18
 
-
+#define SPIC_RESTORE_VALID      0x871078EF
 /**
   \brief  The data struct of recovery data
 */
@@ -81,6 +81,7 @@ typedef struct hal_spic_restore_setting_s {
     u8   flash_type;                                //!< Flash type
     u8   spic_bit_mode;                             //!< Current IO mode used by the adaptor
     u8   quad_pin_sel;                              //!< Record if the quad IO pins are used
+    u32  recored;                                   //!< a pattern to make data in this struct is valid or not
 } hal_spic_restore_setting_t, *phal_spic_restore_setting_t;
 
 /**

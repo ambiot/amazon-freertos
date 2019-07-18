@@ -48,10 +48,13 @@ __weak int main (void)
 }
 #endif
 
+__weak void os_heap_init(void) { /* default os_heap_init, for FreeRTOS heap5 */ }
+
 void app_start (void)
 {    
     dbg_printf ("Build @ %s, %s\r\n", __TIME__, __DATE__);
     shell_cmd_init ();
+    os_heap_init();
     main();
 }
 

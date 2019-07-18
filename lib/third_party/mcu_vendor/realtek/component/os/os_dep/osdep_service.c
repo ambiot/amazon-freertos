@@ -3,7 +3,6 @@
  * Copyright(c) 2007 - 2012 Realtek Corporation. All rights reserved.
  *                                        
  ******************************************************************************/
-
 #include <osdep_service.h>
 #if defined(CONFIG_USE_TCM_HEAP) && CONFIG_USE_TCM_HEAP
 #include "tcm_heap.h"
@@ -493,9 +492,9 @@ void rtw_free_sema(_sema *sema)
 }
 
 
-#if defined(__GNUC__)
+//#if defined(__GNUC__)
 #include <cmsis.h>
-#endif
+//#endif
 
 int rtw_in_interrupt(void)
 {
@@ -1393,4 +1392,13 @@ u8 rtw_get_scheduler_state()
 		OSDEP_DBG("Not implement osdep service: rtw_get_scheduler_state");
 		return 3;
 	}
+}
+
+void rtw_create_secure_context(u32 secure_stack_size)
+{
+	if(osdep_service.rtw_create_secure_context)
+		osdep_service.rtw_create_secure_context(secure_stack_size);
+	else{
+		OSDEP_DBG("Not implement osdep service: rtw_create_secure_context");
+	}	
 }

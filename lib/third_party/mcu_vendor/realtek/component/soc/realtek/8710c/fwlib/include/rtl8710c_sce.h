@@ -634,7 +634,7 @@ hal_status_t hal_sce_flash_remap_rtl8710c (uint32_t phy_addr, uint32_t vir_addr,
                                              sce_block_size_t block_size, uint8_t key_id);
 hal_status_t hal_sce_set_mem_crypto_rtl8710c (uint32_t start_addr,
                                                 uint32_t mem_size, uint8_t key_id);
-hal_status_t hal_sce_remap_enable_rtl8710c (uint8_t sec_id, uint32_t remap_addr);
+hal_status_t hal_sce_remap_enable_rtl8710c (uint8_t sec_id, uint32_t phy_addr);
 void hal_sce_reg_dump_rtl8710c (void);
 hal_status_t hal_sce_cfg_rtl8710c (sce_page_size_t page_size,
                                      sce_block_size_t block_size, sce_mode_select_t rw_mode);
@@ -661,7 +661,7 @@ typedef struct hal_sce_func_stubs_s {
     uint8_t (*hal_sce_key_pair_search) (uint8_t *key, uint8_t *iv);
     hal_status_t (*hal_sce_set_section) (uint8_t sec_id, uint8_t pair_id,
                                         uint32_t start_address, uint32_t end_address, uint8_t secure_en);
-    hal_status_t (*hal_sce_remap_enable) (uint8_t sec_id, uint32_t remap_addr);
+    hal_status_t (*hal_sce_remap_enable) (uint8_t sec_id, uint32_t phy_addr);
     void (*hal_sce_section_disable) (uint8_t sec_id);
     hal_status_t (*hal_sce_flash_remap) (uint32_t phy_addr, uint32_t vir_addr, uint32_t map_size,
                                          sce_page_size_t page_size_sel, uint8_t secure_en,

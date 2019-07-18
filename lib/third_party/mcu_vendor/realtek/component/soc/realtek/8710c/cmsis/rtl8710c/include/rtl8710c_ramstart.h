@@ -47,6 +47,7 @@ typedef union {
         uint8_t psram_inited    : 1;            /*!< [0..0] the PSRAM controller is initialed */
         uint8_t flash_inited    : 1;            /*!< [1..1] the SPIC Flash controller is initialed */
         uint8_t img2_idx        : 1;            /*!< [2..2] the index of the loaded image2: 0: FW1; 1: FW2 */
+        uint8_t resume          : 1;            /*!< [3..3] the indication of system resume running */
     } b;                                        /*!< bit fields for flags */
 } boot_init_flags_t, *pboot_init_flags_t;
 

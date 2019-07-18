@@ -208,3 +208,17 @@ void gpio_deinit(gpio_t *obj)
     hal_gpio_deinit (&obj->adapter);
 }
 
+/**
+ *  @brief To set the IO Power Voltage of the GPIO A13 and A14.
+ *
+ *  @param[in]  h5l3  The GPIO A13 and A14 Voltage Selection.
+ *                     -0: 3.3V.
+ *                     -1: 5V.
+ *
+ *  @returns    void
+ */
+void gpio_h5l3 (u8 h5l3)
+{
+    hal_gpio_h5l3 (h5l3);
+}
+

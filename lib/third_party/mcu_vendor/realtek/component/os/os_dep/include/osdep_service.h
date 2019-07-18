@@ -1046,6 +1046,13 @@ void	rtw_thread_exit(void);
  */
 u8		rtw_get_scheduler_state(void);
 
+/**
+ * @brief  This function creats secure stack for threads.
+ * @param[in] secure_stack_size:  The size of the secure stack for this thread, the unit is byte.
+ * @return  None
+ */
+void rtw_create_secure_context(u32 secure_stack_size);
+
 /*************************** End Threads *******************************/
 #ifdef PLATFORM_LINUX
 #define rtw_warn_on(condition) WARN_ON(condition)
@@ -1400,6 +1407,7 @@ struct osdep_service_ops {
 	void (*rtw_release_wakelock)(void);
 	void (*rtw_wakelock_timeout)(u32 timeoutMs);
 	u8 (*rtw_get_scheduler_state)(void);
+	void (*rtw_create_secure_context)(u32 secure_stack_size);
 };
 
 #ifdef __cplusplus

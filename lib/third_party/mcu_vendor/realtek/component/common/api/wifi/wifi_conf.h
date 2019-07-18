@@ -266,6 +266,13 @@ int wifi_get_mac_address(char * mac);
 int wifi_enable_powersave(void);
 
 /**
+ * @brief Resume Wi-Fi powersave mode.
+ * @param  None
+ * @return RTW_SUCCESS or RTW_ERROR.
+ */
+int wifi_resume_powersave(void);
+
+/**
  * @brief Disable Wi-Fi powersave mode.
  * @param  None
  * @return RTW_SUCCESS or RTW_ERROR.
@@ -440,6 +447,17 @@ int wifi_on(rtw_mode_t mode);
  * @return  RTW_ERROR: otherwise.
  */
 int wifi_off(void);
+
+/**
+ * @brief  Switch Wifi Mode
+ * 
+ * - Switch Wifi Mode to @param[in]
+ *
+ * @param[in]  mode: Decide to switch WiFi to which mode. The optional modes are RTW_MODE_STA or RTW_MODE_AP.
+ * @return  RTW_SUCCESS:    if the WiFi switch mode successful.
+ * @return  RTW_ERROR:      if the WiFi swithc mdoe not successful.
+ */
+int wifi_set_mode(rtw_mode_t mode);
 
 /**
  * Turn off the Wi-Fi device

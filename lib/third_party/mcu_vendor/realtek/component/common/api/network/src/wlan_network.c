@@ -20,6 +20,7 @@
 #endif
 #include "lwip_netconf.h"
 #include <platform/platform_stdlib.h>
+#include "osdep_service.h"
 
 #ifndef CONFIG_INIT_NET
 #define CONFIG_INIT_NET             1
@@ -34,6 +35,9 @@ xSemaphoreHandle uart_rx_interrupt_sema = NULL;
 
 void init_thread(void *param)
 {
+#if defined(configENABLE_TRUSTZONE) && (configENABLE_TRUSTZONE == 1)
+	rtw_create_secure_context(configMINIMAL_SECURE_STACK_SIZE);
+#endif
 	/* To avoid gcc warnings */
 	( void ) param;
 #if CONFIG_INIT_NET

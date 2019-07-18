@@ -31,6 +31,7 @@
 #include "hal_pinmux.h"
 #include "hal_gpio.h"
 #include "hal_spic.h"
+#include "hal_sys_ctrl.h"
 
 extern hal_spic_adaptor_t *pglob_spic_adaptor;
 extern void hal_flash_return_spi (phal_spic_adaptor_t phal_spic_adaptor);
@@ -147,6 +148,7 @@ void hal_misc_cpu_rst (void)
         hal_flash_return_spi (pglob_spic_adaptor);
     }
 #endif
+    rtl8710c_reset_reason_set(HAL_RESET_REASON_SOFTWARE);
     hal_misc_stubs.hal_misc_cpu_rst ();
 }
 

@@ -24,7 +24,7 @@
 
 
 
-/** @addtogroup Realtek Semiconductor Corp.
+/** @addtogroup Realtek Realtek Semiconductor Corp.
   * @{
   */
 

@@ -89,35 +89,6 @@ void mpu_init (void)
                    ((MPU_REGION3_ATTR_IDX << MPU_RLAR_AttrIndx_Pos) & MPU_RLAR_AttrIndx_Msk) | MPU_REGION_ENABLE;
 #endif
 
-    /* Configure region 4 */
-    MPU->RNR = 4;
-#if MPU_REGION4_EN
-    MPU->RBAR = (MPU_REGION4_BASE & MPU_RBAR_BASE_Msk) | MPU_REGION4_SH | MPU_REGION4_AP | MPU_REGION4_XN;
-    MPU->RLAR = (MPU_REGION4_LIMIT & MPU_RLAR_LIMIT_Msk) | \
-                ((MPU_REGION4_ATTR_IDX << MPU_RLAR_AttrIndx_Pos) & MPU_RLAR_AttrIndx_Msk) | MPU_REGION_ENABLE;
-#endif
-
-    /* Configure region 5 */
-#if MPU_REGION5_EN
-    MPU->RBAR_A1 = (MPU_REGION5_BASE & MPU_RBAR_BASE_Msk) | MPU_REGION5_SH | MPU_REGION5_AP | MPU_REGION5_XN;
-    MPU->RLAR_A1 = (MPU_REGION5_LIMIT & MPU_RLAR_LIMIT_Msk) | \
-                   ((MPU_REGION5_ATTR_IDX << MPU_RLAR_AttrIndx_Pos) & MPU_RLAR_AttrIndx_Msk) | MPU_REGION_ENABLE;
-#endif
-
-    /* Configure region 6 */
-#if MPU_REGION5_EN
-    MPU->RBAR_A2 = (MPU_REGION6_BASE & MPU_RBAR_BASE_Msk) | MPU_REGION6_SH | MPU_REGION6_AP | MPU_REGION6_XN;
-    MPU->RLAR_A2 = (MPU_REGION6_LIMIT & MPU_RLAR_LIMIT_Msk) | \
-                   ((MPU_REGION6_ATTR_IDX << MPU_RLAR_AttrIndx_Pos) & MPU_RLAR_AttrIndx_Msk) | MPU_REGION_ENABLE;
-#endif
-
-    /* Configure region 7 */
-#if MPU_REGION5_EN
-    MPU->RBAR_A3 = (MPU_REGION7_BASE & MPU_RBAR_BASE_Msk) | MPU_REGION7_SH | MPU_REGION7_AP | MPU_REGION7_XN;
-    MPU->RLAR_A3 = (MPU_REGION7_LIMIT & MPU_RLAR_LIMIT_Msk) | \
-                   ((MPU_REGION7_ATTR_IDX << MPU_RLAR_AttrIndx_Pos) & MPU_RLAR_AttrIndx_Msk) | MPU_REGION_ENABLE;
-#endif
-
     MPU->CTRL |= (MPU_INIT_CTRL_PRIVDEFENA << MPU_CTRL_PRIVDEFENA_Pos) | (MPU_INIT_CTRL_HFNMIENA << MPU_CTRL_HFNMIENA_Pos);
 
     MPU->CTRL |= (MPU_INIT_CTRL_ENABLE << MPU_CTRL_ENABLE_Pos); /* Enable the MPU */   

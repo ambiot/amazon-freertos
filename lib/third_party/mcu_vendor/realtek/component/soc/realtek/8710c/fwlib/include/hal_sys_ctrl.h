@@ -126,6 +126,17 @@ enum flash_port_sel_e {
 typedef uint8_t    flash_port_sel_t;
 
 /**
+ * @brief  define debug port mode.
+ */
+enum hal_reset_reason_e {
+    HAL_RESET_REASON_POWER_ON         = 0,    ///< power on
+    HAL_RESET_REASON_SOFTWARE        = BIT0,    ///< software reset
+    HAL_RESET_REASON_WATCHDOG        = BIT1,    ///< watchdog reset
+    HAL_RESET_REASON_JTAG        = BIT2,    ///< jtag reset
+};
+typedef uint32_t     hal_reset_reason_t;
+
+/**
  *  @brief SDIO device enable control.
  *  @details Enable or disable the SDIO device function, clock and pins.
  *  @param[in]   en  The enable control.
@@ -218,6 +229,30 @@ hal_status_t hal_dbg_port_cfg_nsc (dbg_port_mode_t dbg_mode);
 #define hal_dbg_port_cfg             hal_dbg_port_cfg_nsc
 
 #endif  // end of else of "#if !defined(CONFIG_BUILD_NONSECURE)"
+
+/** 
+ *  @brief Get device reset reason.
+ *  @details To get the reset reason.
+ *  @param[in]   reason  The reason code.
+ *  @return      HAL_OK  reset reason read OK.
+ */
+hal_status_t rtl8710c_reset_reason_get (hal_reset_reason_t *reason);
+
+/** 
+ *  @brief Set device reset reason.
+ *  @details To set reason before reset, only the last reason code will be stored.
+ *  @param[in]   reason  The reason code.
+ *  @return      HAL_OK  reset reason set OK.
+ */
+hal_status_t rtl8710c_reset_reason_set (hal_reset_reason_t reason);
+
+/** 
+ *  @brief Clear device boot reason.
+ *  @details To clear reset reason.
+ *  @param[in]   reason  The reason code.
+ *  @return      HAL_OK  reset reason clear OK.
+ */
+hal_status_t rtl8710c_reset_reason_clear (hal_reset_reason_t reason);
 
 #endif  // end of "#ifndef HAL_SYS_CTRL_H"
 

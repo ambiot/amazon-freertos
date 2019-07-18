@@ -72,6 +72,9 @@ void hal_ssi_irq_handle_rtl8710c_patch(phal_ssi_adaptor_t phal_ssi_adaptor);
 void hal_ssi_read_interrupt_rtl8710c_unfix_size_patch(phal_ssi_adaptor_t phal_ssi_adaptor);
 #endif
 
+#if ((CHIP_VER == CHIP_A_CUT) || (CHIP_VER == CHIP_B_CUT)) && (defined(CONFIG_BUILD_RAM))
+hal_status_t hal_ssi_set_sclk_rtl8710c_patch(phal_ssi_adaptor_t phal_ssi_adaptor, u32 clk_rate);
+#endif
 /** \brief Description of hal_ssi_clock_ctl
  *
  *    hal_ssi_clock_ctl is used to enable IP and turn on the clock for the target SPI device.
@@ -257,10 +260,7 @@ __STATIC_INLINE hal_status_t hal_ssi_interrupt_init_write (phal_ssi_adaptor_t ph
  *    hal_ssi_set_sclk is used to set operting frequency of the SPI device.
  *    The operating frequency is determined by the SPI master device, but the SPI slave device still has a constraint for its speed.
  *    We list the maximum speed supported by different SPI devices below.
- *    SPI 0 Master : 37.5MHz, Slave : 7.5MHz
- *    SPI 1 Master : 75MHz, Slave : 15MHz
- *    SPI 2 Master : 37.5MHz
- *    SPI 3 Slave : 37.5MHz
+ *    SPI 0 Master : 25MHz, Slave : 5MHz
  *
  *   \param phal_ssi_adaptor_t phal_ssi_adaptor:      The pointer of SPI adaptor.
  *   \param u32 clk_rate:      The target speed of the SPI device. For the slave device, this parameter can be used to check if it is valid.
@@ -269,7 +269,11 @@ __STATIC_INLINE hal_status_t hal_ssi_interrupt_init_write (phal_ssi_adaptor_t ph
  */
 __STATIC_INLINE hal_status_t hal_ssi_set_sclk (phal_ssi_adaptor_t phal_ssi_adaptor, u32 clk_rate)
 {
+#if ((CHIP_VER == CHIP_A_CUT) || (CHIP_VER == CHIP_B_CUT)) && (defined(CONFIG_BUILD_RAM))
+    return hal_ssi_set_sclk_rtl8710c_patch(phal_ssi_adaptor, clk_rate);
+#else
     return hal_ssi_stubs.hal_ssi_set_sclk (phal_ssi_adaptor, clk_rate);
+#endif
 }
 
 /** \brief Description of hal_ssi_set_format

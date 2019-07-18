@@ -738,9 +738,9 @@ exit:
 }
 
 void fATW6(void *arg){
-	u32		mac[ETH_ALEN];
+	unsigned int mac[ETH_ALEN];
 	u32		i;
-	volatile int ret = RTW_SUCCESS;
+	int ret = RTW_SUCCESS;
 	(void) ret;
 	if(!arg){
 		printf("[ATW6]Usage: ATW6=BSSID\n\r");
@@ -1515,7 +1515,7 @@ void fATXP(void *arg)
 {
 	int argc = 0;
 	char *argv[MAX_ARGC] = {0};
-	volatile int ret = 0;
+	int ret = 0;
 	int mode, dtim;
 	int tdma_slot_period, tdma_rfon_period_len_1, tdma_rfon_period_len_2, tdma_rfon_period_len_3;
 #if defined(CONFIG_INIC_CMD_RSP) && CONFIG_INIC_CMD_RSP
@@ -1523,6 +1523,7 @@ void fATXP(void *arg)
 	int res_len = 0;
 #endif
 
+	(void)ret;
 	printf("[ATXP]: _AT_WLAN_POWER_MODE_\r\n");
 
 	if (!arg) {

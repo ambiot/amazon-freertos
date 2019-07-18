@@ -81,7 +81,8 @@ typedef uint32_t (*PSM_HOOK_FUN)( unsigned int, void* param_ptr );
 typedef enum {
 	PMU_OS					=0,
 	PMU_WLAN_DEVICE		=1,
-	PMU_WAKWLOCK_TIMEOUT=2,
+	PMU_LOGUART_DEVICE	=2,
+	PMU_WAKWLOCK_TIMEOUT=3,
 	PMU_MAX
 } PMU_DEVICE;
 

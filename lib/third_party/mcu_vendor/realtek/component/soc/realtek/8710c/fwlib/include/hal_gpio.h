@@ -397,6 +397,7 @@ hal_status_t hal_gpio_port_init (phal_gpio_port_adapter_t pgpio_port_adapter, ui
                                  uint32_t mask, gpio_dir_t dir);
 void hal_gpio_port_deinit (phal_gpio_port_adapter_t pgpio_port_adapter);
 void hal_gpio_port_dir (phal_gpio_port_adapter_t pgpio_port_adapter, gpio_dir_t dir);
+void hal_gpio_h5l3 (u8 h5l3);
 
 #endif  // end of #if !defined(CONFIG_BUILD_SECURE)
 

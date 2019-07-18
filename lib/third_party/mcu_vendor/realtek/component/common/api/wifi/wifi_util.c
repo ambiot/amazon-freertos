@@ -320,6 +320,39 @@ int wext_enable_powersave(const char *ifname, __u8 ips_mode, __u8 lps_mode)
 	return ret;
 }
 
+int wext_resume_powersave(const char *ifname)
+{
+	struct iwreq iwr;
+	int ret = 0;
+	__u16 pindex = 0;
+	__u8 *para = NULL;
+	int cmd_len = 0;
+
+	memset(&iwr, 0, sizeof(iwr));
+	cmd_len = sizeof("pm_set");
+
+	// Encode parameters as TLV (type, length, value) format
+	para = rtw_malloc( 7 + (1+1+1) + (1+1+1) );
+	if(para == NULL) return -1;
+
+	snprintf((char*)para, cmd_len, "pm_set");
+	pindex = 7;
+
+	para[pindex++] = 8; // type 8 for power save resume
+	para[pindex++] = 0;
+
+	iwr.u.data.pointer = para;
+	iwr.u.data.length = pindex;
+
+	if (iw_ioctl(ifname, SIOCDEVPRIVATE, &iwr) < 0) {
+		RTW_API_INFO("\n\rioctl[SIOCSIWPRIVPMSET] error");
+		ret = -1;
+	}
+
+	rtw_free(para);
+	return ret;
+}
+
 int wext_disable_powersave(const char *ifname)
 {
 	struct iwreq iwr;

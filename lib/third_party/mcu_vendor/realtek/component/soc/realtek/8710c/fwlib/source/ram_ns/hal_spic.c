@@ -30,11 +30,14 @@
 #include "hal_flash.h"
 #include "hal_pinmux.h"
 #include "rtl8710c_spic_type.h"
+#include <arm_cmse.h>
 
 // TODO: modification for 8710c: pin mux register & control, IO mode selection
 #if defined(CONFIG_SPI_FLASH_EN) && (CONFIG_SPI_FLASH_EN == 1)
 
 extern void hal_syson_spic_dev_ctrl(BOOL en);
+extern int32_t spic_init_from_resume (void);
+
 extern const hal_spic_func_stubs_t hal_spic_stubs;
 
 RAM_BSS_NOINIT_SECTION hal_spic_adaptor_t hal_spic_adaptor;
@@ -327,7 +330,6 @@ void spic_flush_fifo(SPIC_Type *spic_dev)
     hal_spic_stubs.spic_flush_fifo(spic_dev);
 }
 
-
 /** \brief Description of spic_pinmux_init
  *
  *    spic_pinmux_init is used to select pinmux to operate flash.
@@ -342,26 +344,49 @@ hal_status_t spic_pinmux_ctl(phal_spic_adaptor_t phal_spic_adaptor, u8 ctl)
 {
     u8 quad_pin_sel = phal_spic_adaptor->quad_pin_sel;
     pflash_pin_sel_t pflash_pin_sel = &(phal_spic_adaptor->flash_pin_sel);
-      
+#if !defined(CONFIG_BUILD_NONSECURE)
+#define spic_pinmux_register        hal_pinmux_register
+#define spic_pinmux_unregister      hal_pinmux_unregister
+#else
+#undef hal_pinmux_register
+#undef hal_pinmux_unregister
+    const hal_pin_manag_func_stubs_t *phal_pin_manag_stubs = (hal_pin_manag_func_stubs_t *)0x160;
+    typedef hal_status_t (*spic_pinmux_register_t) (uint8_t pin_name, uint8_t periphl_id);
+    typedef hal_status_t (*spic_pinmux_unregister_t) (uint8_t pin_name, uint8_t periphl_id);
+    spic_pinmux_register_t spic_pinmux_register;
+    spic_pinmux_unregister_t spic_pinmux_unregister;
+    int state = spic_init_from_resume();
+
+    if (!state) {
+        // called from non-secure
+        spic_pinmux_register = hal_pinmux_register_nsc;
+        spic_pinmux_unregister = hal_pinmux_unregister_nsc;
+    } else {
+        // called from within secure
+        spic_pinmux_register = phal_pin_manag_stubs->hal_pinmux_register;
+        spic_pinmux_unregister = phal_pin_manag_stubs->hal_pinmux_unregister;
+    }
+#endif
+
     if (ctl == ENABLE) {    
-        hal_pinmux_register(pflash_pin_sel->pin_cs, PID_FLASH);
-        hal_pinmux_register(pflash_pin_sel->pin_clk, PID_FLASH);
-        hal_pinmux_register(pflash_pin_sel->pin_d0, PID_FLASH);
-        hal_pinmux_register(pflash_pin_sel->pin_d1, PID_FLASH);
+        spic_pinmux_register(pflash_pin_sel->pin_cs, PID_FLASH);
+        spic_pinmux_register(pflash_pin_sel->pin_clk, PID_FLASH);
+        spic_pinmux_register(pflash_pin_sel->pin_d0, PID_FLASH);
+        spic_pinmux_register(pflash_pin_sel->pin_d1, PID_FLASH);
 
         if (quad_pin_sel) {
-            hal_pinmux_register(pflash_pin_sel->pin_d2, PID_FLASH);
-            hal_pinmux_register(pflash_pin_sel->pin_d3, PID_FLASH);
+            spic_pinmux_register(pflash_pin_sel->pin_d2, PID_FLASH);
+            spic_pinmux_register(pflash_pin_sel->pin_d3, PID_FLASH);
         }
     } else {
-        hal_pinmux_unregister(pflash_pin_sel->pin_cs, PID_FLASH);
-        hal_pinmux_unregister(pflash_pin_sel->pin_clk, PID_FLASH);
-        hal_pinmux_unregister(pflash_pin_sel->pin_d0, PID_FLASH);
-        hal_pinmux_unregister(pflash_pin_sel->pin_d1, PID_FLASH);
+        spic_pinmux_unregister(pflash_pin_sel->pin_cs, PID_FLASH);
+        spic_pinmux_unregister(pflash_pin_sel->pin_clk, PID_FLASH);
+        spic_pinmux_unregister(pflash_pin_sel->pin_d0, PID_FLASH);
+        spic_pinmux_unregister(pflash_pin_sel->pin_d1, PID_FLASH);
         
         if (quad_pin_sel) {
-            hal_pinmux_unregister(pflash_pin_sel->pin_d2, PID_FLASH);
-            hal_pinmux_unregister(pflash_pin_sel->pin_d3, PID_FLASH);
+            spic_pinmux_unregister(pflash_pin_sel->pin_d2, PID_FLASH);
+            spic_pinmux_unregister(pflash_pin_sel->pin_d3, PID_FLASH);
             phal_spic_adaptor->quad_pin_sel = 0;
         }
     }
@@ -877,6 +902,7 @@ void spic_store_setting(phal_spic_adaptor_t phal_spic_adaptor, phal_spic_restore
     phal_spic_setting->spic_init_data = phal_spic_adaptor->spic_init_data[spic_bit_mode][cpu_type];
     phal_spic_setting->cmd = phal_spic_adaptor->cmd;
     phal_spic_setting->quad_pin_sel = phal_spic_adaptor->quad_pin_sel;
+    phal_spic_setting->recored = SPIC_RESTORE_VALID;
 }
 
 /** \brief Description of spic_recover_setting
@@ -939,6 +965,8 @@ void spic_recover_setting(phal_spic_adaptor_t phal_spic_adaptor, phal_spic_resto
     spic_config_user_mode(phal_spic_adaptor);
     hal_flash_release_from_power_down(phal_spic_adaptor);
     hal_flash_return_spi(phal_spic_adaptor);
+    spic_pinmux_ctl(phal_spic_adaptor, DISABLE);
+    spic_init(phal_spic_adaptor, spic_bit_mode, (pflash_pin_sel_t)&(phal_spic_setting->flash_pin_sel));
 }
 
 /** *@} */ /* End of group hs_hal_spic_ram_func */

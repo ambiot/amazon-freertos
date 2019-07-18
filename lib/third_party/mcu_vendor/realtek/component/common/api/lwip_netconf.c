@@ -16,8 +16,6 @@
 
 #include <platform/platform_stdlib.h>
 
-
-
 #if defined(CONFIG_FAST_DHCP) && CONFIG_FAST_DHCP
 #include "wlan_fast_connect/example_wlan_fast_connect.h"
 #endif

@@ -175,14 +175,28 @@ static void _freertos_mutex_free(_mutex *pmutex)
 	*pmutex = NULL;
 }
 
+static int __in_interrupt(void)
+{
+#if defined(__ICCARM__)
+	return (__get_PSR()&0x1FF)!=0;
+#elif defined(__GNUC__)
+	return (__get_xPSR()&0x1FF)!=0;
+#endif
+}
+
 static void _freertos_mutex_get(_mutex *pmutex)
 {
 #if defined(CONFIG_PLATFORM_8710C)
 	if(_freertos_get_scheduler_state() == OS_SCHEDULER_SUSPENDED)
 		return;
 #endif
-	while(xSemaphoreTake(*pmutex, 60 * 1000 / portTICK_RATE_MS) != pdTRUE)
-		printf("[%s] %s(%p) failed, retry\n", pcTaskGetTaskName(NULL), __FUNCTION__, pmutex);
+	if(__in_interrupt()){
+		if(xSemaphoreTakeFromISR(*pmutex, NULL) != pdTRUE)
+			printf("[%s] %s(%p) from ISR <<< FAIL >>> \n", pcTaskGetTaskName(NULL), __FUNCTION__, pmutex);
+	}else{
+		while(xSemaphoreTake(*pmutex, 60 * 1000 / portTICK_RATE_MS) != pdTRUE)
+			printf("[%s] %s(%p) failed, retry\n", pcTaskGetTaskName(NULL), __FUNCTION__, pmutex);
+	}
 }
 
 static int _freertos_mutex_get_timeout(_mutex *pmutex, u32 timeout_ms)
@@ -191,16 +205,27 @@ static int _freertos_mutex_get_timeout(_mutex *pmutex, u32 timeout_ms)
 	if(_freertos_get_scheduler_state() == OS_SCHEDULER_SUSPENDED && timeout_ms != 0)
 		return 0;
 #endif
-	if(xSemaphoreTake(*pmutex, timeout_ms / portTICK_RATE_MS) != pdTRUE){
-		printf("[%s] %s(%p) failed, retry\n", pcTaskGetTaskName(NULL), __FUNCTION__, pmutex);
-		return -1;
+	if(__in_interrupt()){
+		if(xSemaphoreTakeFromISR(*pmutex, NULL) != pdTRUE){
+			printf("[%s] %s(%p) from ISR <<< FAIL >>> \n", pcTaskGetTaskName(NULL), __FUNCTION__, pmutex);
+			return -1;
+		}
+	}else{
+		if(xSemaphoreTake(*pmutex, timeout_ms / portTICK_RATE_MS) != pdTRUE){
+			printf("[%s] %s(%p) failed, retry\n", pcTaskGetTaskName(NULL), __FUNCTION__, pmutex);
+			return -1;
+		}
 	}
 	return 0;
 }
 
 static void _freertos_mutex_put(_mutex *pmutex)
 {
-	xSemaphoreGive(*pmutex);
+	if(__in_interrupt()){
+		xSemaphoreGiveFromISR(*pmutex, NULL);
+	}else{
+		xSemaphoreGive(*pmutex);
+	}
 }
 
 static void _freertos_enter_critical_from_isr(_lock *plock, _irqL *pirqL);
@@ -238,9 +263,9 @@ static void _freertos_enter_critical_from_isr(_lock *plock, _irqL *pirqL)
 	( void ) pirqL;
 	( void ) plock;
 	
-    portASSERT_IF_INTERRUPT_PRIORITY_INVALID();
+	portASSERT_IF_INTERRUPT_PRIORITY_INVALID();
 
-    uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
+	uxSavedInterruptStatus = portSET_INTERRUPT_MASK_FROM_ISR();
 }
 
 static void _freertos_exit_critical_from_isr(_lock *plock, _irqL *pirqL)
@@ -278,7 +303,9 @@ static void _freertos_exit_critical_mutex(_mutex *pmutex, _irqL *pirqL)
 
 #if defined(CONFIG_PLATFORM_8195BHP) || defined(CONFIG_PLATFORM_8710C)
 #include "timer_api.h"
+#if defined(CONFIG_PLATFORM_8195BHP)
 static gtimer_t tmp_timer_obj;
+#endif
 #endif
 static void _freertos_cpu_lock(void)
 {
@@ -286,21 +313,26 @@ static void _freertos_cpu_lock(void)
 	__disable_irq();
 	icache_disable();
 	dcache_disable();
-
+#if defined(CONFIG_PLATFORM_8195BHP)
 	gtimer_init(&tmp_timer_obj, 0xff);
 	gtimer_reload(&tmp_timer_obj, 400*1000 );	// 4s
 	gtimer_start(&tmp_timer_obj);
+#endif
 #endif
 }
 
 static void _freertos_cpu_unlock(void)
 {
-#if defined(CONFIG_PLATFORM_8195BHP) || defined(CONFIG_PLATFORM_8710C)	
+#if defined(CONFIG_PLATFORM_8195BHP) || defined(CONFIG_PLATFORM_8710C)
+#if defined(CONFIG_PLATFORM_8195BHP)	
 	int duration = (int)gtimer_read_us(&tmp_timer_obj)/1000;
+	
 	gtimer_deinit(&tmp_timer_obj);
 	// compensate rtos tick
-#if defined(CONFIG_PLATFORM_8195BHP)
-	vTaskIncTick(duration);
+	//vTaskIncTick(duration); // cannot use this here
+	for(int i=0;i<duration;i++)
+		xTaskIncrementTick();
+	
 #endif
 	dcache_enable();
 	icache_enable();	
@@ -927,6 +959,16 @@ u8 _freertos_get_scheduler_state(void)
 }
 
 
+void _freertos_create_secure_context(u32 secure_stack_size)
+{
+	/* initial support on freertos 10.2.0 */
+#if (tskKERNEL_VERSION_MAJOR>=10) && (tskKERNEL_VERSION_MINOR>=2)	
+	/* This task calls secure side functions. So allocate a secure context for
+	 * it. */
+	portALLOCATE_SECURE_CONTEXT( secure_stack_size );
+#endif	
+}
+
 const struct osdep_service_ops osdep_service = {
 	_freertos_malloc,			//rtw_vmalloc
 	_freertos_zmalloc,			//rtw_zvmalloc
@@ -1016,5 +1058,6 @@ const struct osdep_service_ops osdep_service = {
 	_freertos_acquire_wakelock,		//rtw_acquire_wakelock
 	_freertos_release_wakelock,		//rtw_release_wakelock
 	_freertos_wakelock_timeout,		//rtw_wakelock_timeout
-	_freertos_get_scheduler_state	//rtw_get_scheduler_state
+	_freertos_get_scheduler_state,	//rtw_get_scheduler_state
+	_freertos_create_secure_context,	// rtw_create_secure_context	
 };

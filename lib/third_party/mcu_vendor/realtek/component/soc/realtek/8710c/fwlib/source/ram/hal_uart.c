@@ -112,6 +112,7 @@ hal_status_t hal_uart_init (phal_uart_adapter_t puart_adapter, uint8_t tx_pin, u
     }
 
     uart_idx = hal_uart_check_uart_id(tx_pin,rx_pin);
+
     if ((uart_idx < MaxUartNum) && (Uart0 == uart_idx)) {
         hal_syson_wakeup_uart_func_reset();
     }

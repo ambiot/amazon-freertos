@@ -299,16 +299,17 @@ hal_status_t hal_sce_func_disable (void)
  *         of this function. This memory remapping should be applied to the flash memory only.
  *
  *  @param[in]  sec_id The index of the SCE section for the memory remapping. The valid value is 0 ~ 7.
- *  @param[in]  remap_addr The virtual address of the memory remapping. The SCE section start address will
- *                         be mapped to this address. This address must be aligned to the configured page boundary.
+ *  @param[in]  phy_addr The physical address of the memory remapping. This address will be map to the
+ *                       start address of the corresponding SCE section. 
+ *                       This address must be aligned to the configured page boundary.
  *
  *  @return     HAL_ERR_PARA:  Incorrect memory type or invalid section index.
  *  @return     HAL_OK:  Memory remapping enable OK.
  */
 __STATIC_INLINE
-hal_status_t hal_sce_remap_enable (uint8_t sec_id, uint32_t remap_addr)
+hal_status_t hal_sce_remap_enable (uint8_t sec_id, uint32_t phy_addr)
 {
-    return hal_sce_stubs.hal_sce_remap_enable (sec_id, remap_addr);
+    return hal_sce_stubs.hal_sce_remap_enable (sec_id, phy_addr);
 }
 
 /**
