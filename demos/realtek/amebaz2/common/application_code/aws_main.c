@@ -39,6 +39,8 @@
 #include "aws_clientcredential.h"
 #include "aws_application_version.h"
 
+int errno = 0;
+
 #if (CONFIG_LWIP_LAYER == 0)
 #include "FreeRTOS_IP.h"
 #endif
