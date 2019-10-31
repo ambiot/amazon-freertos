@@ -497,12 +497,22 @@ static int prvInitializeClientCredential( TLSContext_t * pxCtx )
                                              &pxCtx->xMbedX509Cli,
                                              &pxCtx->xMbedPkCtx );
     }
+    
+    if ( 0 != xResult)
+    {
+        /* Cleanup PKCS#11. */
+        if( ( NULL != pxCtx->xP11FunctionList ) &&
+            ( NULL != pxCtx->xP11FunctionList->C_CloseSession ) )
+        {
+            pxCtx->xP11FunctionList->C_CloseSession( pxCtx->xP11Session ); /*lint !e534 This function always return CKR_OK. */
+        }
+    }
 
     if( NULL != pxCertificate )
     {
         vPortFree( pxCertificate );
     }
-
+    
     return xResult;
 }
 

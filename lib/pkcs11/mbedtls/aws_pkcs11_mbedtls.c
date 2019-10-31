@@ -1068,6 +1068,7 @@ CK_DEFINE_FUNCTION( CK_RV, C_FindObjects )( CK_SESSION_HANDLE xSession,
         {
             PKCS11_PRINT( ( "ERROR: Object with label %s not found. \r\n", ( char * ) pxSession->xFindObjectLabel ) );
             xResult = CKR_FUNCTION_FAILED;
+            vPortFree(pxSession->xFindObjectLabel);
         }
     }
 
