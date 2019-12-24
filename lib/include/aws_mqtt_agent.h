@@ -134,18 +134,19 @@ typedef BaseType_t ( * MQTTAgentCallback_t ) ( void * pvUserData,
  */
 typedef struct MQTTAgentConnectParams
 {
-    const char * pcURL;             /**< The URL of the MQTT broker to connect to. */
-    BaseType_t xFlags;              /**< Flags to control the behavior of MQTT connect. */
-    BaseType_t xURLIsIPAddress;     /**< Deprecated. Set the mqttagentURL_IS_IP_ADDRESS bit in xFlags instead. */
-    uint16_t usPort;                /**< Port number at which MQTT broker is listening. This field is ignored if the mqttagentUSE_AWS_IOT_ALPN_443 flag is set. */
-    const uint8_t * pucClientId;    /**< Client Identifier of the MQTT client. It should be unique per broker. */
-    uint16_t usClientIdLength;      /**< The length of the client Id. */
-    BaseType_t xSecuredConnection;  /**< Deprecated. Set the mqttagentREQUIRE_TLS bit in xFlags instead. */
-    void * pvUserData;              /**< User data supplied back as it is in the callback. Can be NULL. */
-    MQTTAgentCallback_t pxCallback; /**< Callback used to report various events. In addition to other events, this callback is invoked for the publish
-                                     *   messages received on the topics for which the user has not registered any subscription callback. Can be NULL. */
-    char * pcCertificate;           /**< Certificate used for secure connection. Can be NULL. If it is NULL, the one specified in the aws_credential_keys.h is used. */
-    uint32_t ulCertificateSize;     /**< Size of certificate used for secure connection. */
+    const char * pcURL;                             /**< The URL of the MQTT broker to connect to. */
+    BaseType_t xFlags;                              /**< Flags to control the behavior of MQTT connect. */
+    BaseType_t xURLIsIPAddress;                     /**< Deprecated. Set the mqttagentURL_IS_IP_ADDRESS bit in xFlags instead. */
+    uint16_t usPort;                                /**< Port number at which MQTT broker is listening. This field is ignored if the mqttagentUSE_AWS_IOT_ALPN_443 flag is set. */
+    const uint8_t * pucClientId;                    /**< Client Identifier of the MQTT client. It should be unique per broker. */
+    uint16_t usClientIdLength;                      /**< The length of the client Id. */
+    BaseType_t xSecuredConnection;                  /**< Deprecated. Set the mqttagentREQUIRE_TLS bit in xFlags instead. */
+    void * pvUserData;                              /**< User data supplied back as it is in the callback. Can be NULL. */
+    MQTTAgentCallback_t pxCallback;                 /**< Callback used to report various events. In addition to other events, this callback is invoked for the publish
+                                                     *   messages received on the topics for which the user has not registered any subscription callback. Can be NULL. */
+    char * pcCertificate;                           /**< Certificate used for secure connection. Can be NULL. If it is NULL, the one specified in the aws_credential_keys.h is used. */
+    uint32_t ulCertificateSize;                     /**< Size of certificate used for secure connection. */
+    const MQTTPublishParams_t * pWillInfo;          /**< A message to publish if the new MQTT connection is unexpectedly closed. */
 } MQTTAgentConnectParams_t;
 
 /**
@@ -355,5 +356,15 @@ MQTTAgentReturnCode_t MQTT_AGENT_Publish( MQTTAgentHandle_t xMQTTHandle,
  */
 MQTTAgentReturnCode_t MQTT_AGENT_ReturnBuffer( MQTTAgentHandle_t xMQTTHandle,
                                                MQTTBufferHandle_t xBufferHandle );
+/**
+ * @brief used to shutdown the socket directly.
+ *
+ * This function is used to shutdown socket connection without closing it.
+ *
+ * @param[in] xMQTTHandle The opaque handle as returned from MQTT_AGENT_Create.
+ *
+ */
+
+void prvShutdownConnection( MQTTAgentHandle_t xMQTTHandle );
 
 #endif /* _AWS_MQTT_AGENT_H_ */

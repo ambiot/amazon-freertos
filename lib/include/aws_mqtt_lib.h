@@ -510,6 +510,23 @@ typedef struct MQTTInitParams
 } MQTTInitParams_t;
 
 /**
+ * @brief MQTT Publish Parameters.
+ *
+ * Parameters passed to the MQTT_Publish API.
+ */
+typedef struct MQTTPublishParams
+{
+    const uint8_t * pucTopic;    /**< The topic to which the data should be published. */
+    uint16_t usTopicLength;      /**< The length of the topic. */
+    MQTTQoS_t xQos;              /**< Quality of Service. */
+    const void * pvData;         /**< The data to publish. */
+    uint32_t ulDataLength;       /**< Length of the data. */
+    uint16_t usPacketIdentifier; /**< The same identifier is returned in the callback when corresponding PUBACK is received or the operation times out. */
+    uint32_t ulTimeoutTicks;     /**< The time interval in ticks after which the operation should fail. */
+} MQTTPublishParams_t;
+
+
+/**
  * @brief MQTT Connect Parameters.
  *
  * Parameters passed to the MQTT_Connect API.
@@ -525,6 +542,7 @@ typedef struct MQTTConnectParams
     uint16_t usUserNameLength;               /**< The length of the user name. */
     uint16_t usPacketIdentifier;             /**< The same identifier is returned in the callback when corresponding CONNACK is received or the operation times out. */
     uint32_t ulTimeoutTicks;                 /**< The time interval in ticks after which the operation should fail. */
+    const MQTTPublishParams_t * pWillInfo;   /**< A message to publish if the new MQTT connection is unexpectedly closed. */
 } MQTTConnectParams_t;
 
 /**
@@ -561,21 +579,7 @@ typedef struct MQTTUnsubscribeParams
     uint32_t ulTimeoutTicks;     /**< The time interval in ticks after which the operation should fail. */
 } MQTTUnsubscribeParams_t;
 
-/**
- * @brief MQTT Publish Parameters.
- *
- * Parameters passed to the MQTT_Publish API.
- */
-typedef struct MQTTPublishParams
-{
-    const uint8_t * pucTopic;    /**< The topic to which the data should be published. */
-    uint16_t usTopicLength;      /**< The length of the topic. */
-    MQTTQoS_t xQos;              /**< Quality of Service. */
-    const void * pvData;         /**< The data to publish. */
-    uint32_t ulDataLength;       /**< Length of the data. */
-    uint16_t usPacketIdentifier; /**< The same identifier is returned in the callback when corresponding PUBACK is received or the operation times out. */
-    uint32_t ulTimeoutTicks;     /**< The time interval in ticks after which the operation should fail. */
-} MQTTPublishParams_t;
+
 
 /**
  * @brief Initializes the given MQTT Context.

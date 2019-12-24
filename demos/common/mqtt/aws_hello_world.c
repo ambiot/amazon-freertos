@@ -113,6 +113,32 @@
  */
 #define echoDONT_BLOCK           ( ( TickType_t ) 0 )
 
+
+#define IOT_DEMO_MQTT_TOPIC_PREFIX           "iotdemo"
+
+/**
+ * @brief The Last Will and Testament topic name in this demo.
+ *
+ * The MQTT server will publish a message to this topic name if this client is
+ * unexpectedly disconnected.
+ */
+#define WILL_TOPIC_NAME                          IOT_DEMO_MQTT_TOPIC_PREFIX "/will"
+
+/**
+ * @brief The length of #WILL_TOPIC_NAME.
+ */
+#define WILL_TOPIC_NAME_LENGTH                   ( ( uint16_t ) ( sizeof( WILL_TOPIC_NAME ) - 1 ) )
+
+/**
+ * @brief The message to publish to #WILL_TOPIC_NAME.
+ */
+#define WILL_MESSAGE                             "MQTT demo unexpectedly disconnected."
+
+/**
+ * @brief The length of #WILL_MESSAGE.
+ */
+#define WILL_MESSAGE_LENGTH                      ( ( size_t ) ( sizeof( WILL_MESSAGE ) - 1 ) )
+
 /*-----------------------------------------------------------*/
 
 /**
@@ -184,6 +210,7 @@ static BaseType_t prvCreateClientAndConnectToBroker( void )
 {
     MQTTAgentReturnCode_t xReturned;
     BaseType_t xReturn = pdFAIL;
+    MQTTPublishParams_t willInfo;
     MQTTAgentConnectParams_t xConnectParameters =
     {
         clientcredentialMQTT_BROKER_ENDPOINT, /* The URL of the MQTT broker to connect to. */
@@ -196,8 +223,16 @@ static BaseType_t prvCreateClientAndConnectToBroker( void )
         NULL,                                 /* User data supplied to the callback. Can be NULL. */
         NULL,                                 /* Callback used to report various events. Can be NULL. */
         NULL,                                 /* Certificate used for secure connection. Can be NULL. */
-        0                                     /* Size of certificate used for secure connection. */
+        0,                                    /* Size of certificate used for secure connection. */
+        &willInfo                             /* MQTT LWT information. */
     };
+
+    /* Add topic, message for MQTT LWT.  */
+    willInfo.pucTopic = WILL_TOPIC_NAME;
+    willInfo.usTopicLength = WILL_TOPIC_NAME_LENGTH;
+    willInfo.pvData = WILL_MESSAGE;
+    willInfo.ulDataLength = WILL_MESSAGE_LENGTH;
+    willInfo.xQos = eMQTTQoS0;
 
     /* Check this function has not already been executed. */
     configASSERT( xMQTTHandle == NULL );

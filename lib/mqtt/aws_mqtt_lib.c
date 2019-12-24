@@ -99,6 +99,19 @@
 #define mqttCONNECT_USER_NAME_FLAG        ( ( uint8_t ) ( ( uint8_t ) 1 << ( uint8_t ) 7 ) )
 /** @} */
 
+/*
+ * @brief Positions of each flag in the "Connect Flag" field of an MQTT CONNECT
+ * packet.
+ */
+#define MQTT_CONNECT_FLAG_CLEAN                     ( 1 )  /**< @brief Clean session. */
+#define MQTT_CONNECT_FLAG_WILL                      ( 2 )  /**< @brief Will present. */
+#define MQTT_CONNECT_FLAG_WILL_QOS1                 ( 3 )  /**< @brief Will QoS1. */
+#define MQTT_CONNECT_FLAG_WILL_QOS2                 ( 4 )  /**< @brief Will QoS2. */
+#define MQTT_CONNECT_FLAG_WILL_RETAIN               ( 5 )  /**< @brief Will retain. */
+#define MQTT_CONNECT_FLAG_PASSWORD                  ( 6 )  /**< @brief Password present. */
+#define MQTT_CONNECT_FLAG_USERNAME                  ( 7 )  /**< @brief Username present. */
+
+
 /**
  * @brief Protocol level value is 4 for version 3.1.1.
  */
@@ -2527,6 +2540,11 @@ MQTTReturnCode_t MQTT_Connect( MQTTContext_t * pxMQTTContext,
                             ( uint32_t ) usClientIdLength +
                             ( uint32_t ) usUserNameLength;
 
+        if( pxConnectParams->pWillInfo ) {
+            ulRemainingLength += mqttSTRLEN(pxConnectParams->pWillInfo->usTopicLength);
+            ulRemainingLength += mqttSTRLEN(pxConnectParams->pWillInfo->ulDataLength);
+        }
+
         /* Calculate the number of bytes occupied by the "Remaining Length" field. */
         ucRemainingLengthFieldBytes = prvSizeOfRemainingLength( ulRemainingLength );
 
@@ -2580,6 +2598,22 @@ MQTTReturnCode_t MQTT_Connect( MQTTContext_t * pxMQTTContext,
                     mqttbufferGET_DATA( xBuffer )[ mqttADJUST_OFFSET( mqttCONNECT_FLAGS_OFFSET, ucRemainingLengthFieldBytes ) ] |= mqttCONNECT_USER_NAME_FLAG;
                 }
 
+                /* update LWT regarding flag */
+                if( pxConnectParams->pWillInfo )
+                {
+                    mqttbufferGET_DATA( xBuffer )[ mqttADJUST_OFFSET( mqttCONNECT_FLAGS_OFFSET, ucRemainingLengthFieldBytes ) ] |= (1 << MQTT_CONNECT_FLAG_WILL);
+
+                    /* Flags only need to be changed for will QoS 1 and 2 */
+                    switch(pxConnectParams->pWillInfo->xQos) {
+                        case eMQTTQoS1:
+                            mqttbufferGET_DATA( xBuffer )[ mqttADJUST_OFFSET( mqttCONNECT_FLAGS_OFFSET, ucRemainingLengthFieldBytes ) ] |= (1 << MQTT_CONNECT_FLAG_WILL_QOS1);
+                            break;
+                        case eMQTTQoS2:
+                            mqttbufferGET_DATA( xBuffer )[ mqttADJUST_OFFSET( mqttCONNECT_FLAGS_OFFSET, ucRemainingLengthFieldBytes ) ] |= (1 << MQTT_CONNECT_FLAG_WILL_QOS2);
+                            break;
+                    }
+                }
+
                 /* Update keep alive timeout. */
                 mqttbufferGET_DATA( xBuffer )[ mqttADJUST_OFFSET( mqttCONNECT_KEEPALIVE_MSB_OFFSET,
                                                                   ucRemainingLengthFieldBytes ) ] = ( uint8_t ) ( pxConnectParams->usKeepAliveIntervalSeconds >> mqttBITS_PER_BYTE );
@@ -2589,6 +2623,13 @@ MQTTReturnCode_t MQTT_Connect( MQTTContext_t * pxMQTTContext,
                 /* Write the client ID into the payload. */
                 pucNextByte = &( mqttbufferGET_DATA( xBuffer )[ mqttADJUST_OFFSET( mqttCONNECT_CLIENT_ID_OFFSET, ucRemainingLengthFieldBytes ) ] );
                 pucNextByte = prvWriteString( pucNextByte, pucLastByteInBuffer, pxConnectParams->pucClientId, pxConnectParams->usClientIdLength );
+
+                /* Write the will topic name and message into the CONNECT packet if provided. */
+                if( pxConnectParams->pWillInfo )
+                {
+                    pucNextByte = prvWriteString( pucNextByte, pucLastByteInBuffer, pxConnectParams->pWillInfo->pucTopic , pxConnectParams->pWillInfo->usTopicLength );
+                    pucNextByte = prvWriteString( pucNextByte, pucLastByteInBuffer, pxConnectParams->pWillInfo->pvData , pxConnectParams->pWillInfo->ulDataLength );
+                }
 
                 /* Write the user name into the payload. */
                 if( pxConnectParams->usUserNameLength > ( uint16_t ) 0 )
