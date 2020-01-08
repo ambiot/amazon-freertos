@@ -121,6 +121,34 @@
 #define mqttagenttestMULTI_TASK_TEST_TOPIC_NAME                ( ( const uint8_t * ) "freertos/tests/multiTask/%d" )
 #define mqttagenttestMULTI_TASK_TEST_MAX_TOPIC_NAME_SIZE       ( 30 )
 
+/* topic for last will */
+#define IOT_TEST_MQTT_TOPIC_PREFIX               "iottest"
+
+/**
+ * @brief The Last Will and Testament topic name in this demo.
+ *
+ * The MQTT server will publish a message to this topic name if this client is
+ * unexpectedly disconnected.
+ */
+#define WILL_TOPIC_NAME                          IOT_TEST_MQTT_TOPIC_PREFIX "/will"
+
+/**
+ * @brief The length of #WILL_TOPIC_NAME.
+ */
+#define WILL_TOPIC_NAME_LENGTH                   ( ( uint16_t ) ( sizeof( WILL_TOPIC_NAME ) - 1 ) )
+
+/**
+ * @brief The message to publish to #WILL_TOPIC_NAME.
+ */
+#define WILL_MESSAGE                             "MQTT demo unexpectedly disconnected."
+
+/**
+ * @brief The length of #WILL_MESSAGE.
+ */
+#define WILL_MESSAGE_LENGTH                      ( ( size_t ) ( sizeof( WILL_MESSAGE ) - 1 ) )
+
+
+
 
 /* Default connection parameters. */
 static const MQTTAgentConnectParams_t xDefaultConnectParameters =
@@ -218,8 +246,25 @@ static MQTTBool_t prvMultiTaskTestMQTTCallback( void * pvUserData,
 static MQTTBool_t prvMQTTCallback( void * pvUserData,
                                    const MQTTPublishData_t * const pxPublishParameters )
 {
+
     /* Give the semaphore to signal message receipt. */
     xSemaphoreGive( ( SemaphoreHandle_t ) pvUserData );
+
+    return eMQTTFalse;
+}
+
+                                   /**
+ * @brief Callback for MQTT LWT subscription.
+ */
+static MQTTBool_t prvMQTTLWTCallback( void * pvUserData,
+                                   const MQTTPublishData_t * const pxPublishParameters )
+{
+    if (strlen(WILL_MESSAGE) == pxPublishParameters->ulDataLength &&
+        strncmp(pxPublishParameters->pvData, WILL_MESSAGE, pxPublishParameters->ulDataLength) == 0) {
+
+        /* Give the semaphore to signal message receipt. */
+        xSemaphoreGive( ( SemaphoreHandle_t ) pvUserData );
+    }
 
     return eMQTTFalse;
 }
@@ -365,6 +410,7 @@ TEST_TEAR_DOWN( Full_MQTT_Agent_ALPN )
  */
 TEST_GROUP_RUNNER( Full_MQTT_Agent )
 {
+    RUN_TEST_CASE( Full_MQTT_Agent, LastWillAndTestament );
     RUN_TEST_CASE( Full_MQTT_Agent, AFQP_MQTT_Agent_SubscribePublishDefaultPort );
     RUN_TEST_CASE( Full_MQTT_Agent, AFQP_MQTT_Agent_InvalidCredentials );
 }
@@ -377,6 +423,110 @@ TEST_GROUP_RUNNER( Full_MQTT_Agent_ALPN )
     RUN_TEST_CASE( Full_MQTT_Agent_ALPN, MQTT_Agent_SubscribePublishAlpn );
 }
 /*-----------------------------------------------------------*/
+
+TEST( Full_MQTT_Agent, LastWillAndTestament )
+{
+    MQTTAgentReturnCode_t xReturned = eMQTTAgentFailure;
+    StaticSemaphore_t xSemaphore = { 0 };
+    MQTTAgentHandle_t xMQTTHandle = NULL;
+    MQTTAgentSubscribeParams_t xSubscribeParams;
+    BaseType_t xMQTTAgentCreated = pdFALSE;
+    MQTTAgentConnectParams_t xConnectParameters;
+    MQTTPublishParams_t xWillInfoParameters;
+    MQTTAgentHandle_t xTestMQTTHandle = NULL;
+    MQTTAgentConnectParams_t xTestConnectParameters;
+    MQTTAgentPublishParams_t xPublishParameters;
+
+    /*connect to IoT Core with LWT parameter. */
+    memcpy( &xConnectParameters, &xDefaultConnectParameters, sizeof( MQTTAgentConnectParams_t ) );
+    xConnectParameters.pWillInfo = &xWillInfoParameters;
+    xConnectParameters.pucClientId = "LWTtest";
+
+    /*connect to IoT Core and used to detect LWT. */
+    memcpy( &xTestConnectParameters, &xDefaultConnectParameters, sizeof( MQTTAgentConnectParams_t ) );    
+
+    /* Setup the MQTT LWT publish parameters. */
+    memset( &( xWillInfoParameters ), 0x00, sizeof( xWillInfoParameters ) );
+    xWillInfoParameters.pucTopic = WILL_TOPIC_NAME;
+    xWillInfoParameters.pvData = WILL_MESSAGE;
+    xWillInfoParameters.usTopicLength = WILL_TOPIC_NAME_LENGTH;
+    xWillInfoParameters.ulDataLength = WILL_MESSAGE_LENGTH;
+    xWillInfoParameters.xQos = eMQTTQoS0;
+
+    /* Initialize the semaphore as unavailable. */
+    TEST_ASSERT_NOT_NULL( xSemaphoreCreateCountingStatic( 1, 0, &xSemaphore ) );
+
+    /* Fill in the MQTTAgentConnectParams_t member that is not const. */
+    xConnectParameters.usClientIdLength = ( uint16_t ) strlen(
+        ( char * ) xConnectParameters.pucClientId );
+
+    xTestConnectParameters.usClientIdLength = ( uint16_t ) strlen(
+        ( char * ) xTestConnectParameters.pucClientId );
+
+
+    if( TEST_PROTECT() )
+    {
+        /* The MQTT client object must be created before it can be used. */
+        xReturned = MQTT_AGENT_Create( &xTestMQTTHandle );
+        TEST_ASSERT_EQUAL_INT( xReturned, eMQTTAgentSuccess );
+
+        /* Connect to the broker. */
+        xReturned = MQTT_AGENT_Connect( xTestMQTTHandle,
+                                        &xTestConnectParameters,
+                                        mqttagenttestTIMEOUT );
+
+        /* Setup subscribe parameters to subscribe to echo topic. */
+        xSubscribeParams.pucTopic = WILL_TOPIC_NAME;
+        xSubscribeParams.pvPublishCallbackContext = &xSemaphore;
+        xSubscribeParams.pxPublishCallback = prvMQTTLWTCallback;
+        xSubscribeParams.usTopicLength = ( uint16_t ) strlen( ( const char * ) WILL_TOPIC_NAME );
+        xSubscribeParams.xQoS = eMQTTQoS1;
+
+        /* Subscribe to the topic. */
+        xReturned = MQTT_AGENT_Subscribe( xTestMQTTHandle,
+                                          &xSubscribeParams,
+                                          mqttagenttestTIMEOUT );
+    
+        /* The MQTT client object must be created before it can be used. */
+        xReturned = MQTT_AGENT_Create( &xMQTTHandle );
+        TEST_ASSERT_EQUAL_INT( xReturned, eMQTTAgentSuccess );
+        xMQTTAgentCreated = pdTRUE;
+
+        /* Connect to the broker. */
+        xReturned = MQTT_AGENT_Connect( xMQTTHandle,
+                                        &xConnectParameters,
+                                        mqttagenttestTIMEOUT );
+        TEST_ASSERT_EQUAL_INT_MESSAGE( xReturned, eMQTTAgentSuccess, "Failed to connect to the MQTT broker with MQTT_AGENT_Connect()." );
+
+
+        //xReturned = MQTT_AGENT_Disconnect( xMQTTHandle, mqttagenttestTIMEOUT );
+        prvShutdownConnection( xMQTTHandle );
+
+        /* Take the semaphore to ensure the message is Received. */
+        if( pdFALSE == xSemaphoreTake( ( QueueHandle_t ) &( xSemaphore ), mqttagenttestTIMEOUT ) )
+        {
+            TEST_FAIL();
+        }
+        
+
+        /* Disconnect the client. */
+        xReturned = MQTT_AGENT_Disconnect( xTestMQTTHandle, mqttagenttestTIMEOUT );
+        TEST_ASSERT_EQUAL_INT( xReturned, eMQTTAgentSuccess );
+    }
+    else
+    {
+        TEST_FAIL();
+    }
+
+
+    if( xMQTTAgentCreated == pdTRUE )
+    {
+        /* Delete the MQTT client. */
+        xReturned = MQTT_AGENT_Delete( xTestMQTTHandle );
+        TEST_ASSERT_EQUAL_INT( xReturned, eMQTTAgentSuccess );
+    }
+
+}
 
 /* Test for ping-ponging a message using the default AWS IoT port for MQTT. */
 TEST( Full_MQTT_Agent, AFQP_MQTT_Agent_SubscribePublishDefaultPort )
