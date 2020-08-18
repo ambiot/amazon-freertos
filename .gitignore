@@ -1,0 +1,26 @@
+# Ignore uncrustify backups
+*.unc*
+doc/html/*
+doc/output/*
+doc/tag/*
+doxygen_warnings.txt
+/.metadata/
+.vscode/*
+*.o
+*.d 
+*.elf
+*.hex
+*.bin
+
+RemoteSystemsTempFiles/*
+
+# Ignore top-level build dir
+/build*/
+
+projects/realtek/amebaD/IAR/aws_demos/settings/*
+projects/realtek/amebaD/IAR/aws_demos/Debug/*
+projects/realtek/amebaD/IAR/aws_tests/settings/*
+projects/realtek/amebaD/IAR/aws_tests/Debug/*
+*.dep
+*.ewt
+
