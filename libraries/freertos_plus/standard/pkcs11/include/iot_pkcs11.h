@@ -22,17 +22,6 @@
  * http://aws.amazon.com/freertos
  * http://www.FreeRTOS.org
  */
- 
-/*
- * Notice:
- * For best security practice, it is recommended to utilize a random number
- * generation solution that is truly randomized and conforms to the guidelines
- * provided in the FreeRTOS Qualification Checklist. The random number generator
- * method presented in this file by the silicon vendor is not truly random in
- * nature. Please contact the silicon vendor for details regarding the method
- * implemented.
- *
-*/
 
 #ifndef _AWS_PKCS11_H_
 #define _AWS_PKCS11_H_
