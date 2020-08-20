@@ -202,6 +202,7 @@ static void vTaskRxSelect( void * param )
     {
         if (ctx->state == SST_RX_CLOSING)
         {
+            ctx->rx_handle = NULL;
             ctx->state = SST_RX_CLOSED;
             vTaskDelete( NULL );
         }
@@ -214,6 +215,7 @@ static void vTaskRxSelect( void * param )
             /*ctx->rx_callback = NULL; */
 
             /*vTaskDelete( rx_handle ); */
+            ctx->rx_handle = NULL;
             vTaskDelete( NULL );
         }
 
@@ -545,6 +547,8 @@ int32_t SOCKETS_Close( Socket_t xSocket )
 
     if( 0 <= ctx->ip_socket )
     {
+        if( ctx->rx_handle != NULL )
+        {
         int   cnt = 0;
         ctx->state = SST_RX_CLOSING;
 
@@ -552,6 +556,7 @@ int32_t SOCKETS_Close( Socket_t xSocket )
         {
             cnt++;
             vTaskDelay( 10 );
+        }
         }
 
         lwip_close( ctx->ip_socket );

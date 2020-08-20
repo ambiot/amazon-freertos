@@ -476,7 +476,11 @@ int eap_cert_setup(ssl_context *ssl)
 
 #elif CONFIG_USE_MBEDTLS
 
-#include <mbedtls/config.h>
+#if !defined(MBEDTLS_CONFIG_FILE)
+#include "mbedtls/config.h"
+#else
+#include MBEDTLS_CONFIG_FILE
+#endif
 #include <mbedtls/platform.h>
 #include <mbedtls/ssl.h>
 #include <mbedtls/ssl_internal.h>

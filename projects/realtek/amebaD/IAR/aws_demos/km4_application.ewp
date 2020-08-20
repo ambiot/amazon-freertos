@@ -8527,7 +8527,7 @@
         </configuration>
     </group>
     <group>
-        <name>amazon202002</name>
+        <name>amazon</name>
         <group>
             <name>demos</name>
             <group>
@@ -8597,6 +8597,9 @@
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\arc4.c</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\aria.c</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\asn1parse.c</name>
                         </file>
                         <file>
@@ -8619,6 +8622,12 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\certs.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\chacha20.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\chachapoly.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\cipher.c</name>
@@ -8672,6 +8681,9 @@
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\havege.c</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\hkdf.c</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\hmac_drbg.c</name>
                         </file>
                         <file>
@@ -8696,6 +8708,9 @@
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\net_sockets.c</name>
                         </file>
                         <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\nist_kw.c</name>
+                        </file>
+                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\oid.c</name>
                         </file>
                         <file>
@@ -8709,6 +8724,9 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\pk_wrap.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\pkcs11.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\pkcs12.c</name>
@@ -8727,6 +8745,9 @@
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\platform_util.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\poly1305.c</name>
                         </file>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\ripemd160.c</name>
@@ -8804,35 +8825,38 @@
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\library\xtea.c</name>
                         </file>
                     </group>
-                    <group>
-                        <name>utils</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\utils\mbedtls_utils.c</name>
-                        </file>
-                    </group>
+                </group>
+                <group>
+                    <name>mbedtls_utils</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls_utils\mbedtls_error.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls_utils\mbedtls_utils.c</name>
+                    </file>
                 </group>
                 <group>
                     <name>tinycbor</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\cborencoder.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\src\cborencoder.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\cborencoder_close_container_checked.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\src\cborencoder_close_container_checked.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\cborerrorstrings.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\src\cborerrorstrings.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\cborparser.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\src\cborparser.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\cborparser_dup_string.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\src\cborparser_dup_string.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\cborpretty.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\src\cborpretty.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\cborvalidation.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\src\cborvalidation.c</name>
                     </file>
                 </group>
                 <group>
@@ -9075,6 +9099,7 @@
                         <state>CONFIG_FUNCION_O0_OPTIMIZE</state>
                         <state>DM_ODM_SUPPORT_TYPE=32</state>
                         <state>__IEEE_LITTLE_ENDIAN</state>
+                        <state>MBEDTLS_CONFIG_FILE="aws_mbedtls_config.h"</state>
                     </option>
                     <option>
                         <name>CCPreprocFile</name>
@@ -9339,12 +9364,14 @@
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\standard\utils\include</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\jsmn</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\include</state>
-                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls\include\mbedtls</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\tinycbor\src</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\unity\src</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\unity\extras\fixture\src</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\pkcs11</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\freertos_kernel\include</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls_utils</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls_config</state>
                     </option>
                     <option>
                         <name>CCStdIncCheck</name>

@@ -1,0 +1,59 @@
+
+/*
+ * Release Note
+ */
+
+	v7.0a
+	1. First release for AmebaZ2.
+	
+	v7.1a_rc1
+	1. revision 35223
+	2. TBD list
+		a. Tickless mode
+		b. example eap, googlenest, high_load_memory_use, httpd & uart_atcmd
+		c. Trust Zone
+
+	v7.1a_rc2
+	1.revision 35446
+	2.TBD list
+		a.example eap, google nest.
+
+	v7.1a_rc3
+	1.revision 35629
+	2.TBD list
+		a.example eap, google nest.
+
+	v7.1a_rc3_gcc
+	1.revision 35662
+	2.TBD list
+		a.example eap, google nest.
+
+	v7.1a_rc5_gcc
+	1.revision 37107
+    
+    v7.1a_rc6_gcc
+    1. revision 38005
+    2. FreeRTOS 10.2.0 in TZ project
+    3. MbedTLS private key in TZ
+    4. pyOCD support
+
+    v7.1c_gcc
+    1. revision 38630
+    2. v7.1a_rc6_gcc + 7.1a_rc6_patch_r38630_full_v(04)
+    3. support both IAR & GCC
+    4. bug fix
+    
+    v7.1d
+    1. revision 41545
+    2. add mimo support for promisc mode
+    3. more free RAM
+    4. support trp/tis certification test
+    5. update GCC toolchain version
+    6. change start bt example from atcmd
+    7. add ble central example and ble scatternet example to project
+    8. add Support for MAC OS
+    9. bug fix
+	10. + 7.1d_v4_critical_r41397_BT_patch_v(02) to fix BT hardfault issue on TrustZone
+	11. + 7.1d_v4_critical_r41438_wifi_TCP_patch_v(01) to support API wifi_set_lowrssi_use_b
+	12. + 7.1d_v4_critical_r41458_BT_patch_v(04) to support BT Mesh
+	13. + 7.1d_rc4_critical_patch_r41545_enable_secure_boot_v(02) to support secure boot and RTL8708CF

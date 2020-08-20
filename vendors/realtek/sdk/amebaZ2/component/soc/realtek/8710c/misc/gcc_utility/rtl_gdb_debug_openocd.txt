@@ -1,0 +1,74 @@
+# GDB script for debug with openOCD
+
+#===============================================================================
+#set GDB connection 
+set remotetimeout 100000
+target remote :3333
+
+#===============================================================================
+#Message display setting
+#disable all messages
+
+set verbose off
+set complaints 0
+set confirm off
+set exec-done-display off
+show exec-done-display
+set trace-commands off
+#set debug aix-thread off
+#set debug dwarf2-die 0
+set debug displaced off 
+set debug expression 0
+set debug frame 0
+set debug infrun 0
+set debug observer 0
+set debug overload 0
+#set debugvarobj 0
+set pagination off
+set print address off
+set print symbol-filename off
+set print symbol off
+set print pretty off
+set print object off
+#set debug notification off
+set debug parser off
+set debug remote 0
+
+#===============================================================================
+#set JTAG and external SRAM
+monitor reset halt
+monitor sleep 20
+
+#===============================================================================
+#not a version, then will use wdt reset to reset peripherals and cpu will park at ram start
+set $VER = (({int}0x400001F0) >> 4) & 0xF
+printf "VER: %x\n",$VER
+if ($VER != 0x0)
+	printf "WDT RESET\n"
+	set $FASTBOOT = ({int}0x400000F0) & 0xFFFF0000
+	set {int}0x400000F0 = $FASTBOOT
+	set $REASON = ({int}0x400000F4) | 0x4
+	set {int}0x400000F4 = $REASON
+	set {int}0x10000480=0
+	set {int}0x40002800 = 0x42A50001
+	monitor sleep 2000
+	set $FASTBOOT = ({int}0x400000F0) & 0xFFFF | 0x8710
+	set {int}0x400000F0 = $FASTBOOT	
+	monitor reset halt
+	monitor sleep 20
+	set $REASON = $REASON & ~0x4
+	set {int}0x400000F4 = $REASON
+end
+
+#===============================================================================
+#Load flash download file
+source debug.gdb
+
+hbreak main
+continue
+clear main
+
+
+
+
+

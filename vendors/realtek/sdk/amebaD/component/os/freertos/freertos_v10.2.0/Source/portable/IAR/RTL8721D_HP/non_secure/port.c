@@ -895,7 +895,7 @@ void vPortEndScheduler( void ) /* PRIVILEGED_FUNCTION */
 	}
 #endif /* configENABLE_MPU */
 /*-----------------------------------------------------------*/
-#ifndef CONFIG_ENABLE_AMAZON_FREERTOS
+#if 0//ndef CONFIG_ENABLE_AMAZON_FREERTOS
 void vApplicationIdleHook( void )
 {
 	/* Use the idle task to place the CPU into a low power mode.  Greater power

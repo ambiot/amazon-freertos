@@ -384,14 +384,12 @@ void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
  * configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h.
  *
  */
-#if 0 //hank
 void vApplicationMallocFailedHook()
 {
     /* The TCP tests will test behavior when the entire heap is allocated. In
      * order to avoid interfering with those tests, this function does nothing. */
 }
-#endif
-#if 0 // hank
+
 /**
  * @brief Loop forever if stack overflow is detected.
  *
@@ -413,10 +411,9 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
     {
     }
 }
-#endif
+
 /*-----------------------------------------------------------*/
 
-#if 0 //hank
 /**
  * @brief User defined Idle task function.
  *
@@ -438,7 +435,7 @@ void vApplicationIdleHook( void )
         xLastPrint = xTimeNow;
     }
 }
-#endif
+
 /*-----------------------------------------------------------*/
 
 /**

@@ -37,7 +37,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#if !defined(MBEDTLS_CONFIG_FILE)
 #include "mbedtls/config.h"
+#else
+#include MBEDTLS_CONFIG_FILE
+#endif
 
 #include "flash_api.h"
 #include <device_lock.h>
@@ -45,12 +49,12 @@
 #include "aws_clientcredential.h"
 
 #if defined(CONFIG_PLATFORM_8195A) || defined(CONFIG_PLATFORM_8711B) || defined(CONFIG_PLATFORM_8721D)
-#define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    2048
+#define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
 #define pkcs11OBJECT_FLASH_CERT_PRESENT      ( 0x22ABCDEFuL ) //magic number for check flash data
-#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0xFB000 ) //Flash location for CERT
-#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0xFA000 ) //Flash location for Priv Key
-#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0xF9000 ) //Flash location for Pub Key
-#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0xF8000 ) //Flash location for code verify Key
+#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x102000 ) //Flash location for CERT
+#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x103000 ) //Flash location for Priv Key
+#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x104000 ) //Flash location for Pub Key
+#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x105000 ) //Flash location for code verify Key
 
 /*
  * Flash Format
@@ -117,6 +121,11 @@ void prvLabelToFlashAddrHandle( uint8_t * pcLabel,
     }
 }
 
+CK_RV PKCS11_PAL_Initialize( void )
+{
+    return CKR_OK;
+}
+
 /**
 * @brief Writes a file to local storage.
 *
@@ -129,10 +138,10 @@ void prvLabelToFlashAddrHandle( uint8_t * pcLabel,
 * @return The file handle of the object that was stored.
 */
 CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
-    uint8_t * pucData,
-    uint32_t ulDataSize )
+                                        CK_BYTE_PTR pucData,
+                                        CK_ULONG ulDataSize )
 {
-	CK_OBJECT_HANDLE xHandle = eInvalidHandle;
+	CK_OBJECT_HANDLE xHandle = 0;
 	uint32_t pcFlashAddr;
 	CK_RV xBytesWritten = 0;
 	CK_ULONG ulFlashMark = pkcs11OBJECT_FLASH_CERT_PRESENT;
@@ -169,26 +178,26 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
 * Port-specific object handle retrieval.
 *
 *
-* @param[in] pLabel         Pointer to the label of the object
+* @param[in] pxLabel         Pointer to the label of the object
 *                           who's handle should be found.
 * @param[in] usLength       The length of the label, in bytes.
 *
 * @return The object handle if operation was successful.
 * Returns eInvalidHandle if unsuccessful.
 */
-CK_OBJECT_HANDLE PKCS11_PAL_FindObject( uint8_t * pLabel,
-    uint8_t usLength )
+CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
+                                        CK_ULONG usLength )
 {
 	/* Avoid compiler warnings about unused variables. */
 	( void ) usLength;
 
-	CK_OBJECT_HANDLE xHandle = eInvalidHandle;
+	CK_OBJECT_HANDLE xHandle = 0;
 	uint32_t pcFlashAddr = 0;
 	flash_t flash;
 	CK_ULONG ulFlashMark;
 
 	/* Converts a label to its respective flash address and handle. */
-	prvLabelToFlashAddrHandle( pLabel, &pcFlashAddr, &xHandle);
+	prvLabelToFlashAddrHandle( pxLabel, &pcFlashAddr, &xHandle);
 
 	/* Check if object exists/has been created before returning. */
 	if(xHandle != eInvalidHandle)
@@ -228,9 +237,9 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( uint8_t * pLabel,
 * error.
 */
 CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
-    uint8_t ** ppucData,
-    uint32_t * pulDataSize,
-    CK_BBOOL * pIsPrivate )
+                                      CK_BYTE_PTR * ppucData,
+                                      CK_ULONG_PTR pulDataSize,
+                                      CK_BBOOL * pIsPrivate )
 {
     CK_RV xReturn = CKR_OK;
     uint32_t pcFlashAddr = 0;
@@ -311,8 +320,8 @@ exit:
 * @param[in] ulDataSize    The length of the buffer to free.
 *                          (*pulDataSize from PKCS11_PAL_GetObjectValue())
 */
-void PKCS11_PAL_GetObjectValueCleanup( uint8_t * pucData,
-    uint32_t ulDataSize )
+void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
+                                       CK_ULONG ulDataSize )
 {
 	/* Unused parameters. */
 	( void ) ulDataSize;
