@@ -2,7 +2,7 @@
 => branch : ambd-v202002
 
 # AmebaD Getting Started Guide
-https://github.com/ambiot/amazon-freertos/blob/ambd-v202002/AmebaD_Amazon_FreeRTOS_Getting_Started_Guide_v1.3.pdf
+https://github.com/ambiot/amazon-freertos/blob/ambd-v202002/AmebaD_Amazon_FreeRTOS_Getting_Started_Guide_v1.4.pdf
 
 
 
