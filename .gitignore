@@ -17,10 +17,15 @@ RemoteSystemsTempFiles/*
 # Ignore top-level build dir
 /build*/
 
-projects/realtek/amebaD/IAR/aws_demos/settings/*
-projects/realtek/amebaD/IAR/aws_demos/Debug/*
-projects/realtek/amebaD/IAR/aws_tests/settings/*
-projects/realtek/amebaD/IAR/aws_tests/Debug/*
+# RTK
 *.dep
 *.ewt
+projects/realtek/amebaD/IAR/aws_demos/settings/*
+projects/realtek/amebaD/IAR/aws_tests/settings/*
+#projects/realtek/amebaD/IAR/aws_demos/Debug/*
+#projects/realtek/amebaD/IAR/aws_tests/Debug/*
+projects/realtek/amebaZ2/IAR/aws_demos/settings/*
+projects/realtek/amebaZ2/IAR/aws_tests/settings/*
+#projects/realtek/amebaZ2/IAR/aws_demos/Debug/*
+#projects/realtek/amebaZ2/IAR/aws_tests/Debug/*
 

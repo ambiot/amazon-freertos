@@ -1,6 +1,6 @@
 /**************************************************************************//**
  * @file     app_start.c
- * @brief    The application entry function implementation. It initial the 
+ * @brief    The application entry function implementation. It initial the
  *           application functions.
  * @version  V1.00
  * @date     2016-05-27
@@ -41,7 +41,7 @@ extern void bus_idau_setup(uint32_t idau_idx, uint32_t start_addr, uint32_t end_
 //void app_start (void) __attribute__ ((noreturn));
 
 #if !defined ( __CC_ARM ) && !(defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)) /* ARM Compiler 4/5 */
-// for __CC_ARM compiler, it will add a __ARM_use_no_argv symbol for every main() function, that cause linker report error 
+// for __CC_ARM compiler, it will add a __ARM_use_no_argv symbol for every main() function, that cause linker report error
 /// default main
 __weak int main (void)
 {
@@ -54,12 +54,12 @@ __weak int main (void)
 
 __weak void __iar_data_init3(void)
 {
-	
+
 }
 
 __weak void __iar_zero_init3(void)
 {
-	
+
 }
 
 #if (defined(CONFIG_MIIO)&&(CONFIG_MIIO))
@@ -83,7 +83,7 @@ void HalHardFaultHandler_Patch_asm(void)
 #endif
 
 #if defined(CONFIG_BUILD_SECURE)
-/** 
+/**
  *  @brief To setup SAUs to partition the system memory as Secure memory and Non-secure memory.
  *  @param[in]   ns_region  The table for this function to return the memory range of NS world.
  *                          For the boot flow to check whether the NS world entry is located in
@@ -113,7 +113,7 @@ void sau_setup(ns_region_t *ns_region)
         ns_region[1].end_addr = SAU_INIT_END1;
         ns_region[1].is_valid = 1;
 #endif
-    
+
 #if SAU_INIT_REGION2
         //dbg_printf ("SAU 2: 0x%08x ~ 0x%08x as %s\r\n", SAU_INIT_START2, SAU_INIT_END2, SAU_INIT_NSC2?"Secure(NSC)":"Non-Secure");
         if (SAU_INIT_NSC2 == 0) {
@@ -139,9 +139,12 @@ void sau_setup(ns_region_t *ns_region)
 }
 #endif
 
+__weak void os_heap_init(void) { /* default os_heap_init, for FreeRTOS heap5 */ }
+
 void app_start (void)
-{    
+{
     dbg_printf ("Build @ %s, %s\r\n", __TIME__, __DATE__);
+    os_heap_init();
 
 #if (defined(CONFIG_MIIO)&&(CONFIG_MIIO))
 	extern int_vector_t ram_vector_table[];
@@ -151,16 +154,16 @@ void app_start (void)
 	ram_vector_table[6] = (int_vector_t)HalHardFaultHandler_Patch_asm;
 	ram_vector_table[7] = (int_vector_t)HalHardFaultHandler_Patch_asm;
 #endif
-	
+
 #if defined (__ICCARM__)
 	// __iar_data_init3 replaced by __iar_cstart_call_ctors, just do c++ constructor
 	//__iar_cstart_call_ctors(NULL);
 #endif
-	
+
     shell_cmd_init ();
     main();
 #if defined ( __ICCARM__ )
-	// for compile issue, If user never call this function, Liking fail 
+	// for compile issue, If user never call this function, Liking fail
 	__iar_data_init3();
 #endif
 }

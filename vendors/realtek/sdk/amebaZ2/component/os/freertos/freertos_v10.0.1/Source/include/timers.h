@@ -73,13 +73,7 @@ or interrupt version of the queue send function should be used. */
  * reference the subject timer in calls to other software timer API functions
  * (for example, xTimerStart(), xTimerReset(), etc.).
  */
-#if ((defined ENABLE_AMAZON_COMMON) && (!defined AMAZON_FREERTOS_ENABLE_UNIT_TESTS))
-//from 10.3.0
-struct tmrTimerControl; /* The old naming convention is used to prevent breaking kernel aware debuggers. */
-typedef struct tmrTimerControl * TimerHandle_t;
-#else
 typedef void * TimerHandle_t;
-#endif
 
 /*
  * Defines the prototype to which timer callback functions must conform.

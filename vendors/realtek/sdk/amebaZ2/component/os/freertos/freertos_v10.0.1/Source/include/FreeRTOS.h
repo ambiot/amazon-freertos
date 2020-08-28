@@ -1116,22 +1116,6 @@ typedef struct xSTATIC_EVENT_GROUP
  * the hope users will recognise that it would be unwise to make direct use of
  * the structure members.
  */
-#if ((defined ENABLE_AMAZON_COMMON) && (!defined AMAZON_FREERTOS_ENABLE_UNIT_TESTS))
-//10.3.0
-typedef struct xSTATIC_TIMER
-{
-	void				*pvDummy1;
-	StaticListItem_t	xDummy2;
-	TickType_t			xDummy3;
-	void 				*pvDummy5;
-	TaskFunction_t		pvDummy6;
-	#if( configUSE_TRACE_FACILITY == 1 )
-		UBaseType_t		uxDummy7;
-	#endif
-	uint8_t 			ucDummy8;
-
-} StaticTimer_t;
-#else
 typedef struct xSTATIC_TIMER
 {
 	void				*pvDummy1;
@@ -1148,7 +1132,7 @@ typedef struct xSTATIC_TIMER
 	#endif
 
 } StaticTimer_t;
-#endif
+
 /*
 * In line with software engineering best practice, especially when supplying a
 * library that is likely to change in future versions, FreeRTOS implements a

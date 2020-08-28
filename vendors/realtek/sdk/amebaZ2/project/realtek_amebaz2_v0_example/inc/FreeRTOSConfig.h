@@ -391,6 +391,8 @@ extern void vLoggingPrint( const char * pcMessage );
 
 #define configUSE_DAEMON_TASK_STARTUP_HOOK		0
 
+#define configRUN_FREERTOS_SECURE_ONLY                  1
+
 #if defined(configENABLE_TRUSTZONE) && (configENABLE_TRUSTZONE == 1)
 extern void rtw_create_secure_context(u32 secure_stack_size);
 #endif

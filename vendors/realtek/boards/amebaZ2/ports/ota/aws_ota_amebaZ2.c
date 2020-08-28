@@ -373,26 +373,26 @@ int16_t prvPAL_WriteBlock_amebaZ2(OTA_FileContext_t *C, int32_t iOffset, uint8_t
     uint32_t WriteLen, offset;
 	uint32_t NewFWAddr = 0;
 
+#ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS
+		OTA_PRINT("[OTA_TEST] Write %d bytes @ 0x%x\n", iBlockSize, address+iOffset);
+		device_mutex_lock(RT_DEV_LOCK_FLASH);
+		flash_erase_sector(&flash_ota, C->lFileHandle - SPI_FLASH_BASE);
+		if(flash_stream_write(&flash_ota, address+iOffset, iBlockSize, pacData) < 0){
+			OTA_PRINT("[%s] Write sector failed\n", __FUNCTION__);
+			device_mutex_unlock(RT_DEV_LOCK_FLASH);
+			return -1;
+		}
+		aws_ota_imgsz += iBlockSize;
+		device_mutex_unlock(RT_DEV_LOCK_FLASH);
+		return iBlockSize;
+#endif
+
 	gNewImgLen = C->ulFileSize - (C->ulFileSize%1024);
 	if(gNewImgLen<1024)
 	{
 		OTA_PRINT("Invalid file size:%d\n",gNewImgLen);
 		return -1;
 	}
-
-#ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS
-    OTA_PRINT("[OTA_TEST] Write %d bytes @ 0x%x\n", iBlockSize, address+iOffset);
-    device_mutex_lock(RT_DEV_LOCK_FLASH);
-    flash_erase_sector(&flash_ota, C->lFileHandle - SPI_FLASH_BASE);
-    if(flash_stream_write(&flash_ota, address+iOffset, iBlockSize, pacData) < 0){
-        OTA_PRINT("[%s] Write sector failed\n", __FUNCTION__);
-        device_mutex_unlock(RT_DEV_LOCK_FLASH);
-        return -1;
-    }
-    aws_ota_imgsz += iBlockSize;
-    device_mutex_unlock(RT_DEV_LOCK_FLASH);
-    return iBlockSize;
-#endif
 
 	if (aws_ota_target_hdr_get != true) {
 		int i;
