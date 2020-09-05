@@ -1,6 +1,6 @@
 ::@echo off
 
-set sourcePath=C:\working\github\ambd_amazon-freertos
+set sourcePath="C:\workspace\amazon-freertos"
 set iarbuild="C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.1\common\bin\IarBuild.exe"
 
 set opensslpath="C:\Program Files\OpenSSL-Win64\bin\openssl.exe"

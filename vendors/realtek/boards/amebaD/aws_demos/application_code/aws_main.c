@@ -296,6 +296,7 @@ void prvWifiConnect( void )
         }
         else
         {
+            #if 0
             /* Connection failed, configure SoftAP. */
             configPRINTF( ( "Wi-Fi failed to connect to AP %s.\r\n", xNetworkParams.pcSSID ) );
 
@@ -314,6 +315,9 @@ void prvWifiConnect( void )
             }
 
             configPRINTF( ( "Wi-Fi configuration successful. \r\n" ) );
+            #else
+            configPRINTF( ( "Wi-Fi failed to connect to AP.\r\n" ) );
+            #endif
         }
 }
 /*-----------------------------------------------------------*/

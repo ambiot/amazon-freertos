@@ -43,7 +43,7 @@
         "id": "device1",
         "connectivity": {
           "protocol": "uart",
-          "serialPort": "COM4"
+          "serialPort": "COM20"
         },
         "identifiers": [
           {

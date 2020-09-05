@@ -1,18 +1,18 @@
 ::@echo off
 
-set sourcePath_ori=C:/workspace/idt/ambd-afr
+set sourcePath_ori=C:/workspace/amazon-freertos
 set sourcePath=%sourcePath_ori:/=\%
 
 SET project_type=%1
 
-set FlashToolDir=C:\workspace\idt\ambd-afr\vendors\realtek\tools\1-10_MP_Image_Tool_Release
+set FlashToolDir=C:\workspace\amazon-freertos\vendors\realtek\tools\1-10_MP_Image_Tool_Release
 set ImagePath_km0=%sourcePath%\projects\realtek\amebaD\IAR\%project_type%\Debug\Exe\km0_image
 set ImagePath_km4=%sourcePath%\projects\realtek\amebaD\IAR\%project_type%\Debug\Exe\km4_image
 set RootDir=%CD%
-set COMPORT=COM4
+set COMPORT=COM20
 
-::Delay 10 seconds
-ping 127.0.0.1 -n 10 -w 1000
+::Delay 3 seconds
+ping 127.0.0.1 -n 3 -w 1000
 
 cd %FlashToolDir%
 
