@@ -81,7 +81,7 @@ if not exist Debug\Exe\firmware_is.bin (
 )
 
 ::generate flash image, including partition + bootloader + firmware
-%tooldir%\elf2bin.exe combine Debug/Exe/flash_is.bin PTAB=Debug\Exe\partition.bin,BOOT=Debug\Exe\bootloader.bin,FW1=Debug\Exe\firmware_is.bin >> postbuild_is_log.txt
+%tooldir%\elf2bin.exe combine Debug/Exe/flash_is.bin PTAB=Debug\Exe\partition.bin,BOOT=Debug\Exe\bootloader.bin,FW1=Debug\Exe\firmware_is.bin,FW2=Debug\Exe\firmware_is.bin >> postbuild_is_log.txt
 if not exist Debug\Exe\flash_is.bin (
 	echo flash_is.bin isn't generated, check postbuild_is_log.txt
 	echo flash_is.bin isn't generated > postbuild_is_error.txt

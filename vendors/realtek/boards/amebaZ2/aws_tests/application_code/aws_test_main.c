@@ -201,7 +201,11 @@ void vApplicationDaemonTaskStartupHook( void )
         if( SYSTEM_Init() == pdPASS )
         {
             /* Connect to the Wi-Fi before running the tests. */
-            prvWifiConnect();
+            do
+            {
+                prvWifiConnect();
+                vTaskDelay( 50000 );
+            }while(WIFI_IsConnected()!=TRUE);
 
             /* Provision the device with AWS certificate and private key. */
             vDevModeKeyProvisioning();
@@ -277,9 +281,9 @@ void prvWifiConnect( void )
 
     /* Setup parameters. */
     xNetworkParams.pcSSID = clientcredentialWIFI_SSID;
-        xNetworkParams.ucSSIDLength = sizeof( clientcredentialWIFI_SSID );
+    xNetworkParams.ucSSIDLength = sizeof( clientcredentialWIFI_SSID );
     xNetworkParams.pcPassword = clientcredentialWIFI_PASSWORD;
-        xNetworkParams.ucPasswordLength = sizeof( clientcredentialWIFI_PASSWORD );
+    xNetworkParams.ucPasswordLength = sizeof( clientcredentialWIFI_PASSWORD );
     xNetworkParams.xSecurity = clientcredentialWIFI_SECURITY;
     xNetworkParams.cChannel = 0;
 
@@ -304,7 +308,7 @@ void prvWifiConnect( void )
              * The while loop below will block the above printing. */
             vTaskDelay( mainLOGGING_WIFI_STATUS_DELAY );
 
-            while( 1 )
+            //while( 1 )
         {
         }
     }

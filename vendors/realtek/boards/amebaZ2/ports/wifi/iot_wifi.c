@@ -194,10 +194,10 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
         ret = eWiFiFailure;
         if(ota_recover==1)
         {
-			if(reconnect_count>=5)
+			if(reconnect_count==5)
 			{
-				printf("sys_recover_ota_signature.\n");
-				sys_recover_ota_signature();
+				printf("sys_clear_ota_signature.\n");
+				sys_clear_ota_signature();
 				printf("watchdog_start : 60s\n");
 				watchdog_init(60000);
 				watchdog_start();

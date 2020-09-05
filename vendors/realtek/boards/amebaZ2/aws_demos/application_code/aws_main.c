@@ -210,7 +210,7 @@ void vApplicationDaemonTaskStartupHook( void )
         if( SYSTEM_Init() == pdPASS )
         {
             /* Connect to the Wi-Fi before running the tests. */
-            prvWifiConnect();
+            prvWifiConnect();  
 
             /* Provision the device with AWS certificate and private key. */
             vDevModeKeyProvisioning();
@@ -296,24 +296,28 @@ void prvWifiConnect( void )
         }
         else
         {
-            /* Connection failed, configure SoftAP. */
-            configPRINTF( ( "Wi-Fi failed to connect to AP %s.\r\n", xNetworkParams.pcSSID ) );
+			#if 0
+				/* Connection failed, configure SoftAP. */
+				configPRINTF( ( "Wi-Fi failed to connect to AP %s.\r\n", xNetworkParams.pcSSID ) );
 
-            xNetworkParams.pcSSID = wificonfigACCESS_POINT_SSID_PREFIX;
-            xNetworkParams.pcPassword = wificonfigACCESS_POINT_PASSKEY;
-            xNetworkParams.xSecurity = wificonfigACCESS_POINT_SECURITY;
-            xNetworkParams.cChannel = wificonfigACCESS_POINT_CHANNEL;
+				xNetworkParams.pcSSID = wificonfigACCESS_POINT_SSID_PREFIX;
+				xNetworkParams.pcPassword = wificonfigACCESS_POINT_PASSKEY;
+				xNetworkParams.xSecurity = wificonfigACCESS_POINT_SECURITY;
+				xNetworkParams.cChannel = wificonfigACCESS_POINT_CHANNEL;
 
-            configPRINTF( ( "Connect to SoftAP %s using password %s. \r\n",
-                            xNetworkParams.pcSSID, xNetworkParams.pcPassword ) );
+				configPRINTF( ( "Connect to SoftAP %s using password %s. \r\n",
+								xNetworkParams.pcSSID, xNetworkParams.pcPassword ) );
 
-            while( WIFI_ConfigureAP( &xNetworkParams ) != eWiFiSuccess )
-            {
-                configPRINTF( ( "Connect to SoftAP %s using password %s and configure Wi-Fi. \r\n",
-                                xNetworkParams.pcSSID, xNetworkParams.pcPassword ) );
-            }
+				while( WIFI_ConfigureAP( &xNetworkParams ) != eWiFiSuccess )
+				{
+					configPRINTF( ( "Connect to SoftAP %s using password %s and configure Wi-Fi. \r\n",
+									xNetworkParams.pcSSID, xNetworkParams.pcPassword ) );
+				}
 
-            configPRINTF( ( "Wi-Fi configuration successful. \r\n" ) );
+				configPRINTF( ( "Wi-Fi configuration successful. \r\n" ) );
+			#else
+				configPRINTF( ( "Wi-Fi failed to connect to AP.\r\n" ) );
+			#endif
         }
 }
 /*-----------------------------------------------------------*/

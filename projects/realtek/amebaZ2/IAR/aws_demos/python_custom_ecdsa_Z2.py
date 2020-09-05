@@ -49,6 +49,6 @@ f.write(bytes([ota1_sig_size]))
 f.close()
 
 #Caculate OTA-siganture
-subprocess.call([r'get_ota_signature.bat'])
+#subprocess.call([r'get_ota_signature.bat'])
 
 #os.remove('./Debug/Exe/firmware_is_pad.bin')

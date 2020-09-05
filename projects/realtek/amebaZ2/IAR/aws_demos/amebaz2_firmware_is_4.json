@@ -41,7 +41,7 @@
 			"enc":false,
 			"user_key2":"BB0102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F",
 			"__comment_pkey_idx":"assign by program, no need to configurate",
-			"serial": 2
+			"serial": 4
 		},
         "FST":{
 			"__comment_FST0": "enc_algorithm: cbc/ecb with cipher key",

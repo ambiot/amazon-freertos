@@ -1,0 +1,85 @@
+{
+  "sourcePath": "C:/workspace/amazon-freertos",
+  "vendorPath": "C:/workspace/amazon-freertos/vendors/realtek/boards/amebaZ2",
+  "inputImageFilePath": "C:/workspace/amazon-freertos/projects/realtek/amebaZ2/IAR/aws_demos/Debug/Exe/flash_is.bin",
+  "outputSignatureFilePath": "C:/workspace/amazon-freertos/projects/realtek/amebaZ2/IAR/aws_demos/Debug/Exe/IDT-OTA-Signature",
+  "buildTool": {
+    "name": "IAR",
+    "version": "8.1",
+    "command": [
+      "C:/workspace/devicetester_freertos_win_3.1.2_ambZ2/configs/script_templates/build.bat {{enableTests}}"
+    ]
+  },
+  "flashTool": {
+    "name": "1-10_MP_Image_Tool",
+    "version": "2.4",
+    "command": [
+      "C:/workspace/devicetester_freertos_win_3.1.2_ambZ2/configs/script_templates/flash.bat {{buildImageName}}"
+    ],
+    "buildImageInfo" : {
+      "testsImageName": "aws_tests",
+      "demosImageName": "aws_demos"
+    }
+  },
+  "clientWifiConfig": {
+    "wifiSSID": "Test",
+    "wifiPassword": "12342234",
+    "wifiSecurityType": "eWiFiSecurityWPA2"
+  },
+  "testWifiConfig": {
+    "wifiSSID": "Test",
+    "wifiPassword": "12342234",
+    "wifiSecurityType": "eWiFiSecurityWPA2"
+  },
+  "echoServerCertificateConfiguration": {
+    "certificateGenerationMethod": "Automatic",
+    "customPath": {
+      "certificatePath":"<C:/path/to/certificate>",
+      "privateKeyPath": "<C:/path/to/privateKey>"
+    },
+    "eccCurveFormat": "P256"
+  },
+  "echoServerConfiguration": {
+    "securePortForSecureSocket": 33333,
+    "insecurePortForSecureSocket": 33334,
+    "insecurePortForWiFi": 33335
+  },
+  "otaConfiguration": {
+    "otaDemoConfigFilePath": "C:/workspace/amazon-freertos/vendors/realtek/boards/amebaZ2/aws_demos/config_files/aws_demo_config.h",
+    "otaFirmwareFilePath": "C:/workspace/amazon-freertos/projects/realtek/amebaZ2/IAR/aws_demos/Debug/Exe/firmware_is_sig.bin",
+    "deviceFirmwareFileName": "firmware_is_sig.bin",
+    "codeSigningConfiguration": {
+      "signingMethod": "Custom",
+      "signerHashingAlgorithm": "SHA256",
+      "signerSigningAlgorithm": "ECDSA",
+      "signerCertificate": "C:/workspace/amazon-freertos/projects/realtek/amebaZ2/IAR/aws_demos/ecdsa-sha256-signer.crt.pem",
+      "signerCertificateFileName": "ecdsa-sha256-signer.crt.pem",
+      "compileSignerCertificate": true,
+      "signCommand": [
+        "C:/workspace/devicetester_freertos_win_3.1.2_ambZ2/configs/script_templates/sign.bat {{inputImageFilePath}} {{outputSignatureFilePath}}"
+      ]
+    }
+  },
+  "freertosFileConfiguration": {
+    "required": [
+      {
+        "configName": "pkcs11Config",
+        "filePath": "C:/workspace/amazon-freertos/vendors/realtek/boards/amebaZ2/aws_tests/config_files/iot_pkcs11_config.h"
+      },
+      {
+        "configName": "pkcs11TestConfig",
+        "filePath": "C:/workspace/amazon-freertos/vendors/realtek/boards/amebaZ2/aws_tests/config_files/iot_test_pkcs11_config.h"
+      }
+    ],
+    "optional": [
+      {
+        "configName": "otaAgentTestsConfig",
+        "filePath": "C:/workspace/amazon-freertos/vendors/realtek/boards/amebaZ2/aws_tests/config_files/aws_ota_agent_config.h"
+      },
+      {
+        "configName": "otaAgentDemosConfig",
+        "filePath": "C:/workspace/amazon-freertos/vendors/realtek/boards/amebaZ2/aws_demos/config_files/aws_ota_agent_config.h"
+      }
+    ]
+  }
+}

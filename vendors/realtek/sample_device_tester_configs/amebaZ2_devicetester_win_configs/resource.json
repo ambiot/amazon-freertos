@@ -1,0 +1,17 @@
+[
+  {
+    "id": "<pool-id>",
+    "features": [
+      {"name":"ble", "version":"4.2"}
+    ],
+    "devices": [
+      {
+        "id": "<device-id>",
+        "connectivity": {
+          "protocol": "ssh",
+          "ip": "127.0.0.1"
+        }
+      }
+    ]
+  }
+]
