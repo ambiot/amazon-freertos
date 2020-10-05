@@ -11,13 +11,10 @@
   "certificatePath": "../certificates/",
   "awsRegion": "ap-southeast-1",
   "auth": {
-    "method": "file",
-    "credentials": {
-      "profile": "default"
-    }
+    "method": "environment"
   },
   "product": {
-    "name": "AmebaD",
+    "name": "RTL8722DM",
     "version": "1"
   }
 }
