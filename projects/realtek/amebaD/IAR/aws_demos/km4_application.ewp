@@ -8531,6 +8531,15 @@
         <group>
             <name>demos</name>
             <group>
+                <name>common</name>
+                <group>
+                    <name>pkcs11_helpers</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\demos\common\pkcs11_helpers\pkcs11_helpers.c</name>
+                    </file>
+                </group>
+            </group>
+            <group>
                 <name>demo_runner</name>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\..\demos\demo_runner\aws_demo.c</name>
@@ -8564,13 +8573,10 @@
                 <name>$PROJ_DIR$\..\..\..\..\..\demos\dev_mode_key_provisioning\src\aws_dev_mode_key_provisioning.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\demos\shadow\aws_iot_demo_shadow.c</name>
-            </file>
-            <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\demos\ota\aws_iot_ota_update_demo.c</name>
             </file>
             <file>
-                <name>$PROJ_DIR$\..\..\..\..\..\demos\mqtt\iot_demo_mqtt.c</name>
+                <name>$PROJ_DIR$\..\..\..\..\..\demos\coreMQTT\mqtt_demo_mutual_auth.c</name>
             </file>
         </group>
         <group>
@@ -8872,9 +8878,51 @@
             <group>
                 <name>abstractions</name>
                 <group>
+                    <name>backoff_algorithm</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\backoff_algorithm\source\backoff_algorithm.c</name>
+                    </file>
+                </group>
+                <group>
                     <name>pkcs11</name>
+                    <group>
+                        <name>corePKCS11</name>
+                        <group>
+                            <name>portable</name>
+                            <group>
+                                <name>mbedtls</name>
+                                <file>
+                                    <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\pkcs11\corePKCS11\source\portable\mbedtls\core_pkcs11_mbedtls.c</name>
+                                </file>
+                            </group>
+                        </group>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\pkcs11\corePKCS11\source\core_pkcs11.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\pkcs11\corePKCS11\source\core_pki_utils.c</name>
+                        </file>
+                    </group>
+                    <group>
+                        <name>psa</name>
+                        <excluded>
+                            <configuration>is</configuration>
+                        </excluded>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\pkcs11\psa\iot_pkcs11_psa.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\pkcs11\psa\iot_pkcs11_psa_input_format.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\pkcs11\psa\iot_pkcs11_psa_object_management.c</name>
+                        </file>
+                    </group>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\boards\amebaD\libraries\abstractions\pkcs11\mbedtls\iot_pkcs11_mbedtls.c</name>
+                        <excluded>
+                            <configuration>is</configuration>
+                        </excluded>
                     </file>
                 </group>
                 <group>
@@ -8895,43 +8943,37 @@
                         </file>
                     </group>
                 </group>
+                <group>
+                    <name>test</name>
+                    <excluded>
+                        <configuration>is</configuration>
+                    </excluded>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\pkcs11\test\iot_test_pkcs11.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\secure_sockets\test\iot_test_tcp.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\wifi\test\iot_test_wifi.c</name>
+                    </file>
+                </group>
+                <group>
+                    <name>transport</name>
+                    <group>
+                        <name>secure_sockets</name>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\transport\secure_sockets\transport_secure_sockets.c</name>
+                        </file>
+                    </group>
+                </group>
             </group>
             <group>
                 <name>c_sdk</name>
                 <group>
-                    <name>aws</name>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\aws\shadow\src\aws_iot_shadow_api.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\aws\shadow\src\aws_iot_shadow_operation.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\aws\shadow\src\aws_iot_shadow_parser.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\aws\shadow\src\aws_iot_shadow_static_memory.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\aws\shadow\src\aws_iot_shadow_subscription.c</name>
-                    </file>
-                    <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\aws\shadow\src\aws_shadow.c</name>
-                    </file>
-                </group>
-                <group>
                     <name>standard</name>
                     <group>
                         <name>common</name>
-                        <group>
-                            <name>logging</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\common\logging\iot_logging.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\common\logging\iot_logging_task_dynamic_buffers.c</name>
-                            </file>
-                        </group>
                         <group>
                             <name>taskpool</name>
                             <file>
@@ -8962,13 +9004,25 @@
                                 <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_api.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_context_connection.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_managed_function_wrapper.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_mutex_wrapper.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_network.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_operation.c</name>
                             </file>
                             <file>
-                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_serialize.c</name>
+                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_publish_duplicates.c</name>
+                            </file>
+                            <file>
+                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_serializer_deserializer_wrapper.c</name>
                             </file>
                             <file>
                                 <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_static_memory.c</name>
@@ -8977,37 +9031,88 @@
                                 <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_subscription.c</name>
                             </file>
                             <file>
+                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_subscription_container.c</name>
+                            </file>
+                            <file>
                                 <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\iot_mqtt_validate.c</name>
                             </file>
                         </group>
                     </group>
                     <group>
-                        <name>serializer</name>
-                        <group>
-                            <name>cbor</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\serializer\src\cbor\iot_serializer_tinycbor_decoder.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\serializer\src\cbor\iot_serializer_tinycbor_encoder.c</name>
-                            </file>
-                        </group>
-                        <group>
-                            <name>json</name>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\serializer\src\json\iot_serializer_json_decoder.c</name>
-                            </file>
-                            <file>
-                                <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\serializer\src\json\iot_serializer_json_encoder.c</name>
-                            </file>
-                        </group>
+                        <name>test</name>
+                        <excluded>
+                            <configuration>is</configuration>
+                        </excluded>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\serializer\src\iot_json_utils.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\access\iot_test_access_mqtt_api.c</name>
+                            <excluded>
+                                <configuration>is</configuration>
+                            </excluded>
                         </file>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\serializer\src\iot_serializer_static_memory.c</name>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\access\iot_test_access_mqtt_subscription.c</name>
+                            <excluded>
+                                <configuration>is</configuration>
+                            </excluded>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\iot_test_mqtt_agent.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\unit\iot_tests_mqtt_api.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\unit\iot_tests_mqtt_metrics.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\mock\iot_tests_mqtt_mock.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\unit\iot_tests_mqtt_receive.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\unit\iot_tests_mqtt_subscription.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\system\iot_tests_mqtt_system.c</name>
+                        </file>
+                        <file>
+                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\unit\iot_tests_mqtt_validate.c</name>
                         </file>
                     </group>
+                </group>
+            </group>
+            <group>
+                <name>coreHTTP</name>
+                <group>
+                    <name>http_parser</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\coreHTTP\source\dependency\3rdparty\http_parser\http_parser.c</name>
+                    </file>
+                </group>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\libraries\coreHTTP\source\core_http_client.c</name>
+                </file>
+            </group>
+            <group>
+                <name>coreMQTT</name>
+                <group>
+                    <name>source</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\coreMQTT\source\core_mqtt.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\coreMQTT\source\core_mqtt_serializer.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\coreMQTT\source\core_mqtt_state.c</name>
+                    </file>
+                </group>
+                <group>
+                    <name>test</name>
+                    <excluded>
+                        <configuration>is</configuration>
+                    </excluded>
                 </group>
             </group>
             <group>
@@ -9024,7 +9129,7 @@
                         <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\aws\ota\src\aws_iot_ota_interface.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\boards\amebaD\libraries\freertos_plus\aws\ota\src\mqtt\aws_iot_ota_mqtt.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\aws\ota\src\mqtt\aws_iot_ota_mqtt.c</name>
                     </file>
                 </group>
                 <group>
@@ -9036,12 +9141,6 @@
                         </file>
                     </group>
                     <group>
-                        <name>pkcs11</name>
-                        <file>
-                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\standard\pkcs11\src\iot_pkcs11.c</name>
-                        </file>
-                    </group>
-                    <group>
                         <name>tls</name>
                         <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\standard\tls\src\iot_tls.c</name>
@@ -9050,13 +9149,46 @@
                     <group>
                         <name>utils</name>
                         <file>
-                            <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\standard\utils\src\iot_pki_utils.c</name>
-                        </file>
-                        <file>
                             <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\boards\amebaD\libraries\freertos_plus\standard\utils\src\iot_system_init.c</name>
                         </file>
                     </group>
                 </group>
+                <group>
+                    <name>test</name>
+                    <excluded>
+                        <configuration>is</configuration>
+                    </excluded>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\aws\ota\test\aws_test_ota_agent.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\aws\ota\test\aws_test_ota_cbor.c</name>
+                        <excluded>
+                            <configuration>is</configuration>
+                        </excluded>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\aws\ota\test\aws_test_ota_end_to_end.c</name>
+                        <excluded>
+                            <configuration>is</configuration>
+                        </excluded>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\aws\ota\test\aws_test_ota_pal.c</name>
+                    </file>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\standard\tls\test\iot_test_tls.c</name>
+                    </file>
+                </group>
+            </group>
+            <group>
+                <name>logging</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\libraries\logging\iot_logging.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\libraries\logging\iot_logging_task_dynamic_buffers.c</name>
+                </file>
             </group>
         </group>
         <group>
@@ -9070,7 +9202,13 @@
                     <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\boards\amebaD\ports\ota\aws_ota_rtl8721d.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\boards\amebaD\ports\pkcs11\core_pkcs11_pal.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\boards\amebaD\ports\pkcs11\iot_pkcs11_pal.c</name>
+                    <excluded>
+                        <configuration>is</configuration>
+                    </excluded>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\boards\amebaD\ports\secure_sockets\iot_secure_sockets.c</name>
@@ -9353,7 +9491,9 @@
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\common\include\private</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\common\include\types</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\include</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\src\private</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\access</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\serializer\include</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\aws\ota\include</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\freertos_plus\aws\ota\src</state>
@@ -9372,6 +9512,16 @@
                         <state>$PROJ_DIR$\..\..\..\..\..\freertos_kernel\include</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls_utils</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls_config</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\pkcs11\corePKCS11\source\include</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\logging\include</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\coreMQTT\source\interface</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\coreMQTT\source\include</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\backoff_algorithm\source\include</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\transport\secure_sockets</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\coreHTTP\source\include</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\coreHTTP\source\dependency\3rdparty\http_parser</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\demos\common\pkcs11_helpers</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\access</state>
                     </option>
                     <option>
                         <name>CCStdIncCheck</name>

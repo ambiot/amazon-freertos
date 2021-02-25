@@ -252,7 +252,8 @@ void prvWifiConnect( void )
 {
         WIFINetworkParams_t xNetworkParams;
         WIFIReturnCode_t xWifiStatus;
-        uint8_t ucTempIp[4] = { 0 };
+        WIFIIPConfiguration_t xIPInfo;
+        uint8_t *ucTempIp;
 
         xWifiStatus = WIFI_On();
 
@@ -274,12 +275,14 @@ void prvWifiConnect( void )
         }
 
         /* Setup parameters. */
-        xNetworkParams.pcSSID = clientcredentialWIFI_SSID;
+        memset( xNetworkParams.ucSSID, 0x00, wificonfigMAX_SSID_LEN );
+        memcpy( xNetworkParams.ucSSID, clientcredentialWIFI_SSID, sizeof( clientcredentialWIFI_SSID ) ); // xNetworkParams.pcSSID = clientcredentialWIFI_SSID;
         xNetworkParams.ucSSIDLength = sizeof( clientcredentialWIFI_SSID );
-        xNetworkParams.pcPassword = clientcredentialWIFI_PASSWORD;
-        xNetworkParams.ucPasswordLength = sizeof( clientcredentialWIFI_PASSWORD );
+        memset( xNetworkParams.xPassword.xWPA.cPassphrase, 0x00, wificonfigMAX_PASSPHRASE_LEN );
+        memcpy( xNetworkParams.xPassword.xWPA.cPassphrase, clientcredentialWIFI_PASSWORD, sizeof( clientcredentialWIFI_PASSWORD )); // xNetworkParams.pcPassword = clientcredentialWIFI_PASSWORD;
+        xNetworkParams.xPassword.xWPA.ucLength = sizeof( clientcredentialWIFI_PASSWORD );
         xNetworkParams.xSecurity = clientcredentialWIFI_SECURITY;
-        xNetworkParams.cChannel = 0;
+        xNetworkParams.ucChannel = 0;
 
         xWifiStatus = WIFI_ConnectAP( &( xNetworkParams ) );
 
@@ -287,7 +290,8 @@ void prvWifiConnect( void )
         {
             configPRINTF( ( "Wi-Fi Connected to AP. Creating tasks which use network...\r\n" ) );
 
-            xWifiStatus = WIFI_GetIP( ucTempIp );
+            xWifiStatus = WIFI_GetIPInfo( &xIPInfo );
+            ucTempIp = ( uint8_t * ) ( &xIPInfo.xIPAddress.ulAddress[0] );
             if ( eWiFiSuccess == xWifiStatus )
             {
                 configPRINTF( ( "IP Address acquired %d.%d.%d.%d\r\n",

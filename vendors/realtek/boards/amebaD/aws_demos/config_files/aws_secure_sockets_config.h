@@ -53,6 +53,9 @@
  */
 #define socketsconfigDEFAULT_MAX_NUM_SECURE_SOCKETS     4
 
+
 #define socketsconfigRECEIVE_CALLBACK_TASK_STACK_DEPTH	1024u
+
+#define AWS_IOT_SECURE_SOCKETS_METRICS_ENABLED    ( 1 )
 
 #endif /* _AWS_SECURE_SOCKETS_CONFIG_H_ */

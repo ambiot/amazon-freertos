@@ -221,6 +221,7 @@
                 <option>
                     <name>CCDefines</name>
                     <state>CONFIG_PLATFORM_8721D</state>
+                    <state>MBEDTLS_CONFIG_FILE="aws_mbedtls_config.h"</state>
                     <state>__ARM_FEATURE_DSP=0</state>
                 </option>
                 <option>
@@ -354,7 +355,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\soc\realtek\amebad\app\touch_key</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\os\freertos</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\freertos_kernel\include</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\os\freertos\freertos_v10.2.0\Source\portable\IAR\RTL8721D_LP</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\os\freertos\freertos_v10.4.3\Source\portable\IAR\RTL8721D_LP</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\soc\realtek\amebad\cmsis</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\soc\realtek\amebad\wifi_fw\include</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\soc\realtek\amebad\app\monitor\include</state>
@@ -400,6 +401,7 @@
                     <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\common\application\apple\homekit\crypto\sha512</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\common\api\platform</state>
                     <state>$PROJ_DIR$\..\..\..\..\..\libraries\abstractions\pkcs11\mbedtls</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\libraries\3rdparty\mbedtls_config</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -666,7 +668,7 @@
                 <option>
                     <name>AUserIncludes</name>
                     <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\inc\inc_lp</state>
-                    <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\os\freertos\freertos_v10.2.0\Source\portable\IAR\RTL8721D_LP</state>
+                    <state>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\os\freertos\freertos_v10.4.3\Source\portable\IAR\RTL8721D_LP</state>
                 </option>
                 <option>
                     <name>AExtraOptionsCheckV2</name>
@@ -2264,10 +2266,10 @@
                 <group>
                     <name>portable</name>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\os\freertos\freertos_v10.2.0\Source\portable\IAR\RTL8721D_LP\port.c</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\os\freertos\freertos_v10.4.3\Source\portable\IAR\RTL8721D_LP\port.c</name>
                     </file>
                     <file>
-                        <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\os\freertos\freertos_v10.2.0\Source\portable\IAR\RTL8721D_LP\portasm.s</name>
+                        <name>$PROJ_DIR$\..\..\..\..\..\vendors\realtek\sdk\amebaD\component\os\freertos\freertos_v10.4.3\Source\portable\IAR\RTL8721D_LP\portasm.s</name>
                     </file>
                 </group>
                 <group>
@@ -2301,7 +2303,7 @@
                     </file>
                 </group>
                 <group>
-                    <name>v10.3.0</name>
+                    <name>v10.4.3</name>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\..\freertos_kernel\croutine.c</name>
                     </file>

@@ -204,8 +204,8 @@ void vApplicationDaemonTaskStartupHook( void )
             do
             {
                 prvWifiConnect();
-                vTaskDelay( 50000 );
-            }while(WIFI_IsConnected()!=TRUE);
+                vTaskDelay( 500 );
+            }while(WIFI_IsConnected(NULL)!=TRUE);
 
             /* Provision the device with AWS certificate and private key. */
             vDevModeKeyProvisioning();
@@ -230,7 +230,7 @@ void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
      * unit tests and after MQTT, Bufferpool, and Secure Sockets libraries have been
      * imported into the project. If you are not using Ethernet see the
      * vApplicationDaemonTaskStartupHook function. */
-    #if 0
+//    #if 0
     static BaseType_t xTasksAlreadyCreated = pdFALSE;
 
     /* If the network has just come up...*/
@@ -248,7 +248,7 @@ void vApplicationIPNetworkEventHook( eIPCallbackEvent_t eNetworkEvent )
             xTasksAlreadyCreated = pdTRUE;
         }
     }
-    #endif /* if 0 */
+//    #endif /* if 0 */
 }
 #endif
 
@@ -258,7 +258,9 @@ void prvWifiConnect( void )
 {
     WIFINetworkParams_t xNetworkParams;
     WIFIReturnCode_t xWifiStatus;
-    uint8_t ucTempIp[4] = { 0 };
+    //uint8_t ucTempIp[4] = { 0 };
+    WIFIIPConfiguration_t xIPInfo;
+    uint8_t *ucTempIp;
 
     xWifiStatus = WIFI_On();
 
@@ -280,20 +282,22 @@ void prvWifiConnect( void )
     }
 
     /* Setup parameters. */
-    xNetworkParams.pcSSID = clientcredentialWIFI_SSID;
+    memcpy( xNetworkParams.ucSSID, clientcredentialWIFI_SSID, sizeof( clientcredentialWIFI_SSID ) ); // xNetworkParams.pcSSID = clientcredentialWIFI_SSID;
     xNetworkParams.ucSSIDLength = sizeof( clientcredentialWIFI_SSID );
-    xNetworkParams.pcPassword = clientcredentialWIFI_PASSWORD;
-    xNetworkParams.ucPasswordLength = sizeof( clientcredentialWIFI_PASSWORD );
+    memcpy( xNetworkParams.xPassword.xWPA.cPassphrase, clientcredentialWIFI_PASSWORD, sizeof( clientcredentialWIFI_PASSWORD )); // xNetworkParams.pcPassword = clientcredentialWIFI_PASSWORD;
+    xNetworkParams.xPassword.xWPA.ucLength = sizeof( clientcredentialWIFI_PASSWORD );
     xNetworkParams.xSecurity = clientcredentialWIFI_SECURITY;
-    xNetworkParams.cChannel = 0;
+    xNetworkParams.ucChannel = 0;
 
     xWifiStatus = WIFI_ConnectAP( &( xNetworkParams ) );
 
     if( xWifiStatus == eWiFiSuccess )
     {
         configPRINTF( ( "Wi-Fi Connected to AP. Creating tasks which use network...\r\n" ) );
-
-        xWifiStatus = WIFI_GetIP( ucTempIp );
+        
+        xWifiStatus = WIFI_GetIPInfo( &xIPInfo );
+        ucTempIp = ( uint8_t * ) ( &xIPInfo.xIPAddress.ulAddress[0] );
+        
         if ( eWiFiSuccess == xWifiStatus )
         {
             configPRINTF( ( "IP Address acquired %d.%d.%d.%d\r\n",
