@@ -5,7 +5,7 @@ set sourcePath=%sourcePath_ori:/=\%
 
 SET project_type=%1
 
-set FlashToolDir=C:\workspace\amazon-freertos\vendors\realtek\tools\1-10_MP_Image_Tool_Release
+set FlashToolDir=%sourcePath%\vendors\realtek\tools\1-10_MP_Image_Tool_Release
 set ImagePath_km0=%sourcePath%\projects\realtek\amebaD\IAR\%project_type%\Debug\Exe\km0_image
 set ImagePath_km4=%sourcePath%\projects\realtek\amebaD\IAR\%project_type%\Debug\Exe\km4_image
 set RootDir=%CD%

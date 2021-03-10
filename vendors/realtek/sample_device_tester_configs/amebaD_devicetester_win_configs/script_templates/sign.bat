@@ -1,6 +1,6 @@
 ::@echo off
 
-set ProjectRoot="C:/workspace/amazon-freertos/vendors/realtek/boards/amebaD/aws_demos"
+set ProjectRoot="C:/workspace/amazon-freertos/projects/realtek/amebaD/IAR/aws_demos"
 set RootDir=%CD%
 
 cd %ProjectRoot%

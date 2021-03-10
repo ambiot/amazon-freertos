@@ -9,7 +9,14 @@
         "id": "<device-id>",
         "connectivity": {
           "protocol": "ssh",
-          "ip": "127.0.0.1"
+          "ip": "127.0.0.1",
+          "auth": {
+            "method": "password",
+            "credentials": {
+              "user": "<user>",
+              "password": "<your-password>"
+            }
+          }
         }
       }
     ]

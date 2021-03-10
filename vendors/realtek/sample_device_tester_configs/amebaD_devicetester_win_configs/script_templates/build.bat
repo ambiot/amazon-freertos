@@ -28,14 +28,16 @@ ping 127.0.0.1 -n 8 -w 1000
 %iarbuild% %sourcePath%\projects\realtek\amebaD\IAR\%project_type%\km4_bootloader.ewp -make is -log errors -parallel 4
 
 ping 127.0.0.1 -n 8 -w 1000
+%iarbuild% %sourcePath%\projects\realtek\amebaD\IAR\%project_type%\km4_application.ewp -clean is -log errors 
 
+ping 127.0.0.1 -n 8 -w 1000
 %iarbuild% %sourcePath%\projects\realtek\amebaD\IAR\%project_type%\km4_application.ewp -make is -log errors -parallel 4
 
 ping 127.0.0.1 -n 15 -w 1000
 
 IF %1==0 (
     cd %sourcePath%\projects\realtek\amebaD\IAR\aws_demos
-    wsl python python_custom_ecdsa_D.py
+    wsl python3 python_custom_ecdsa_D.py
     ping 127.0.0.1 -n 5 -w 1000
 
     wsl openssl dgst -sha256 -sign ecdsa-sha256-signer.key.pem -out ./Debug/Exe/km4_image/km0_km4_image2_sig.bin ./Debug/Exe/km4_image/km0_km4_image2.bin
