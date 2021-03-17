@@ -50,6 +50,7 @@
 
 #define CONFIG_CORE_MQTT_MUTUAL_AUTH_DEMO_ENABLED
 //#define CONFIG_OTA_UPDATE_DEMO_ENABLED
+//#define CONFIG_DEVICE_SHADOW_DEMO_ENABLED
 
 /* Default configuration for all demos. Individual demos can override these below */
 #define democonfigDEMO_STACKSIZE    ( configMINIMAL_STACK_SIZE * 8 )

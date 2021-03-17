@@ -8533,6 +8533,12 @@
             <group>
                 <name>common</name>
                 <group>
+                    <name>mqtt_demo_helpers</name>
+                    <file>
+                        <name>$PROJ_DIR$\..\..\..\..\..\demos\common\mqtt_demo_helpers\mqtt_demo_helpers.c</name>
+                    </file>
+                </group>
+                <group>
                     <name>pkcs11_helpers</name>
                     <file>
                         <name>$PROJ_DIR$\..\..\..\..\..\demos\common\pkcs11_helpers\pkcs11_helpers.c</name>
@@ -8577,6 +8583,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\..\..\..\demos\coreMQTT\mqtt_demo_mutual_auth.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\..\..\..\demos\device_shadow_for_aws\shadow_demo_main.c</name>
             </file>
         </group>
         <group>
@@ -9095,6 +9104,12 @@
                 </file>
             </group>
             <group>
+                <name>coreJSON</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\libraries\coreJSON\source\core_json.c</name>
+                </file>
+            </group>
+            <group>
                 <name>coreMQTT</name>
                 <group>
                     <name>source</name>
@@ -9114,6 +9129,12 @@
                         <configuration>is</configuration>
                     </excluded>
                 </group>
+            </group>
+            <group>
+                <name>device_shadow_for_aws</name>
+                <file>
+                    <name>$PROJ_DIR$\..\..\..\..\..\libraries\device_shadow_for_aws\source\shadow.c</name>
+                </file>
             </group>
             <group>
                 <name>freertos_plus</name>
@@ -9522,6 +9543,10 @@
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\coreHTTP\source\dependency\3rdparty\http_parser</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\demos\common\pkcs11_helpers</state>
                         <state>$PROJ_DIR$\..\..\..\..\..\libraries\c_sdk\standard\mqtt\test\access</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\device_shadow_for_aws\source\include</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\coreJSON\source\include</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\demos\common\mqtt_demo_helpers</state>
+                        <state>$PROJ_DIR$\..\..\..\..\..\libraries\coreJSON\source\include</state>
                     </option>
                     <option>
                         <name>CCStdIncCheck</name>
