@@ -179,12 +179,12 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
 	if(pxNetworkParams->xPassword.xWPA.cPassphrase != NULL)
 	{
     	ret = wifi_connect((char*)pxNetworkParams->ucSSID, prvConvertSecurityAbstractedToRTW(pxNetworkParams->xSecurity), (char*)pxNetworkParams->xPassword.xWPA.cPassphrase,
-    					strlen((char*)pxNetworkParams->ucSSID), strlen((char*)pxNetworkParams->xPassword.xWPA.cPassphrase), -1, NULL);
+    					pxNetworkParams->ucSSIDLength, pxNetworkParams->xPassword.xWPA.ucLength, -1, NULL);
     }
 	else
 	{
 		ret = wifi_connect((char*)pxNetworkParams->ucSSID, prvConvertSecurityAbstractedToRTW(pxNetworkParams->xSecurity), (char*)pxNetworkParams->xPassword.xWPA.cPassphrase,
-						strlen((char*)pxNetworkParams->ucSSID), 0, -1, NULL);
+						pxNetworkParams->ucSSIDLength, 0, -1, NULL);
     }
 
     device_mutex_unlock(RT_DEV_LOCK_WLAN);
@@ -486,14 +486,14 @@ WIFIReturnCode_t WIFI_ConfigureAP( const WIFINetworkParams_t * const pxNetworkPa
     if((pxNetworkParams == NULL) || (pxNetworkParams->ucSSID == NULL) || (pxNetworkParams->xPassword.xWPA.cPassphrase == NULL))
     	return eWiFiFailure;
 
-    if((strlen((char*)pxNetworkParams->ucSSID) > wificonfigMAX_SSID_LEN) || (strlen((char*)pxNetworkParams->xPassword.xWPA.cPassphrase) > wificonfigMAX_PASSPHRASE_LEN))
+    if((pxNetworkParams->ucSSIDLength > wificonfigMAX_SSID_LEN) || pxNetworkParams->xPassword.xWPA.ucLength > wificonfigMAX_PASSPHRASE_LEN)
     	return eWiFiFailure;
 
     if( (wifi_mode != RTW_MODE_AP) ){
         WIFI_SetMode(eWiFiModeAP);
     }
     if((ret = wifi_start_ap((char*)pxNetworkParams->ucSSID, prvConvertSecurityAbstractedToRTW(pxNetworkParams->xSecurity),
-                                            (char*)pxNetworkParams->xPassword.xWPA.cPassphrase, strlen((char*)pxNetworkParams->ucSSID), strlen((char*)pxNetworkParams->xPassword.xWPA.cPassphrase),
+                                            (char*)pxNetworkParams->xPassword.xWPA.cPassphrase, pxNetworkParams->ucSSIDLength, pxNetworkParams->xPassword.xWPA.ucLength,
                                             pxNetworkParams->ucChannel) )< 0) {
         printf("\n\rERROR: Operation failed!");
         return eWiFiFailure;
