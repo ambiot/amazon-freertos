@@ -404,6 +404,7 @@ void runDemoTask( void * pArgument )
  * configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h.
  *
  */
+#if 0 //define in freertos_v10.2.0/Source/portable/GCC/RTL8721D_HP/non_secure/port.c
     void vApplicationMallocFailedHook()
     {
         configPRINT_STRING( ( "ERROR: Malloc failed to allocate memory\r\n" ) );
@@ -414,7 +415,7 @@ void runDemoTask( void * pArgument )
         {
         }
     }
-
+#endif
 /*-----------------------------------------------------------*/
 
 /**
@@ -428,6 +429,7 @@ void runDemoTask( void * pArgument )
  * has occurred.
  *
  */
+#if 0 //define in freertos_v10.2.0/Source/portable/GCC/RTL8721D_HP/non_secure/port.c
     void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                         char * pcTaskName )
     {
@@ -443,5 +445,7 @@ void runDemoTask( void * pArgument )
         {
         }
     }
+#endif
+
 #endif /* iotconfigUSE_PORT_SPECIFIC_HOOKS */
 /*-----------------------------------------------------------*/

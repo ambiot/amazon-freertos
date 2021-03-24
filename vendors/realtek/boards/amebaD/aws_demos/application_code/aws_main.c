@@ -53,7 +53,7 @@ const AppVersion32_t xAppFirmwareVersion = {
 };
 #endif
 
-int errno = 0;
+//int errno = 0;  // define in example_nonblock_connect.c
 
 /* Logging Task Defines. */
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 15 )
@@ -440,6 +440,7 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask,
  *
  * @note Do not make any blocking operations in this function.
  */
+#if 0 //define in freertos_v10.2.0/Source/portable/GCC/RTL8721D_HP/non_secure/port.c
 void vApplicationIdleHook( void )
 {
     /* FIX ME. If necessary, update to application idle periodic actions. */
@@ -456,6 +457,7 @@ void vApplicationIdleHook( void )
         xLastPrint = xTimeNow;
     }
 }
+#endif
 /*-----------------------------------------------------------*/
 
 /**
