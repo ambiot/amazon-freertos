@@ -1,7 +1,0 @@
-#define UTS_VERSION "2021/03/02-21:53:55" 
-#define RTL_FW_COMPILE_TIME "2021/03/02-21:53:55" 
-#define RTL_FW_COMPILE_DATE "2021/03/02" 
-#define RTL_FW_COMPILE_BY "hungtselee" 
-#define RTL_FW_COMPILE_HOST "R073610100" 
-#define RTL_FW_COMPILE_DOMAIN 
-#define RTL_FW_COMPILER "IAR compiler" 
