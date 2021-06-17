@@ -207,17 +207,17 @@ void vApplicationDaemonTaskStartupHook( void )
      * have been imported into the project. If you are not using Wi-Fi, see the
      * vApplicationIPNetworkEventHook function. */
     //#if 0
-        if( SYSTEM_Init() == pdPASS )
-        {
-            /* Connect to the Wi-Fi before running the tests. */
-            prvWifiConnect();
+    if( SYSTEM_Init() == pdPASS )
+    {
+        /* Connect to the Wi-Fi before running the tests. */
+        //prvWifiConnect();
 
-            /* Provision the device with AWS certificate and private key. */
-            vDevModeKeyProvisioning();
+        /* Provision the device with AWS certificate and private key. */
+        vDevModeKeyProvisioning();
 
-            /* Start the demo tasks. */
-            DEMO_RUNNER_RunDemos();
-        }
+        /* Start the demo tasks. */
+        DEMO_RUNNER_RunDemos();
+    }
     //#endif
 }
 /*-----------------------------------------------------------*/

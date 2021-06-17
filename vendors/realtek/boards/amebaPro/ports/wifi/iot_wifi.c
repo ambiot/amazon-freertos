@@ -174,7 +174,9 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
         return eWiFiFailure;
 
     device_mutex_lock(RT_DEV_LOCK_WLAN);
-    printf("\n\rJoining BSS by SSID %s...\n\r", (char*)pxNetworkParams->ucSSID);
+    char ssid_content[pxNetworkParams->ucSSIDLength];
+    memcpy(ssid_content, pxNetworkParams->ucSSID, pxNetworkParams->ucSSIDLength);
+    printf("\n\rJoining BSS by SSID %s...\n\r", (char*)ssid_content);
 
 	if(pxNetworkParams->xPassword.xWPA.cPassphrase != NULL)
 	{
