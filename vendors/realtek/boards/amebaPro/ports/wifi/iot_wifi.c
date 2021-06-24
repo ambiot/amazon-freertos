@@ -168,8 +168,8 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
     //uint32_t ipaddr = 0;
     WIFIIPConfiguration_t xIPInfo;
 
-    if((pxNetworkParams == NULL) || ((char*)pxNetworkParams->ucSSID == NULL))
-    return eWiFiFailure;
+    if((pxNetworkParams == NULL) || ((char*)pxNetworkParams->ucSSID == NULL) || (pxNetworkParams->ucSSIDLength == 0))
+        return eWiFiFailure;
     if((prvConvertSecurityAbstractedToRTW(pxNetworkParams->xSecurity) != RTW_SECURITY_OPEN) && ((char*)pxNetworkParams->xPassword.xWPA.cPassphrase == NULL))
         return eWiFiFailure;
 
