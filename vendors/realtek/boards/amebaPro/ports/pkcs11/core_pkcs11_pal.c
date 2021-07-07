@@ -348,7 +348,7 @@ void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
 }
 
 /*-----------------------------------------------------------*/
-#if defined(MBEDTLS_ENTROPY_HARDWARE_ALT)
+#if 0 //defined(MBEDTLS_ENTROPY_HARDWARE_ALT)
 extern int rtw_get_random_bytes(void* dst, u32 size);
 int mbedtls_hardware_poll( void * data,
                            unsigned char * output,

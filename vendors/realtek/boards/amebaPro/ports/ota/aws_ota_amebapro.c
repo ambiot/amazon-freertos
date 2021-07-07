@@ -285,7 +285,7 @@ OTA_Err_t prvPAL_CheckFileSignature_amebaPro(OTA_FileContext_t * const C)
     void *pvSigVerifyContext;
     uint8_t *pucSignerCert = NULL;
 
-    mbedtls_platform_set_calloc_free(calloc_freertos, vPortFree);
+    //mbedtls_platform_set_calloc_free(calloc_freertos, vPortFree);
 
     while(true)
     {
