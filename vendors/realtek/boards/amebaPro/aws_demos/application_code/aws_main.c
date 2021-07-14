@@ -53,7 +53,7 @@ const AppVersion32_t xAppFirmwareVersion = {
 };
 #endif
 
-//int errno = 0;  // define in example_nonblock_connect.c
+int errno = 0;  // define in example_nonblock_connect.c
 
 /* Logging Task Defines. */
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 15 )
