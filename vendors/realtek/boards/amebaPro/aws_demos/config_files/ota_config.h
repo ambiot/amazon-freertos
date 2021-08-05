@@ -98,7 +98,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer. <br>
  */
-#define otaconfigFILE_REQUEST_WAIT_MS           10000U /* TODO */
+#define otaconfigFILE_REQUEST_WAIT_MS           2500U /* TODO */
 
 /**
  * @brief The maximum allowed length of the thing name used by the OTA agent.
