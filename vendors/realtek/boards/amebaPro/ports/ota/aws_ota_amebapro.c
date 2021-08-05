@@ -24,12 +24,12 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
 /* OTA PAL implementation for Realtek Ameba platform. */
-#include "aws_iot_ota_pal.h"
-#include "aws_iot_ota_agent.h"
+#include "ota.h"
+#include "ota_pal.h"
+#include "ota_interface_private.h"
+#include "ota_config.h"
 #include "iot_crypto.h"
-#include "aws_ota_codesigner_certificate.h"
-#include "aws_iot_ota_agent_internal.h"
-#include "aws_application_version.h"
+#include "core_pkcs11.h"
 #include "platform_opts.h"
 #if CONFIG_EXAMPLE_AMAZON_AFQP_TESTS
     #include "aws_test_runner_config.h"
@@ -50,28 +50,34 @@ extern void sys_disable_fast_boot (void);
 
 static flash_t flash_ota;
 
-//#define AWS_OTA_IMAGE_HEADER_LEN					4
-#define AWS_OTA_IMAGE_SIGNATURE_LEN					32
+//#define AWS_OTA_IMAGE_HEADER_LEN                      4
+#define AWS_OTA_IMAGE_SIGNATURE_LEN                     32
 
-#define AWS_OTA_IMAGE_STATE_FLASH_OFFSET			0x00008000 // Flash reserved section 0x0000_8000 - 0x0000_9000-1
+#define AWS_OTA_IMAGE_STATE_FLASH_OFFSET                0x00008000 // Flash reserved section 0x0000_8000 - 0x0000_9000-1
 
-#define AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW			0xffffffffU /* 11111111b A new image that hasn't yet been run. */
-#define AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT		0xfffffffeU /* 11111110b Image is pending commit and is ready for self test. */
-#define AWS_OTA_IMAGE_STATE_FLAG_IMG_VALID			0xfffffffcU /* 11111100b The image was accepted as valid by the self test code. */
-#define AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID		0xfffffff8U /* 11111000b The image was NOT accepted by the self test code. */
+#define AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW                0xffffffffU /* 11111111b A new image that hasn't yet been run. */
+#define AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT         0xfffffffeU /* 11111110b Image is pending commit and is ready for self test. */
+#define AWS_OTA_IMAGE_STATE_FLAG_IMG_VALID              0xfffffffcU /* 11111100b The image was accepted as valid by the self test code. */
+#define AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID            0xfffffff8U /* 11111000b The image was NOT accepted by the self test code. */
 
 //================================================================================
 extern uint32_t update_ota_prepare_addr(void);
 
-#define OTA_DEBUG 0
-#define OTA_MEMDUMP 0
-#define OTA_PRINT printf
+#define OTA_DEBUG       0
+#define OTA_MEMDUMP     0
+#define OTA_PRINT       printf
 
-uint32_t gNewImgLen=0;
+uint32_t gNewImgLen = 0;
 
 unsigned char sig_backup[32];
 static uint32_t aws_ota_imgsz = 0;
-static bool_t aws_ota_target_hdr_get = false;
+static bool aws_ota_target_hdr_get = false;
+
+typedef struct {
+    int32_t lFileHandle;
+} amebapro_ota_context_t;
+
+static amebapro_ota_context_t ota_ctx;
 
 
 #if OTA_DEBUG && OTA_MEMDUMP
@@ -81,7 +87,7 @@ void vMemDump(const u8 *start, u32 size, char * strHeader)
     u8 *buf, *line;
 
     if(!start ||(size==0))
-            return;
+        return;
 
     line = (u8*)start;
 
@@ -127,66 +133,69 @@ void vMemDump(const u8 *start, u32 size, char * strHeader)
 
 static void clean_upgrade_region()
 {
-	uint32_t curr_fw_idx = 0;
+    uint32_t curr_fw_idx = 0;
         
-        fw_img_export_info_type_t *pfw_image_info;
-	pfw_image_info = get_fw_img_info_tbl();
-	curr_fw_idx = pfw_image_info->loaded_fw_idx;
+    fw_img_export_info_type_t *pfw_image_info;
+    pfw_image_info = get_fw_img_info_tbl();
+    curr_fw_idx = pfw_image_info->loaded_fw_idx;
         
-	printf("Current firmware index is fw%d. \r\n",curr_fw_idx);
-	if(curr_fw_idx==1)
-	{
-		printf("Clean invalid firmware index is fw2. \r\n");
-		cmd_ota_image(1);  //active : fw1(0) ; invalid : fw2(1)
-	}
-	else
-	{
-		printf("Clean invalid firmware index is fw1. \r\n");
-		cmd_ota_image(0);  //active : fw2(1) ; invalid : fw1(0)
-	}
+    printf("Current firmware index is fw%d. \r\n",curr_fw_idx);
+    if(curr_fw_idx==1)
+    {
+        printf("Clean invalid firmware index is fw2. \r\n");
+        cmd_ota_image(1);  //active : fw1(0) ; invalid : fw2(1)
+    }
+    else
+    {
+        printf("Clean invalid firmware index is fw1. \r\n");
+        cmd_ota_image(0);  //active : fw2(1) ; invalid : fw1(0)
+    }
 }
 
 static void prvSysReset_amebaPro(void)
 {
-	ota_platform_reset();
+    ota_platform_reset();
 }
 
-static __inline__ bool_t prvContextValidate_amebaPro( OTA_FileContext_t *C )
+static __inline__ bool prvContextValidate_amebaPro( OtaFileContext_t *C )
 {
     return pdTRUE;
 }
 
-OTA_Err_t prvPAL_Abort_amebaPro(OTA_FileContext_t *C)
+OtaPalStatus_t prvPAL_Abort_amebaPro(OtaFileContext_t *C)
 {
     if( NULL != C)
     {
-        C->lFileHandle = 0x0;
+        ota_ctx.lFileHandle = 0x0;
     }
-    return kOTA_Err_None;
+    return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
 }
 
-bool_t prvPAL_CreateFileForRx_amebaPro(OTA_FileContext_t *C)
+bool prvPAL_CreateFileForRx_amebaPro(OtaFileContext_t *C)
 {
-	uint32_t curr_fw_idx = 0;
+    uint32_t curr_fw_idx = 0;
 
-	fw_img_export_info_type_t *pfw_image_info;
-	pfw_image_info = get_fw_img_info_tbl();
-	curr_fw_idx = pfw_image_info->loaded_fw_idx;
-        
-	OTA_LOG_L1("Current firmware index is %d\r\n", curr_fw_idx);
+    fw_img_export_info_type_t *pfw_image_info;
+    pfw_image_info = get_fw_img_info_tbl();
+    curr_fw_idx = pfw_image_info->loaded_fw_idx;
 
-	C->lFileHandle = update_ota_prepare_addr() + SPI_FLASH_BASE;
-	if(curr_fw_idx==1)
-		OTA_LOG_L1("fw2 address 0x%x will be upgraded\n", C->lFileHandle);
-	else
-		OTA_LOG_L1("fw1 address 0x%x will be upgraded\n", C->lFileHandle);
+    LogInfo( ( "Current firmware index is %d", curr_fw_idx ) );
 
-	if (C->lFileHandle > SPI_FLASH_BASE)
-	{
-		aws_ota_imgsz = 0;
-		aws_ota_target_hdr_get = false;
-	}
-	return ( C->lFileHandle > SPI_FLASH_BASE ) ? pdTRUE : pdFALSE;
+    C->pFile = (uint8_t*)&ota_ctx;
+
+    ota_ctx.lFileHandle = update_ota_prepare_addr() + SPI_FLASH_BASE;
+
+    if(curr_fw_idx==1)
+        LogInfo( ( "fw2 address 0x%x will be upgraded", ota_ctx.lFileHandle ) );
+    else
+        LogInfo( ( "fw1 address 0x%x will be upgraded", ota_ctx.lFileHandle ) );
+
+    if (ota_ctx.lFileHandle > SPI_FLASH_BASE)
+    {
+        aws_ota_imgsz = 0;
+        aws_ota_target_hdr_get = false;
+    }
+    return ( ota_ctx.lFileHandle > SPI_FLASH_BASE ) ? pdTRUE : pdFALSE;
 }
 
 /* Read the specified signer certificate from the filesystem into a local buffer. The
@@ -194,93 +203,90 @@ bool_t prvPAL_CreateFileForRx_amebaPro(OTA_FileContext_t *C)
  */
 uint8_t * prvPAL_ReadAndAssumeCertificate_amebaPro(const uint8_t * const pucCertName, int32_t * const lSignerCertSize)
 {
-	uint8_t*	pucCertData;
-	uint32_t	ulCertSize;
-	uint8_t 	*pucSignerCert = NULL;
+    uint8_t* pucCertData;
+    uint32_t ulCertSize;
+    uint8_t  *pucSignerCert = NULL;
 
-	extern BaseType_t PKCS11_PAL_GetObjectValue( const char * pcFileName,
-							   uint8_t ** ppucData,
-							   uint32_t * pulDataSize );
+    extern BaseType_t PKCS11_PAL_GetObjectValue( const char * pcFileName,
+                                                        uint8_t ** ppucData,
+                                                        uint32_t * pulDataSize );
 
-	if ( PKCS11_PAL_GetObjectValue( (const char *) pucCertName, &pucCertData, &ulCertSize ) != pdTRUE )
-	{	/* Use the back up "codesign_keys.h" file if the signing credentials haven't been saved in the device. */
-		pucCertData = (uint8_t*) signingcredentialSIGNING_CERTIFICATE_PEM;
-		ulCertSize = sizeof( signingcredentialSIGNING_CERTIFICATE_PEM );
-		OTA_LOG_L1( "Assume Cert - No such file: %s. Using header file\r\n",
-				   (const char*)pucCertName );
-	}
-	else
-	{
-		OTA_LOG_L1( "Assume Cert - file: %s OK\r\n", (const char*)pucCertName );
-	}
+    if ( PKCS11_PAL_GetObjectValue( (const char *) pucCertName, &pucCertData, &ulCertSize ) != pdTRUE )
+    {	/* Use the back up "codesign_keys.h" file if the signing credentials haven't been saved in the device. */
+        pucCertData = (uint8_t*) otapalconfigCODE_SIGNING_CERTIFICATE;
+        ulCertSize = sizeof( otapalconfigCODE_SIGNING_CERTIFICATE );
+        LogInfo( ( "Assume Cert - No such file: %s. Using header file", (const char*)pucCertName ) );
+    }
+    else
+    {
+        LogInfo( ( "Assume Cert - file: %s OK", (const char*)pucCertName ) );
+    }
 
-	/* Allocate memory for the signer certificate plus a terminating zero so we can load it and return to the caller. */
-	pucSignerCert = pvPortMalloc( ulCertSize +	1);
-	if ( pucSignerCert != NULL )
-	{
-		memcpy( pucSignerCert, pucCertData, ulCertSize );
-		/* The crypto code requires the terminating zero to be part of the length so add 1 to the size. */
-		pucSignerCert[ ulCertSize ] = '\0';
-		*lSignerCertSize = ulCertSize + 1;
-	}
-	return pucSignerCert;
+    /* Allocate memory for the signer certificate plus a terminating zero so we can load it and return to the caller. */
+    pucSignerCert = pvPortMalloc( ulCertSize +	1);
+    if ( pucSignerCert != NULL )
+    {
+        memcpy( pucSignerCert, pucCertData, ulCertSize );
+        /* The crypto code requires the terminating zero to be part of the length so add 1 to the size. */
+        pucSignerCert[ ulCertSize ] = '\0';
+        *lSignerCertSize = ulCertSize + 1;
+    }
+    return pucSignerCert;
 }
 
-static OTA_Err_t prvSignatureVerificationUpdate_amebaPro(OTA_FileContext_t *C, void * pvContext)
+static OtaPalStatus_t prvSignatureVerificationUpdate_amebaPro(OtaFileContext_t *C, void * pvContext)
 {
-    OTA_Err_t eResult = kOTA_Err_None;
+    OtaPalStatus_t eResult = OtaPalSuccess;
     u32 i;
     int rlen;
     u8 * pTempbuf;
     u32 len = gNewImgLen;
-    u32 addr = C->lFileHandle;
+    u32 addr = ota_ctx.lFileHandle;
 
     pTempbuf = update_malloc(BUF_SIZE);
     if(!pTempbuf){
-        eResult = kOTA_Err_SignatureCheckFailed;
+        eResult = OtaPalSignatureCheckFailed;
         goto error;
     }
 
 #ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS
-	len = aws_ota_imgsz;
-	/* read flash data back to check signature of the image */
-	for(i=0;i<len;i+=BUF_SIZE){
-		rlen = (len-i)>BUF_SIZE?BUF_SIZE:(len-i);
-		device_mutex_lock(RT_DEV_LOCK_FLASH);
-		flash_stream_read(&flash_ota, addr - SPI_FLASH_BASE+i, rlen, pTempbuf);
-		//Cache_Flush();
-		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		CRYPTO_SignatureVerificationUpdate(pvContext, pTempbuf, rlen);
-	}
+    len = aws_ota_imgsz;
+    /* read flash data back to check signature of the image */
+    for(i=0;i<len;i+=BUF_SIZE){
+        rlen = (len-i)>BUF_SIZE?BUF_SIZE:(len-i);
+        device_mutex_lock(RT_DEV_LOCK_FLASH);
+        flash_stream_read(&flash_ota, addr - SPI_FLASH_BASE+i, rlen, pTempbuf);
+        //Cache_Flush();
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        CRYPTO_SignatureVerificationUpdate(pvContext, pTempbuf, rlen);
+    }
 #else
-	/*add image signature*/
-	CRYPTO_SignatureVerificationUpdate(pvContext, sig_backup, 32);
+    /*add image signature*/
+    CRYPTO_SignatureVerificationUpdate(pvContext, sig_backup, 32);
 
-	len = len-32;
-	/* read flash data back to check signature of the image */
-	for(i=0;i<len;i+=BUF_SIZE){
-		rlen = (len-i)>BUF_SIZE?BUF_SIZE:(len-i);
-		device_mutex_lock(RT_DEV_LOCK_FLASH);
-		flash_stream_read(&flash_ota, addr - SPI_FLASH_BASE+i+32, rlen, pTempbuf);
-		//Cache_Flush();
-		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		CRYPTO_SignatureVerificationUpdate(pvContext, pTempbuf, rlen);
-	}
+    len = len-32;
+    /* read flash data back to check signature of the image */
+    for(i=0;i<len;i+=BUF_SIZE){
+        rlen = (len-i)>BUF_SIZE?BUF_SIZE:(len-i);
+        device_mutex_lock(RT_DEV_LOCK_FLASH);
+        flash_stream_read(&flash_ota, addr - SPI_FLASH_BASE+i+32, rlen, pTempbuf);
+        //Cache_Flush();
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        CRYPTO_SignatureVerificationUpdate(pvContext, pTempbuf, rlen);
+    }
 #endif
 error:
     if(pTempbuf)
         update_free(pTempbuf);
 
-    return eResult;
+    return OTA_PAL_COMBINE_ERR( eResult, 0 );
 }
 
 extern void *calloc_freertos(size_t nelements, size_t elementSize);
-OTA_Err_t prvPAL_SetPlatformImageState_amebaPro (OTA_ImageState_t eState);
-OTA_Err_t prvPAL_CheckFileSignature_amebaPro(OTA_FileContext_t * const C)
+OtaPalStatus_t prvPAL_SetPlatformImageState_amebaPro (OtaImageState_t eState);
+OtaPalStatus_t prvPAL_CheckFileSignature_amebaPro(OtaFileContext_t * const C)
 {
-    DEFINE_OTA_METHOD_NAME( "prvPAL_CheckFileSignature_amebaPro" );
-
-    OTA_Err_t eResult;
+    OtaPalStatus_t eResult;
     int32_t lSignerCertSize;
     void *pvSigVerifyContext;
     uint8_t *pucSignerCert = NULL;
@@ -293,33 +299,33 @@ OTA_Err_t prvPAL_CheckFileSignature_amebaPro(OTA_FileContext_t * const C)
         if (CRYPTO_SignatureVerificationStart( &pvSigVerifyContext, cryptoASYMMETRIC_ALGORITHM_ECDSA,
                                               cryptoHASH_ALGORITHM_SHA256) == pdFALSE)
         {
-            eResult = kOTA_Err_SignatureCheckFailed;
+            eResult = OtaPalSignatureCheckFailed;
             break;
         }
+        
+        LogInfo( ( "Started %s signature verification, file: %s\r\n", OTA_JsonFileSignatureKey, (const char*)C->pCertFilepath ) );
 
-        OTA_LOG_L1( "[%s] Started %s signature verification, file: %s\r\n", OTA_METHOD_NAME,
-                   cOTA_JSON_FileSignatureKey, (const char*)C->pucCertFilepath);
-        pucSignerCert = prvPAL_ReadAndAssumeCertificate_amebaPro((const uint8_t* const)C->pucCertFilepath, &lSignerCertSize);
+        pucSignerCert = prvPAL_ReadAndAssumeCertificate_amebaPro((const uint8_t* const)C->pCertFilepath, &lSignerCertSize);
         if (pucSignerCert == NULL)
         {
-            eResult = kOTA_Err_BadSignerCert;
+            eResult = OtaPalBadSignerCert;
             break;
         }
 
         eResult = prvSignatureVerificationUpdate_amebaPro(C, pvSigVerifyContext);
-        if(eResult != kOTA_Err_None)
+        if(eResult != OtaPalSuccess)
         {
             break;
-		}
+        }
         if ( CRYPTO_SignatureVerificationFinal(pvSigVerifyContext, (char*)pucSignerCert, lSignerCertSize,
-                                                    C->pxSignature->ucData, C->pxSignature->usSize ) == pdFALSE )
+                                                    C->pSignature->data, C->pSignature->size ) == pdFALSE )
         {
-            eResult = kOTA_Err_SignatureCheckFailed;
-            prvPAL_SetPlatformImageState_amebaPro(eOTA_ImageState_Rejected);
+            eResult = OtaPalSignatureCheckFailed;
+            prvPAL_SetPlatformImageState_amebaPro(OtaImageStateRejected);
         }
         else
         {
-            eResult = kOTA_Err_None;
+            eResult = OtaPalSuccess;
         }
         break;
     }
@@ -328,140 +334,139 @@ OTA_Err_t prvPAL_CheckFileSignature_amebaPro(OTA_FileContext_t * const C)
     {
         vPortFree(pucSignerCert);
     }
-    return eResult;
+    return OTA_PAL_COMBINE_ERR( eResult, 0 );
 }
 
 /* Close the specified file. This will also authenticate the file if it is marked as secure. */
-OTA_Err_t prvPAL_CloseFile_amebaPro(OTA_FileContext_t *C)
+OtaPalStatus_t prvPAL_CloseFile_amebaPro(OtaFileContext_t *C)
 {
-    DEFINE_OTA_METHOD_NAME( "prvPAL_CloseFile" );
-    OTA_Err_t eResult = kOTA_Err_None;
+    OtaPalStatus_t eResult = OtaPalSuccess;
 
     OTA_PRINT("[OTA] Authenticating and closing file.\r\n");
 
     if( prvContextValidate_amebaPro( C ) == pdFALSE )
     {
-        eResult = kOTA_Err_FileClose;
+        eResult = OtaPalFileClose;
     }
 
-    if( kOTA_Err_None == eResult )
+    if( OtaPalSuccess == eResult )
     {
-        if( C->pxSignature != NULL )
+        if( C->pSignature != NULL )
         {
-            OTA_LOG_L1( "[%s] Authenticating and closing file.\r\n", OTA_METHOD_NAME );
+            LogInfo( ( "Authenticating and closing file.") );
             #if OTA_DEBUG && OTA_MEMDUMP
-            vMemDump(C->pxSignature->ucData, C->pxSignature->usSize, "Signature");
+            vMemDump(C->pSignature->ucData, C->pSignature->size, "Signature");
             #endif
             /* TODO: Verify the file signature, close the file and return the signature verification result. */
             eResult = prvPAL_CheckFileSignature_amebaPro( C );
-            //eResult = kOTA_Err_None;
+            //eResult = OtaPalSuccess;
         }
         else
         {
-            eResult = kOTA_Err_SignatureCheckFailed;
+            eResult = OtaPalSignatureCheckFailed;
         }
     }
 #ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS
     aws_ota_imgsz = 0;
     aws_ota_target_hdr_get = false;
 #endif
-    return eResult;
+    return OTA_PAL_COMBINE_ERR( eResult, 0 );
 }
 
-int16_t prvPAL_WriteBlock_amebaPro(OTA_FileContext_t *C, int32_t iOffset, uint8_t* pacData, uint32_t iBlockSize)
+int16_t prvPAL_WriteBlock_amebaPro(OtaFileContext_t *C, int32_t iOffset, uint8_t* pacData, uint32_t iBlockSize)
 {
-    static bool_t wait_target_img = true;
+    static bool wait_target_img = true;
     static uint32_t img_sign = 0;
 
-	uint32_t address = C->lFileHandle - SPI_FLASH_BASE;
+    uint32_t address = ota_ctx.lFileHandle - SPI_FLASH_BASE;
     uint32_t NewImg2Len = 0;
     uint32_t NewImg2BlkSize = 0;
     uint32_t WriteLen, offset;
-	uint32_t NewFWAddr = 0;
+    uint32_t NewFWAddr = 0;
 
 #ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS
-		OTA_PRINT("[OTA_TEST] Write %d bytes @ 0x%x\n", iBlockSize, address+iOffset);
-		device_mutex_lock(RT_DEV_LOCK_FLASH);
-		flash_erase_sector(&flash_ota, C->lFileHandle - SPI_FLASH_BASE);
-		if(flash_stream_write(&flash_ota, address+iOffset, iBlockSize, pacData) < 0){
-			OTA_PRINT("[%s] Write sector failed\n", __FUNCTION__);
-			device_mutex_unlock(RT_DEV_LOCK_FLASH);
-			return -1;
-		}
-		aws_ota_imgsz += iBlockSize;
-		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		return iBlockSize;
+    OTA_PRINT("[OTA_TEST] Write %d bytes @ 0x%x\n", iBlockSize, address+iOffset);
+    device_mutex_lock(RT_DEV_LOCK_FLASH);
+    flash_erase_sector(&flash_ota, ota_ctx.lFileHandle - SPI_FLASH_BASE);
+    if(flash_stream_write(&flash_ota, address+iOffset, iBlockSize, pacData) < 0){
+        OTA_PRINT("[%s] Write sector failed\n", __FUNCTION__);
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        return -1;
+    }
+    aws_ota_imgsz += iBlockSize;
+    device_mutex_unlock(RT_DEV_LOCK_FLASH);
+    return iBlockSize;
 #endif
 
-	gNewImgLen = C->ulFileSize - (C->ulFileSize%1024);
-	if(gNewImgLen<1024)
-	{
-		OTA_PRINT("Invalid file size:%d\n",gNewImgLen);
-		return -1;
-	}
+    gNewImgLen = C->fileSize - (C->fileSize%1024);
+    if(gNewImgLen<1024)
+    {
+        OTA_PRINT("Invalid file size:%d\n",gNewImgLen);
+        return -1;
+    }
 
-	if (aws_ota_target_hdr_get != true) {
-		int i;
-		//if(iOffset != 0){
-		//	OTA_PRINT("OTA header not found yet\r\n");
-		//	return -1;
-		//}
-		wait_target_img = true;
-		img_sign = 0;
+    if (aws_ota_target_hdr_get != true) {
+        int i;
+        //if(iOffset != 0){
+        //	OTA_PRINT("OTA header not found yet\r\n");
+        //	return -1;
+        //}
+        wait_target_img = true;
+        img_sign = 0;
 
-		NewFWAddr = update_ota_prepare_addr();
-		/*get new image length from the firmware header*/
-		NewImg2Len = update_ota_erase_upg_region(gNewImgLen, NewImg2Len, NewFWAddr);
-		NewImg2BlkSize = ((NewImg2Len - 1)/4096) + 1;
+        NewFWAddr = update_ota_prepare_addr();
+        /*get new image length from the firmware header*/
+        NewImg2Len = update_ota_erase_upg_region(gNewImgLen, NewImg2Len, NewFWAddr);
+        NewImg2BlkSize = ((NewImg2Len - 1)/4096) + 1;
 
-		OTA_PRINT("[OTA][%s] NewImg2BlkSize %d\n", __FUNCTION__, NewImg2BlkSize);
-		//device_mutex_lock(RT_DEV_LOCK_FLASH);
-		//for( i = 0; i < NewImg2BlkSize; i++){
-		//	flash_erase_sector(&flash_ota, C->lFileHandle - SPI_FLASH_BASE + i * 4096);
-		//	OTA_PRINT("[OTA] Erase sector @ 0x%x\n", C->lFileHandle - SPI_FLASH_BASE + i * 4096);
-		//}
-		//device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		aws_ota_target_hdr_get = true;
-	}
+        OTA_PRINT("[OTA][%s] NewImg2BlkSize %d\n", __FUNCTION__, NewImg2BlkSize);
+        //device_mutex_lock(RT_DEV_LOCK_FLASH);
+        //for( i = 0; i < NewImg2BlkSize; i++){
+        //	flash_erase_sector(&flash_ota, C->lFileHandle - SPI_FLASH_BASE + i * 4096);
+        //	OTA_PRINT("[OTA] Erase sector @ 0x%x\n", C->lFileHandle - SPI_FLASH_BASE + i * 4096);
+        //}
+        //device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        aws_ota_target_hdr_get = true;
+    }
 
-	OTA_PRINT("[OTA][%s] iFileSize %d, iOffset: 0x%x: iBlockSize: 0x%x\n", __FUNCTION__, C->ulFileSize, iOffset, iBlockSize);
-	if((C->ulFileSize/OTA_FILE_BLOCK_SIZE) == (iOffset/OTA_FILE_BLOCK_SIZE))
-	{
-		if(C->pxSignature != NULL && C->pxSignature->usSize > 10 )
-		{
-			OTA_PRINT("[OTA][%s] OTA1 Sig Size is %d\n", __FUNCTION__, C->pxSignature->usSize);
-			#if OTA_DEBUG && OTA_MEMDUMP
-			vMemDump(C->pxSignature->ucData, C->pxSignature->usSize, "AWS_Signature");
-			#endif
-		}
-		else
-		{
-			OTA_PRINT("[OTA] Final block with signature arrived\n");
-			#if OTA_DEBUG && OTA_MEMDUMP
-			vMemDump(pacData, iBlockSize, "Full signature");
-			#endif
-			uint32_t ota_size = iBlockSize-1;
-			OTA_PRINT("[OTA][%s] OTA1 Sig Size is %d\n", __FUNCTION__, ota_size);
-			C->pxSignature->usSize = ota_size;
-			memcpy(C->pxSignature->ucData, pacData, ota_size);
-			#if OTA_DEBUG && OTA_MEMDUMP
-			vMemDump(C->pxSignature->ucData, C->pxSignature->usSize, "Signature Write");
-			#endif
-		}
-	}
+    OTA_PRINT("[OTA][%s] iFileSize %d, iOffset: 0x%x: iBlockSize: 0x%x\n", __FUNCTION__, C->fileSize, iOffset, iBlockSize);
+    if((C->fileSize/OTA_FILE_BLOCK_SIZE) == (iOffset/OTA_FILE_BLOCK_SIZE))
+    {
+        if(C->pSignature != NULL && C->pSignature->size > 10 )
+        {
+            OTA_PRINT("[OTA][%s] OTA1 Sig Size is %d\n", __FUNCTION__, C->pSignature->size);
+            #if OTA_DEBUG && OTA_MEMDUMP
+            vMemDump(C->pSignature->ucData, C->pSignature->size, "AWS_Signature");
+            #endif
+        }
+        else
+        {
+            OTA_PRINT("[OTA] Final block with signature arrived\n");
+            #if OTA_DEBUG && OTA_MEMDUMP
+            vMemDump(pacData, iBlockSize, "Full signature");
+            #endif
+            uint32_t ota_size = iBlockSize-1;
+            OTA_PRINT("[OTA][%s] OTA1 Sig Size is %d\n", __FUNCTION__, ota_size);
+            C->pSignature->size = ota_size;
+            memcpy(C->pSignature->data, pacData, ota_size);
+            #if OTA_DEBUG && OTA_MEMDUMP
+            vMemDump(C->pSignature->ucData, C->pSignature->size, "Signature Write");
+            #endif
+        }
+    }
 
-	if(aws_ota_imgsz >= gNewImgLen){
-		OTA_PRINT("[OTA] image download is already done, dropped, aws_ota_imgsz=0x%X, ImgLen=0x%X\n",aws_ota_imgsz,gNewImgLen);
-		return iBlockSize;
-	}
+    if(aws_ota_imgsz >= gNewImgLen){
+        OTA_PRINT("[OTA] image download is already done, dropped, aws_ota_imgsz=0x%X, ImgLen=0x%X\n",aws_ota_imgsz,gNewImgLen);
+        return iBlockSize;
+    }
 
-	if(wait_target_img == true && iOffset <= (AWS_OTA_IMAGE_SIGNATURE_LEN)) {
-		uint32_t byte_to_write = (iOffset + iBlockSize);
+    if(wait_target_img == true && iOffset <= (AWS_OTA_IMAGE_SIGNATURE_LEN)) {
+        uint32_t byte_to_write = (iOffset + iBlockSize);
 #if OTA_DEBUG && OTA_MEMDUMP
-		vMemDump(pacData, iBlockSize, "PAYLOAD0");
+        vMemDump(pacData, iBlockSize, "PAYLOAD0");
 #endif
-		pacData += (iBlockSize - byte_to_write);
-		OTA_PRINT("[OTA] FIRST image data arrived %d\n", byte_to_write);
+        pacData += (iBlockSize - byte_to_write);
+        OTA_PRINT("[OTA] FIRST image data arrived %d\n", byte_to_write);
         if(img_sign < 32){
             img_sign = (byte_to_write > 32)?32:byte_to_write;
             memcpy(sig_backup, pacData, img_sign);
@@ -471,91 +476,91 @@ int16_t prvPAL_WriteBlock_amebaPro(OTA_FileContext_t *C, int32_t iOffset, uint8_
             aws_ota_imgsz += img_sign;
         }
 
-		device_mutex_lock(RT_DEV_LOCK_FLASH);
-		OTA_PRINT("[OTA] FIRST Write %d bytes @ 0x%x\n", byte_to_write, address);
-		if(flash_stream_write(&flash_ota, address+AWS_OTA_IMAGE_SIGNATURE_LEN, byte_to_write, pacData) < 0){
-			OTA_PRINT("[%s] Write sector failed\n", __FUNCTION__);
-			device_mutex_unlock(RT_DEV_LOCK_FLASH);
-			return -1;
-		}
+        device_mutex_lock(RT_DEV_LOCK_FLASH);
+        OTA_PRINT("[OTA] FIRST Write %d bytes @ 0x%x\n", byte_to_write, address);
+        if(flash_stream_write(&flash_ota, address+AWS_OTA_IMAGE_SIGNATURE_LEN, byte_to_write, pacData) < 0){
+            OTA_PRINT("[%s] Write sector failed\n", __FUNCTION__);
+            device_mutex_unlock(RT_DEV_LOCK_FLASH);
+            return -1;
+        }
 #if OTA_DEBUG && OTA_MEMDUMP
-		vMemDump(pacData, byte_to_write, "PAYLOAD1");
+        vMemDump(pacData, byte_to_write, "PAYLOAD1");
 #endif
-		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		aws_ota_imgsz += byte_to_write;
-		wait_target_img = false;
-		return iBlockSize;
-	}
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        aws_ota_imgsz += byte_to_write;
+        wait_target_img = false;
+        return iBlockSize;
+    }
 
-	WriteLen = iBlockSize;
-	offset = iOffset;
-	if ((offset + iBlockSize) >= gNewImgLen) {
+    WriteLen = iBlockSize;
+    offset = iOffset;
+    if ((offset + iBlockSize) >= gNewImgLen) {
+        if(offset > gNewImgLen)
+            return iBlockSize;
+        WriteLen -= (offset + iBlockSize - gNewImgLen);
+        OTA_PRINT("[OTA] LAST image data arrived %d\n", WriteLen);
+    }
 
-		if(offset > gNewImgLen)
-			return iBlockSize;
-		WriteLen -= (offset + iBlockSize - gNewImgLen);
-		OTA_PRINT("[OTA] LAST image data arrived %d\n", WriteLen);
-	}
+    device_mutex_lock(RT_DEV_LOCK_FLASH);
+    OTA_PRINT("[OTA] Write %d bytes @ 0x%x (0x%x)\n", WriteLen, address + offset, (address + offset));
+    if(flash_stream_write(&flash_ota, address + offset, WriteLen, pacData) < 0){
+        OTA_PRINT("[%s] Write sector failed\n", __FUNCTION__);
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        return -1;
+    }
 
-	device_mutex_lock(RT_DEV_LOCK_FLASH);
-	OTA_PRINT("[OTA] Write %d bytes @ 0x%x (0x%x)\n", WriteLen, address + offset, (address + offset));
-	if(flash_stream_write(&flash_ota, address + offset, WriteLen, pacData) < 0){
-		OTA_PRINT("[%s] Write sector failed\n", __FUNCTION__);
-		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		return -1;
-	}
-
-	device_mutex_unlock(RT_DEV_LOCK_FLASH);
-	aws_ota_imgsz += WriteLen;
-	return iBlockSize;
+    device_mutex_unlock(RT_DEV_LOCK_FLASH);
+    aws_ota_imgsz += WriteLen;
+    return iBlockSize;
 }
 
-OTA_Err_t prvPAL_ActivateNewImage_amebaPro(void)
+OtaPalStatus_t prvPAL_ActivateNewImage_amebaPro(void)
 {
-	int ret = -1;
-	uint32_t NewFWAddr = 0;
+    int ret = -1;
+    uint32_t NewFWAddr = 0;
 
-	NewFWAddr = update_ota_prepare_addr();
-	if(NewFWAddr == -1){
-		return kOTA_Err_ActivateFailed;
-	}
+    NewFWAddr = update_ota_prepare_addr();
+    if(NewFWAddr == -1){
+        return OTA_PAL_COMBINE_ERR( OtaPalActivateFailed, 0 );
+    }
 
-	ret = update_ota_signature(sig_backup, NewFWAddr);
-	if(ret == -1){
-		OTA_PRINT("[%s] Update signature fail\r\n", __FUNCTION__);
-		return kOTA_Err_ActivateFailed;
-	}
-	else{
-		device_mutex_lock(RT_DEV_LOCK_FLASH);
-		flash_erase_sector(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
-		flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT);
-		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		OTA_PRINT("[OTA] [%s] Update OTA success!\r\n", __FUNCTION__);
-	}
+    ret = update_ota_signature(sig_backup, NewFWAddr);
+    if(ret == -1){
+        OTA_PRINT("[%s] Update signature fail\r\n", __FUNCTION__);
+        return OTA_PAL_COMBINE_ERR( OtaPalActivateFailed, 0 );
+    }
+    else{
+        device_mutex_lock(RT_DEV_LOCK_FLASH);
+        flash_erase_sector(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
+        flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT);
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        OTA_PRINT("[OTA] [%s] Update OTA success!\r\n", __FUNCTION__);
+    }
 
-	OTA_PRINT("[OTA] Resetting MCU to activate new image.\r\n");
-	vTaskDelay( 100 );
-	prvSysReset_amebaPro();
-	return kOTA_Err_None;
+    OTA_PRINT("[OTA] Resetting MCU to activate new image.\r\n");
+    vTaskDelay( 100 );
+    prvSysReset_amebaPro();
+    return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
 }
 
-OTA_Err_t prvPAL_ResetDevice_amebaPro (void)
+OtaPalStatus_t prvPAL_ResetDevice_amebaPro (void)
 {
     prvSysReset_amebaPro();
-    return kOTA_Err_None;
+    return OTA_PAL_COMBINE_ERR( OtaPalSuccess, 0 );
 }
 
-OTA_Err_t prvPAL_SetPlatformImageState_amebaPro (OTA_ImageState_t eState)
+OtaPalStatus_t prvPAL_SetPlatformImageState_amebaPro (OtaImageState_t eState)
 {
-    DEFINE_OTA_METHOD_NAME( "prvSetImageState_amebaPro" );
-    OTA_Err_t eResult = kOTA_Err_Uninitialized;
+    LogInfo( ( "%s", __func__ ) );
+
+    OtaPalStatus_t eResult = OtaPalUninitialized;
     uint32_t ota_imagestate =  AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
 
     device_mutex_lock(RT_DEV_LOCK_FLASH);
     flash_read_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, &ota_imagestate);
     device_mutex_unlock(RT_DEV_LOCK_FLASH);
 
-    if ( eState == eOTA_ImageState_Accepted )
+    if ( eState == OtaImageStateAccepted )
     {
         /* This should be an image launched in self test mode! */
         if ( ota_imagestate == AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT )
@@ -568,68 +573,67 @@ OTA_Err_t prvPAL_SetPlatformImageState_amebaPro (OTA_ImageState_t eState)
             device_mutex_unlock(RT_DEV_LOCK_FLASH);
 
             {
-                OTA_LOG_L1( "[%s] Accepted and committed final image.\r\n", OTA_METHOD_NAME );
+                LogInfo( ( "Accepted and committed final image.") );
                 update_ota_prepare_addr();
-                eResult = kOTA_Err_None;
+                eResult = OtaPalSuccess;
             }
         }
         else
         {
-            OTA_LOG_L1( "[%s] Warning: image is not pending commit (0x%02x)\r\n", OTA_METHOD_NAME, ota_imagestate );
+            LogInfo( ( "Warning: image is not pending commit (0x%02x).", ota_imagestate ) );
             if ( ota_imagestate == AWS_OTA_IMAGE_STATE_FLAG_IMG_VALID )
             {
-                eResult = kOTA_Err_None;
+                eResult = OtaPalSuccess;
             }
             else
             {
-                eResult = ( uint32_t ) kOTA_Err_CommitFailed/* | ( ( ( uint32_t ) MCHP_ERR_NOT_PENDING_COMMIT ) & ( uint32_t ) kOTA_PAL_ErrMask )*/;
+                eResult = ( uint32_t ) OtaPalCommitFailed/* | ( ( ( uint32_t ) MCHP_ERR_NOT_PENDING_COMMIT ) & ( uint32_t ) kOTA_PAL_ErrMask )*/;
             }
         }
     }
-    else if ( eState == eOTA_ImageState_Rejected )
+    else if ( eState == OtaImageStateRejected )
     {
 #ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS
-            ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
-            device_mutex_lock(RT_DEV_LOCK_FLASH);
-            flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
-            device_mutex_unlock(RT_DEV_LOCK_FLASH);
-            eResult = kOTA_Err_None;
+        ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
+        device_mutex_lock(RT_DEV_LOCK_FLASH);
+        flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        eResult = OtaPalSuccess;
 #else
-            u32 ota_target_reset_index;
-            OTA_LOG_L1( "[%s] Rejecting and invalidating image.\r\n", OTA_METHOD_NAME );
-            //clean_upgrade_region();
-            //ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW;
-            ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
-            device_mutex_lock(RT_DEV_LOCK_FLASH);
-            flash_erase_sector(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
-            flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
-            device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        u32 ota_target_reset_index;
+        LogInfo( ( "Rejecting and invalidating image." ) );
+        //clean_upgrade_region();
+        //ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW;
+        ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
+        device_mutex_lock(RT_DEV_LOCK_FLASH);
+        flash_erase_sector(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
+        flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
 
-            eResult = kOTA_Err_None;
+        eResult = OtaPalSuccess;
 #endif
     }
-    else if ( eState == eOTA_ImageState_Aborted )
+    else if ( eState == OtaImageStateAborted )
     {
-        OTA_LOG_L1( "[%s] Aborting and invalidating image.\r\n", OTA_METHOD_NAME );
-        eResult = kOTA_Err_None;
+        LogInfo( ( "Aborting and invalidating image." ) );
+        eResult = OtaPalSuccess;
     }
-    else if ( eState == eOTA_ImageState_Testing )
+    else if ( eState == OtaImageStateTesting )
     {
-        OTA_LOG_L1( "[%s] Testing image.\r\n", OTA_METHOD_NAME );
-        eResult = kOTA_Err_None;
+        LogInfo( ( "Testing image." ) );
+        eResult = OtaPalSuccess;
     }
     else
     {
-        OTA_LOG_L1( "[%s] Bad Image State.\r\n", OTA_METHOD_NAME );
-        eResult = kOTA_Err_BadImageState;
+        LogInfo( ( "Bad Image State." ) );
+        eResult = OtaPalBadImageState;
     }
-	return eResult;
+	return OTA_PAL_COMBINE_ERR( eResult, 0 );
 }
 
-OTA_PAL_ImageState_t prvPAL_GetPlatformImageState_amebaPro( void )
+OtaPalImageState_t prvPAL_GetPlatformImageState_amebaPro( void )
 {
-    DEFINE_OTA_METHOD_NAME( "prvPAL_GetPlatformImageState_amebaPro" );
-    OTA_PAL_ImageState_t eImageState = eOTA_PAL_ImageState_Unknown;
+    OtaPalImageState_t eImageState = OtaPalImageStateUnknown;
 
     uint32_t ota_imagestate =  AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
 
@@ -642,26 +646,26 @@ OTA_PAL_ImageState_t prvPAL_GetPlatformImageState_amebaPro( void )
         case AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT:
         {
             /* Pending Commit means we're in the Self Test phase. */
-            eImageState = eOTA_PAL_ImageState_PendingCommit;
+            eImageState = OtaPalImageStatePendingCommit;
             break;
         }
         case AWS_OTA_IMAGE_STATE_FLAG_IMG_VALID:
         {
-            eImageState = eOTA_PAL_ImageState_Valid;
+            eImageState = OtaPalImageStateValid;
             break;
         }
         case AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW:
         {
-            eImageState = eOTA_PAL_ImageState_Valid;
+            eImageState = OtaPalImageStateValid;
             break;
         }
         default:
         {
-            eImageState = eOTA_PAL_ImageState_Invalid;
+            eImageState = OtaPalImageStateInvalid;
             break;
         }
     }
-    OTA_LOG_L1( "[%s] Image current state (0x%02x)\r\n", OTA_METHOD_NAME, eImageState );
+    LogInfo( ( "Image current state (0x%02x).", eImageState ) );
     return eImageState;
 }
 
