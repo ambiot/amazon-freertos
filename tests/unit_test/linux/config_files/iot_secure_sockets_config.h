@@ -24,23 +24,36 @@
  */
 
 /**
- * @file iot_tests_network.c
- * @brief Common network function implementations for the tests.
+ * @file iot_secure_sockets_config.h
+ * @brief Secure sockets configuration options.
  */
 
-/* The config header is always included first. */
-#include "iot_config.h"
+#ifndef _IOT_SECURE_SOCKETS_CONFIG_H_
+#define _IOT_SECURE_SOCKETS_CONFIG_H_
 
-#include "private/iot_error.h"
-#include "stdbool.h"
+/**
+ * @brief Byte order of the target MCU.
+ *
+ * Valid values are pdLITTLE_ENDIAN and pdBIG_ENDIAN.
+ */
+#define socketsconfigBYTE_ORDER                           pdLITTLE_ENDIAN
 
+/**
+ * @brief Default socket send timeout.
+ */
+#define socketsconfigDEFAULT_SEND_TIMEOUT                 ( 10000 )
 
-static uint16_t _IotTestNetworkType = AWSIOT_NETWORK_TYPE_WIFI;
+/**
+ * @brief Default socket receive timeout.
+ */
+#define socketsconfigDEFAULT_RECV_TIMEOUT                 ( 10000 )
 
-/*-----------------------------------------------------------*/
+/**
+ * @brief Enable metrics of secure socket.
+ */
+#define AWS_IOT_SECURE_SOCKETS_METRICS_ENABLED            ( 0 )
 
-bool IotTestNetwork_SelectNetworkType( uint16_t networkType )
-{
-    _IotTestNetworkType = networkType;
-    return true;
-}
+#define socketsconfigDEFAULT_MAX_NUM_SECURE_SOCKETS       4
+#define socketsconfigRECEIVE_CALLBACK_TASK_STACK_DEPTH    300
+
+#endif /* _IOT_SECURE_SOCKETS_CONFIG_H_ */

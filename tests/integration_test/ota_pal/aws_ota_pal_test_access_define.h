@@ -24,23 +24,38 @@
  */
 
 /**
- * @file iot_tests_network.c
- * @brief Common network function implementations for the tests.
+ * @file aws_ota_pal_test_access_define.h
+ * @brief Definitions to function wrappers that access private methods in
+ *        ota_pal.c. This file must be included in ota_pal.c if either of the
+ *        following macros are defined:
+ *        - otatestpalCHECK_FILE_SIGNATURE_SUPPORTED
+ *        - otatestpalREAD_AND_ASSUME_CERTIFICATE_SUPPORTED
  */
 
-/* The config header is always included first. */
-#include "iot_config.h"
+#ifndef _AWS_OTA_PAL_TEST_ACCESS_DEFINE_H_
+#define _AWS_OTA_PAL_TEST_ACCESS_DEFINE_H_
 
-#include "private/iot_error.h"
-#include "stdbool.h"
-
-
-static uint16_t _IotTestNetworkType = AWSIOT_NETWORK_TYPE_WIFI;
+#include "aws_ota_pal_test_access_declare.h"
+#include "aws_test_ota_config.h"
 
 /*-----------------------------------------------------------*/
 
-bool IotTestNetwork_SelectNetworkType( uint16_t networkType )
-{
-    _IotTestNetworkType = networkType;
-    return true;
-}
+#if otatestpalCHECK_FILE_SIGNATURE_SUPPORTED
+    OtaPalStatus_t test_otaPal_CheckFileSignature( OtaFileContext_t * const C )
+    {
+        return otaPal_CheckFileSignature( C );
+    }
+#endif
+
+/*-----------------------------------------------------------*/
+
+#if otatestpalREAD_AND_ASSUME_CERTIFICATE_SUPPORTED
+    uint8_t * test_otaPal_ReadAndAssumeCertificate( const uint8_t * const pucCertName,
+                                                    uint32_t * const ulSignerCertSize )
+
+    {
+        return otaPal_ReadAndAssumeCertificate( pucCertName, ulSignerCertSize );
+    }
+#endif
+
+#endif /* AWS_OTA_PAL_TEST_ACCESS_DEFINE_H_ */

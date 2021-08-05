@@ -24,23 +24,25 @@
  */
 
 /**
- * @file iot_tests_network.c
- * @brief Common network function implementations for the tests.
+ * @file aws_ota_pal_test_access_declare.h
+ * @brief Function wrappers that access private methods in ota_pal.c.
+ *
+ * Needed for testing private functions.
  */
 
-/* The config header is always included first. */
-#include "iot_config.h"
+#ifndef AWS_OTA_PAL_TEST_ACCESS_DECLARE_H_
+#define AWS_OTA_PAL_TEST_ACCESS_DECLARE_H_
 
-#include "private/iot_error.h"
-#include "stdbool.h"
+#include "ota.h"
+#include "aws_test_ota_config.h"
 
+#if otatestpalCHECK_FILE_SIGNATURE_SUPPORTED
+    OtaPalStatus_t test_otaPal_CheckFileSignature( OtaFileContext_t * const C );
+#endif
 
-static uint16_t _IotTestNetworkType = AWSIOT_NETWORK_TYPE_WIFI;
+#if otatestpalREAD_AND_ASSUME_CERTIFICATE_SUPPORTED
+    uint8_t * test_otaPal_ReadAndAssumeCertificate( const uint8_t * const pucCertName,
+                                                    uint32_t * const ulSignerCertSize );
+#endif
 
-/*-----------------------------------------------------------*/
-
-bool IotTestNetwork_SelectNetworkType( uint16_t networkType )
-{
-    _IotTestNetworkType = networkType;
-    return true;
-}
+#endif /* ifndef AWS_OTA_PAL_TEST_ACCESS_DECLARE_H_ */

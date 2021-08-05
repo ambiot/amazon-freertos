@@ -2,9 +2,9 @@ include("${CMAKE_CURRENT_LIST_DIR}/find_compiler.cmake")
 
 set(CMAKE_SYSTEM_NAME Generic)
 
-# Find GCC for Xtensa-ESP32.
-afr_find_compiler(AFR_COMPILER_CC xtensa-esp32-elf-gcc)
-afr_find_compiler(AFR_COMPILER_CXX xtensa-esp32-elf-g++)
+# Find GCC for Xtensa-ESP32S2.
+afr_find_compiler(AFR_COMPILER_CC xtensa-esp32s2-elf-gcc)
+afr_find_compiler(AFR_COMPILER_CXX xtensa-esp32s2-elf-g++)
 
 # Specify the cross compiler.
 set(CMAKE_C_COMPILER ${AFR_COMPILER_CC} CACHE FILEPATH "C compiler")
