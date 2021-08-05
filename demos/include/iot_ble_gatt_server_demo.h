@@ -1,6 +1,6 @@
 /*
- * FreeRTOS V202012.00
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS V202107.00
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -24,11 +24,11 @@
  */
 
 /**
- * @file aws_ble_gatt_server_demo.h
+ * @file iot_ble_gatt_server_demo.h
  * @brief Sample demo for a BLE GATT server
  */
-#ifndef AWS_BLE_GATT_SERVER_DEMO_H_
-#define AWS_BLE_GATT_SERVER_DEMO_H_
+#ifndef IOT_BLE_GATT_SERVER_DEMO_H_
+#define IOT_BLE_GATT_SERVER_DEMO_H_
 
 #include "FreeRTOS.h"
 /* The config header is always included first. */
@@ -87,20 +87,11 @@ typedef enum
  *
  * @return pdTRUE if the GATT Service is successfully initialized, pdFALSE otherwise
  */
-int vGattDemoSvcInit( bool awsIotMqttMode,
+int vGattDemoSvcInit( bool iotMqttMode,
                       const char * pIdentifier,
                       void * pNetworkServerInfo,
                       void * pNetworkCredentialInfo,
                       const IotNetworkInterface_t * pNetworkInterface );
 
-/**
- * @brief Starts the GATT demo service.
- */
-void vGattDemoSvcStart( void );
 
-/**
- * @brief Stops the GATT demo service.
- */
-void vGattDemoSvcStop( void );
-
-#endif /* AWS_BLE_GATT_SERVER_DEMO_H_ */
+#endif /* IOT_BLE_GATT_SERVER_DEMO_H_ */

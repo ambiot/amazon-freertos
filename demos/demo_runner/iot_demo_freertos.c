@@ -1,6 +1,6 @@
 /*
- * FreeRTOS V202012.00
- * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
+ * FreeRTOS V202107.00
+ * Copyright (C) 2021 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
  * this software and associated documentation files (the "Software"), to deal in
@@ -95,7 +95,7 @@ static void _onNetworkStateChangeCallback( uint32_t network,
 
     demoContext_t * pDemoContext = ( demoContext_t * ) pContext;
 
-    if( ( state == eNetworkStateEnabled ) && ( demoConnectedNetwork == AWSIOT_NETWORK_TYPE_NONE ) )
+    if( ( state == eNetworkStateConnected ) && ( demoConnectedNetwork == AWSIOT_NETWORK_TYPE_NONE ) )
     {
         demoConnectedNetwork = network;
         IotSemaphore_Post( &demoNetworkSemaphore );
@@ -121,8 +121,7 @@ static void _onNetworkStateChangeCallback( uint32_t network,
                                                     pNetworkInterface );
         }
     }
-    else if( ( ( state == eNetworkStateDisabled ) || ( state == eNetworkStateUnknown ) ) &&
-             ( demoConnectedNetwork == network ) )
+    else if( ( state == eNetworkStateEnabled ) && ( demoConnectedNetwork == network ) )
     {
         if( pDemoContext->networkDisconnectedCallback != NULL )
         {
@@ -404,7 +403,6 @@ void runDemoTask( void * pArgument )
  * configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h.
  *
  */
-#if 0 //define in freertos_v10.2.0/Source/portable/GCC/RTL8721D_HP/non_secure/port.c
     void vApplicationMallocFailedHook()
     {
         configPRINT_STRING( ( "ERROR: Malloc failed to allocate memory\r\n" ) );
@@ -415,7 +413,7 @@ void runDemoTask( void * pArgument )
         {
         }
     }
-#endif
+
 /*-----------------------------------------------------------*/
 
 /**
@@ -429,7 +427,6 @@ void runDemoTask( void * pArgument )
  * has occurred.
  *
  */
-#if 0 //define in freertos_v10.2.0/Source/portable/GCC/RTL8721D_HP/non_secure/port.c
     void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                         char * pcTaskName )
     {
@@ -445,7 +442,5 @@ void runDemoTask( void * pArgument )
         {
         }
     }
-#endif
-
 #endif /* iotconfigUSE_PORT_SPECIFIC_HOOKS */
 /*-----------------------------------------------------------*/
