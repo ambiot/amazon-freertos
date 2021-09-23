@@ -59,10 +59,10 @@
 #elif defined(CONFIG_PLATFORM_8195B)
 #define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
 #define pkcs11OBJECT_FLASH_CERT_PRESENT      ( 0x22ABCDEFuL ) //magic number for check flash data
-#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x436000 ) //Flash location for CERT
-#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x437000 ) //Flash location for Priv Key
-#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x438000 ) //Flash location for Pub Key
-#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x439000 ) //Flash location for code verify Key
+#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x4C0000 ) //Flash location for CERT
+#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x4C1000 ) //Flash location for Priv Key
+#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x4C2000 ) //Flash location for Pub Key
+#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x4C3000 ) //Flash location for code verify Key
 
 #define FLASH_SECTOR_SIZE                       0x1000
 
