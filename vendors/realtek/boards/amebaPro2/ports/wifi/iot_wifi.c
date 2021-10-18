@@ -36,8 +36,6 @@
 /* Wi-Fi configuration includes. */
 #include "aws_wifi_config.h"
 
-//#include "aws_secure_sockets.h"
-
 #include "wifi_constants.h"
 #include "wifi_structures.h"
 #include "wifi_conf.h"
@@ -85,7 +83,6 @@ static rtw_security_t prvConvertSecurityAbstractedToRTW( WIFISecurity_t xSecurit
 
     return ucConvertedSecurityType;
 }
-
 /*-----------------------------------------------------------*/
 
 static WIFISecurity_t prvConvertSecurityRTWToAbstracted( rtw_security_t ucSecurity )
@@ -121,7 +118,6 @@ static WIFISecurity_t prvConvertSecurityRTWToAbstracted( rtw_security_t ucSecuri
 
     return xConvertedSecurityType;
 }
-
 /*-----------------------------------------------------------*/
 
 WIFIReturnCode_t WIFI_On( void )
@@ -141,7 +137,7 @@ extern int lwip_init_done;
     vTaskDelay(20);
     if (wifi_on(RTW_MODE_STA) < 0){
         printf("Wifi on failed!");
-    return eWiFiFailure;
+        return eWiFiFailure;
     }
     return eWiFiSuccess;
 }
@@ -171,18 +167,18 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
 	connect_param.password = (char*)pxNetworkParams->xPassword.xWPA.cPassphrase;
 	connect_param.password_len = pxNetworkParams->xPassword.xWPA.ucLength;
 	connect_param.security_type = prvConvertSecurityAbstractedToRTW(pxNetworkParams->xSecurity);
-    
+
     printf("\n\rJoining BSS by SSID %s...\n\r", (char*)pxNetworkParams->ucSSID);
 
     device_mutex_lock(RT_DEV_LOCK_WLAN);
 	if(pxNetworkParams->xPassword.xWPA.cPassphrase != NULL)
 	{
-    	ret = wifi_connect(&connect_param, 1);
+        ret = wifi_connect(&connect_param, 1);
     }
 	else
 	{
         connect_param.password_len = 0;
-		ret = wifi_connect(&connect_param, 1);
+        ret = wifi_connect(&connect_param, 1);
     }
     device_mutex_unlock(RT_DEV_LOCK_WLAN);
 
@@ -192,18 +188,6 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
 
         printf("\n\rERROR: Can't connect to AP");
         ret = eWiFiFailure;
-        // if(ota_recover==1)
-        // {
-			// if(reconnect_count>=5)
-			// {
-				// printf("sys_recover_ota_signature.\n");
-				// sys_recover_ota_signature();
-				// printf("watchdog_start : 60s\n");
-				// watchdog_init(60000);
-				// watchdog_start();
-			// }
-			// reconnect_count++;
-        // }
     }
     else
     {
