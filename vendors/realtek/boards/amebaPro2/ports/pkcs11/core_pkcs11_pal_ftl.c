@@ -164,19 +164,10 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
 			ulCheckSum = 0;
 			for( i = 0; i < xBytesWritten; i++)
 				ulCheckSum += pucData[i];
-            unsigned char* flash_write_buf = (unsigned char *)malloc(xBytesWritten + FLASH_DATA_OFFSET);
-            if (flash_write_buf != NULL){
-                memset(flash_write_buf, 0xff, xBytesWritten + FLASH_DATA_OFFSET);
-                memcpy(flash_write_buf, &ulFlashMark, sizeof(CK_ULONG));
-                memcpy(flash_write_buf + FLASH_CHECKSUM_OFFSET, &ulCheckSum, sizeof(CK_ULONG));
-                memcpy(flash_write_buf + FLASH_DATALEN_OFFSET, &xBytesWritten, sizeof(CK_RV));
-                memcpy(flash_write_buf + FLASH_DATA_OFFSET, pucData, xBytesWritten);
-                ftl_common_write(pcFlashAddr, (unsigned char *)flash_write_buf, xBytesWritten + FLASH_DATA_OFFSET, 0);
-                free(flash_write_buf);
-            }else{
-                printf("\r\nPKCS11_PAL_SaveObject: flash_write_buf allocate fail!\r\n");
-                xHandle = eInvalidHandle;
-            }
+			ftl_common_write(pcFlashAddr, &ulFlashMark, sizeof(CK_ULONG));
+			ftl_common_write(pcFlashAddr + FLASH_CHECKSUM_OFFSET, &ulCheckSum, sizeof(CK_ULONG));
+			ftl_common_write(pcFlashAddr + FLASH_DATALEN_OFFSET, &xBytesWritten, sizeof(CK_RV));
+			ftl_common_write(pcFlashAddr + FLASH_DATA_OFFSET, pucData, xBytesWritten);
 		}
 	}
     return xHandle;
@@ -212,7 +203,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 	/* Check if object exists/has been created before returning. */
 	if(xHandle != eInvalidHandle)
 	{
-        ftl_common_read(pcFlashAddr, (unsigned char *)&ulFlashMark, sizeof(CK_ULONG), 0);
+		ftl_common_read(pcFlashAddr, (unsigned char *)&ulFlashMark, sizeof(CK_ULONG));
 		if( ulFlashMark != pkcs11OBJECT_FLASH_CERT_PRESENT ){
 			xHandle = eInvalidHandle;
 		}
@@ -281,7 +272,7 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 
 	if( pcFlashAddr != 0 )
 	{
-        ftl_common_read(pcFlashAddr, (unsigned char *)&ulFlashMark, sizeof(CK_ULONG), 0);
+		ftl_common_read(pcFlashAddr, (unsigned char *)&ulFlashMark, sizeof(CK_ULONG));
 		if( ulFlashMark == pkcs11OBJECT_FLASH_CERT_PRESENT )
 		{
 			*ppucData = pvPortMalloc(pkcs11OBJECT_CERTIFICATE_MAX_SIZE + 1);
@@ -291,19 +282,10 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 				goto exit;
 			}
 
-            unsigned char* flash_read_buf = (unsigned char *)malloc(pkcs11OBJECT_CERTIFICATE_MAX_SIZE);
-            if (flash_read_buf != NULL){
-                memset(flash_read_buf, 0xff, pkcs11OBJECT_CERTIFICATE_MAX_SIZE);
-                ftl_common_read(pcFlashAddr, (unsigned char *)flash_read_buf, pkcs11OBJECT_CERTIFICATE_MAX_SIZE, 0);
-                memcpy(&ulCheckSum, flash_read_buf + FLASH_CHECKSUM_OFFSET, sizeof(CK_ULONG));
-                memcpy(pulDataSize, flash_read_buf + FLASH_DATALEN_OFFSET, sizeof(CK_ULONG));
-                memcpy(*ppucData, flash_read_buf + FLASH_DATA_OFFSET, *pulDataSize);
-                free(flash_read_buf);
-            }else{
-                printf("\r\nPKCS11_PAL_GetObjectValue: flash_read_buf allocate fail!\r\n");
-                return CKR_KEY_HANDLE_INVALID;
-            }
-            
+			ftl_common_read(pcFlashAddr + FLASH_CHECKSUM_OFFSET, (unsigned char *)&ulCheckSum, sizeof(CK_ULONG));
+			ftl_common_read(pcFlashAddr + FLASH_DATALEN_OFFSET, (unsigned char *)pulDataSize, sizeof(CK_ULONG));
+			ftl_common_read(pcFlashAddr + FLASH_DATA_OFFSET, (unsigned char *)*ppucData, *pulDataSize);
+
 			ulTemp = 0;
 			for( i = 0; i < *pulDataSize; i++ )
 				ulTemp += (*ppucData)[i];
