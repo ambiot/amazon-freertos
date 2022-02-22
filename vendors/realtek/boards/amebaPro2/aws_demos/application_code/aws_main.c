@@ -81,6 +81,19 @@ int aws_main( void )
                             tskIDLE_PRIORITY+6,
                             mainLOGGING_MESSAGE_QUEUE_LENGTH );
 
+    /* Ameba move DEMO_RUNNER_RunDemos from vApplicationDaemonTaskStartupHook to here! */
+    if( SYSTEM_Init() == pdPASS )
+    {
+        /* Connect to the Wi-Fi before running the tests. */
+        //prvWifiConnect();
+
+        /* Provision the device with AWS certificate and private key. */
+        vDevModeKeyProvisioning();
+
+        /* Start the demo tasks. */
+        DEMO_RUNNER_RunDemos();
+    }
+
     /* Start the scheduler.  Initialization that requires the OS to be running,
      * including the Wi-Fi initialization, is performed in the RTOS daemon task
      * startup hook. */
@@ -107,7 +120,7 @@ void vApplicationDaemonTaskStartupHook( void )
      * enable the unit tests and after MQTT, Bufferpool, and Secure Sockets libraries
      * have been imported into the project. If you are not using Wi-Fi, see the
      * vApplicationIPNetworkEventHook function. */
-    //#if 0
+    #if 0
     if( SYSTEM_Init() == pdPASS )
     {
         /* Connect to the Wi-Fi before running the tests. */
@@ -119,7 +132,7 @@ void vApplicationDaemonTaskStartupHook( void )
         /* Start the demo tasks. */
         DEMO_RUNNER_RunDemos();
     }
-    //#endif
+    #endif
 }
 /*-----------------------------------------------------------*/
 

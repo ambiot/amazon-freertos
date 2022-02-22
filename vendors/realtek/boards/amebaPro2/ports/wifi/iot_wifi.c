@@ -30,7 +30,7 @@
 
 /* Socket and Wi-Fi interface includes. */
 #include "FreeRTOS.h"
-#include "Semphr.h"
+#include "semphr.h"
 #include "iot_wifi.h"
 
 /* Wi-Fi configuration includes. */

@@ -43,26 +43,17 @@
 #include MBEDTLS_CONFIG_FILE
 #endif
 
-#include "flash_api.h"
-#include <device_lock.h>
+#include "ftl_common_api.h"
 #include "platform_stdlib.h"
 #include "aws_clientcredential.h"
 
-#if defined(CONFIG_PLATFORM_8195A) || defined(CONFIG_PLATFORM_8711B) || defined(CONFIG_PLATFORM_8721D)
+#if defined(CONFIG_PLATFORM_8735B)  // !!! Please refer amebapro2_partitiontable.json and platform_opts.h to use the proper flash address !!! 
 #define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
 #define pkcs11OBJECT_FLASH_CERT_PRESENT      ( 0x22ABCDEFuL ) //magic number for check flash data
-#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x102000 ) //Flash location for CERT
-#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x103000 ) //Flash location for Priv Key
-#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x104000 ) //Flash location for Pub Key
-#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x105000 ) //Flash location for code verify Key
-
-#elif defined(CONFIG_PLATFORM_8195B) || defined(CONFIG_PLATFORM_8735B)
-#define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
-#define pkcs11OBJECT_FLASH_CERT_PRESENT      ( 0x22ABCDEFuL ) //magic number for check flash data
-#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x4C0000 ) //Flash location for CERT
-#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x4C1000 ) //Flash location for Priv Key
-#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x4C2000 ) //Flash location for Pub Key
-#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x4C3000 ) //Flash location for code verify Key
+#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x1000000 - 0x4000 ) //Flash location for CERT
+#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x1000000 - 0x3000 ) //Flash location for Priv Key
+#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x1000000 - 0x2000 ) //Flash location for Pub Key
+#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x1000000 - 0x1000 ) //Flash location for code verify Key
 
 #define FLASH_SECTOR_SIZE                       0x1000
 
@@ -76,8 +67,6 @@
 #else
 #error "This platform is not supported!"
 #endif
-
-//Amazon-FreeRTOS 1.4.6
 
 enum eObjectHandles
 {
@@ -164,7 +153,6 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
 	CK_ULONG ulFlashMark = pkcs11OBJECT_FLASH_CERT_PRESENT;
 	CK_ULONG ulCheckSum = 0;
 	CK_ULONG i;
-	flash_t flash;
 
 	/* Converts a label to its respective flash address and handle. */
 	prvLabelToFlashAddrHandle( pxLabel->pValue, &pcFlashAddr, &xHandle );
@@ -176,14 +164,10 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
 			ulCheckSum = 0;
 			for( i = 0; i < xBytesWritten; i++)
 				ulCheckSum += pucData[i];
-			device_mutex_lock(RT_DEV_LOCK_FLASH);
-			flash_erase_sector(&flash, pcFlashAddr);
-			flash_write_word(&flash, pcFlashAddr, ulFlashMark);
-			flash_write_word(&flash, pcFlashAddr + FLASH_CHECKSUM_OFFSET, ulCheckSum);
-			flash_write_word(&flash, pcFlashAddr + FLASH_DATALEN_OFFSET, xBytesWritten);
-			flash_stream_write(&flash, pcFlashAddr + FLASH_DATA_OFFSET, xBytesWritten, pucData);
-			flash_write_word(&flash, pcFlashAddr + FLASH_DATA_OFFSET + xBytesWritten, 0x0); // include '\0'
-			device_mutex_unlock(RT_DEV_LOCK_FLASH);
+			ftl_common_write(pcFlashAddr, &ulFlashMark, sizeof(CK_ULONG));
+			ftl_common_write(pcFlashAddr + FLASH_CHECKSUM_OFFSET, &ulCheckSum, sizeof(CK_ULONG));
+			ftl_common_write(pcFlashAddr + FLASH_DATALEN_OFFSET, &xBytesWritten, sizeof(CK_RV));
+			ftl_common_write(pcFlashAddr + FLASH_DATA_OFFSET, pucData, xBytesWritten);
 		}
 	}
     return xHandle;
@@ -219,14 +203,12 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 	/* Check if object exists/has been created before returning. */
 	if(xHandle != eInvalidHandle)
 	{
-		device_mutex_lock(RT_DEV_LOCK_FLASH);
-		flash_read_word(&flash, pcFlashAddr, &ulFlashMark);
+		ftl_common_read(pcFlashAddr, (unsigned char *)&ulFlashMark, sizeof(CK_ULONG));
 		if( ulFlashMark != pkcs11OBJECT_FLASH_CERT_PRESENT ){
 			xHandle = eInvalidHandle;
 		}
-		device_mutex_unlock(RT_DEV_LOCK_FLASH);
 	}
-		
+
     return xHandle;
 }
 
@@ -264,7 +246,6 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 	CK_ULONG ulFlashMark;
 	CK_ULONG ulCheckSum = 0, ulTemp;
 	CK_ULONG i;
-	flash_t flash;
 
     switch(xHandle)
     {
@@ -289,11 +270,9 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 			break;
     }
 
-    device_mutex_lock(RT_DEV_LOCK_FLASH);
-
 	if( pcFlashAddr != 0 )
 	{
-		flash_read_word(&flash, pcFlashAddr, &ulFlashMark);
+		ftl_common_read(pcFlashAddr, (unsigned char *)&ulFlashMark, sizeof(CK_ULONG));
 		if( ulFlashMark == pkcs11OBJECT_FLASH_CERT_PRESENT )
 		{
 			*ppucData = pvPortMalloc(pkcs11OBJECT_CERTIFICATE_MAX_SIZE + 1);
@@ -303,9 +282,9 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 				goto exit;
 			}
 
-			flash_read_word(&flash, pcFlashAddr + FLASH_CHECKSUM_OFFSET, &ulCheckSum);
-			flash_read_word(&flash, pcFlashAddr + FLASH_DATALEN_OFFSET, pulDataSize);
-			flash_stream_read(&flash, pcFlashAddr + FLASH_DATA_OFFSET, pkcs11OBJECT_CERTIFICATE_MAX_SIZE, *ppucData);
+			ftl_common_read(pcFlashAddr + FLASH_CHECKSUM_OFFSET, (unsigned char *)&ulCheckSum, sizeof(CK_ULONG));
+			ftl_common_read(pcFlashAddr + FLASH_DATALEN_OFFSET, (unsigned char *)pulDataSize, sizeof(CK_ULONG));
+			ftl_common_read(pcFlashAddr + FLASH_DATA_OFFSET, (unsigned char *)*ppucData, *pulDataSize);
 
 			ulTemp = 0;
 			for( i = 0; i < *pulDataSize; i++ )
@@ -324,7 +303,6 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 	}
 
 exit:
-	device_mutex_unlock(RT_DEV_LOCK_FLASH);
     return xReturn;
 }
 
@@ -348,16 +326,3 @@ void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
 }
 
 /*-----------------------------------------------------------*/
-#if 0 //defined(MBEDTLS_ENTROPY_HARDWARE_ALT)
-extern int rtw_get_random_bytes(void* dst, u32 size);
-int mbedtls_hardware_poll( void * data,
-                           unsigned char * output,
-                           size_t len,
-                           size_t * olen )
-{
-    rtw_get_random_bytes(output, len);
-    *olen = len;
-	
-    return 0;
-}
-#endif
