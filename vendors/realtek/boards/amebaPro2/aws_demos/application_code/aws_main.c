@@ -66,6 +66,24 @@ static void prvWifiConnect( void );
 static void prvMiscInitialization( void );
 
 /*-----------------------------------------------------------*/
+// RTK wifi
+#include "wifi_conf.h"
+#include "lwip_netconf.h"
+#define wifi_wait_time 500 //Here we wait 5 second to wiat the fast connect 
+static void common_init()
+{
+	uint32_t wifi_wait_count = 0;
+
+	while (!((wifi_get_join_status() == RTW_JOINSTATUS_SUCCESS) && (*(u32 *)LwIP_GetIP(0) != IP_ADDR_INVALID))) {
+		vTaskDelay(10);
+		wifi_wait_count++;
+		if (wifi_wait_count == wifi_wait_time) {
+			printf("\r\nuse ATW0, ATW1, ATWC to make wifi connection\r\n");
+			printf("wait for wifi connection...\r\n");
+		}
+	}
+}
+/*-----------------------------------------------------------*/
 
 /**
  * @brief Application runtime entry point.
@@ -86,6 +104,7 @@ int aws_main( void )
     {
         /* Connect to the Wi-Fi before running the tests. */
         //prvWifiConnect();
+        common_init();
 
         /* Provision the device with AWS certificate and private key. */
         vDevModeKeyProvisioning();
