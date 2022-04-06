@@ -397,7 +397,7 @@ WIFIReturnCode_t WIFI_GetIPInfo( WIFIIPConfiguration_t * pxIPInfo )
     
     memset( pxIPInfo, 0x00, sizeof( WIFIIPConfiguration_t ) );
 #if (CONFIG_LWIP_LAYER == 1)
-    memcpy(&pxIPInfo->xIPAddress.ulAddress[0], (uint32_t*)LwIP_GetIP(&xnetif[0]), 4);
+    memcpy(&pxIPInfo->xIPAddress.ulAddress[0], (uint32_t*)LwIP_GetIP(0), 4);
 #else
      *( ( uint32_t * ) pucIPAddr ) = FreeRTOS_GetIPAddress();
 #endif

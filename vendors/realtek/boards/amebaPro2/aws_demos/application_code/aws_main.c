@@ -99,7 +99,7 @@ int aws_main( void )
                             tskIDLE_PRIORITY+6,
                             mainLOGGING_MESSAGE_QUEUE_LENGTH );
 
-    /* Ameba move DEMO_RUNNER_RunDemos from vApplicationDaemonTaskStartupHook to here! */
+    /* [AmebaPro2] move DEMO_RUNNER_RunDemos from vApplicationDaemonTaskStartupHook to here! */
     if( SYSTEM_Init() == pdPASS )
     {
         /* Connect to the Wi-Fi before running the tests. */
@@ -129,7 +129,7 @@ static void prvMiscInitialization( void )
      */
 }
 /*-----------------------------------------------------------*/
-
+#if 0  // [AmebaPro2] this function has been defined in component/os/freertos/freertos_cb.c
 void vApplicationDaemonTaskStartupHook( void )
 {
     /* FIX ME: Perform any hardware initialization, that require the RTOS to be
@@ -153,6 +153,7 @@ void vApplicationDaemonTaskStartupHook( void )
     }
     #endif
 }
+#endif
 /*-----------------------------------------------------------*/
 
 void prvWifiConnect( void )
