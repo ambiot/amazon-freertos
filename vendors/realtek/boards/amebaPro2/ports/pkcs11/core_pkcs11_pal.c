@@ -44,10 +44,10 @@
 /* virtual file system */
 #include "vfs.h"
 
-#define PKCS11_PRIVATE_KEY_FILE_NAME        "lfs:/AwsDevicePrivateKey.dat"
-#define PKCS11_PUBLIC_KEY_FILE_NAME         "lfs:/AwsDevicePublicKey.dat"
-#define PKCS11_CERTIFICATE_FILE_NAME        "lfs:/AwsDeviceCertificate.dat"
-#define PKCS11_CODE_SIGNING_KEEY_FILE_NAME  "lfs:/AwsCodeSigningKey.dat"
+#define PKCS11_PRIVATE_KEY_FILE_NAME        "sd:/AwsDevicePrivateKey.dat"
+#define PKCS11_PUBLIC_KEY_FILE_NAME         "sd:/AwsDevicePublicKey.dat"
+#define PKCS11_CERTIFICATE_FILE_NAME        "sd:/AwsDeviceCertificate.dat"
+#define PKCS11_CODE_SIGNING_KEEY_FILE_NAME  "sd:/AwsCodeSigningKey.dat"
 
 #define pkcs11OBJECT_CERTIFICATE_MAX_SIZE   4096
 
@@ -116,7 +116,7 @@ CK_RV PKCS11_PAL_Initialize( void )
 
     // virtual file syetem init
     vfs_init(NULL);
-    vfs_user_register("lfs", VFS_FATFS, VFS_INF_SD);
+    vfs_user_register("sd", VFS_FATFS, VFS_INF_SD);
 
     return CKR_OK;
 }
