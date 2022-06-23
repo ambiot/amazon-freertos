@@ -118,7 +118,9 @@ static WIFISecurity_t prvConvertSecurityRTWToAbstracted( rtw_security_t ucSecuri
         case RTW_SECURITY_WPA2_AES_PSK:
         case RTW_SECURITY_WPA2_TKIP_PSK:
         case RTW_SECURITY_WPA2_MIXED_PSK:
-        case RTW_SECURITY_WPA_WPA2_MIXED:
+        case RTW_SECURITY_WPA_WPA2_TKIP_PSK:
+        case RTW_SECURITY_WPA_WPA2_AES_PSK:
+        case RTW_SECURITY_WPA_WPA2_MIXED_PSK:
             xConvertedSecurityType = eWiFiSecurityWPA2;
             break;
 
