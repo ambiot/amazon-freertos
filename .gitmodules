@@ -32,9 +32,13 @@
 [submodule "libraries/abstractions/backoff_algorithm"]
 	path = libraries/abstractions/backoff_algorithm
 	url = https://github.com/FreeRTOS/backoffAlgorithm.git
-[submodule "tools/litani"]
-	path = tools/litani
-	url = https://github.com/awslabs/aws-build-accumulator
 [submodule "libraries/coreMQTT-Agent"]
 	path = libraries/coreMQTT-Agent
 	url = https://github.com/FreeRTOS/coreMQTT-Agent.git
+[submodule "libraries/3rdparty/unity"]
+	path = libraries/3rdparty/unity
+	url = https://github.com/ThrowTheSwitch/Unity.git
+	branch = v2.5.2
+[submodule "tests/FreeRTOS-Libraries-Integration-Tests"]
+	path = tests/FreeRTOS-Libraries-Integration-Tests
+	url = https://github.com/FreeRTOS/FreeRTOS-Libraries-Integration-Tests.git
