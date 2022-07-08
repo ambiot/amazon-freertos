@@ -60,7 +60,7 @@ static flash_t flash_ota;
 #define AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID		0xfffffff8U /* 11111000b The image was NOT accepted by the self test code. */
 
 //================================================================================
-extern uint32_t update_ota_prepare_addr(void);
+extern uint32_t sys_update_ota_prepare_addr(void);
 
 #define OTA_DEBUG 0
 #define OTA_MEMDUMP 0
@@ -567,7 +567,7 @@ OtaPalStatus_t prvPAL_SetPlatformImageState_amebaZ2 (OtaImageState_t eState)
 
             {
                 LogInfo( ( "Accepted and committed final image.") );
-                update_ota_prepare_addr();
+                sys_update_ota_prepare_addr();
                 eResult = OtaPalSuccess;
             }
         }
