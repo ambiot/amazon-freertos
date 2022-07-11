@@ -60,8 +60,8 @@
 /**
  * @brief The number of words allocated to the stack for the OTA agent.
  */
-#define otaconfigSTACK_SIZE                     2048U    /* FIX ME. */   
-   
+#define otaconfigSTACK_SIZE                     2048U    /* FIX ME. */
+
 /**
  * @brief The OTA agent task priority. Normally it runs at a low priority.
  */
@@ -128,7 +128,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer value greater than 0. <br>
  */
-#define otaconfigMAX_NUM_BLOCKS_REQUEST         20U /* TODO */
+#define otaconfigMAX_NUM_BLOCKS_REQUEST         1U /* TODO */
 
 /**
  * @brief The maximum number of requests allowed to send without a response
