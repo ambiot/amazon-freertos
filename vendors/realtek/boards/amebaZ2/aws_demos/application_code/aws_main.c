@@ -168,7 +168,7 @@ int aws_main( void )
 
     /* Create tasks that are not dependent on the Wi-Fi being initialized. */
     ret = xLoggingTaskInitialize( mainLOGGING_TASK_STACK_SIZE,
-                            tskIDLE_PRIORITY+6,
+                            tskIDLE_PRIORITY+2,
                             mainLOGGING_MESSAGE_QUEUE_LENGTH );
 
 #if (CONFIG_LWIP_LAYER == 0)
