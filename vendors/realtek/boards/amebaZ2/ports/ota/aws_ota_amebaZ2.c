@@ -55,9 +55,9 @@ static flash_t flash_ota;
 #define AWS_OTA_IMAGE_STATE_FLASH_OFFSET		0x00003000 // Flash reserved section 0x0000_3000 - 0x0000_4000-1
 
 #define AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW		0xffffffffU /* 11111111b A new image that hasn't yet been run. */
-#define AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT		0xfffffffeU /* 11111110b Image is pending commit and is ready for self test. */
+#define AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT	0xfffffffeU /* 11111110b Image is pending commit and is ready for self test. */
 #define AWS_OTA_IMAGE_STATE_FLAG_IMG_VALID		0xfffffffcU /* 11111100b The image was accepted as valid by the self test code. */
-#define AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID		0xfffffff8U /* 11111000b The image was NOT accepted by the self test code. */
+#define AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID	0xfffffff8U /* 11111000b The image was NOT accepted by the self test code. */
 
 //================================================================================
 extern uint32_t sys_update_ota_prepare_addr(void);
@@ -327,14 +327,13 @@ OtaPalStatus_t prvPAL_CheckFileSignature_amebaZ2(OtaFileContext_t * const C)
     {
         vPortFree(pucSignerCert);
     }
-    return OTA_PAL_COMBINE_ERR( eResult, 0 );
+    return eResult;
 }
 
 /* Close the specified file. This will also authenticate the file if it is marked as secure. */
 OtaPalStatus_t prvPAL_CloseFile_amebaZ2(OtaFileContext_t *C)
 {
-    //DEFINE_OTA_METHOD_NAME( "prvPAL_CloseFile" );
-    OtaPalStatus_t eResult = OtaPalSuccess;
+    OtaPalStatus_t  eResult = OtaPalSuccess;
 
     OTA_PRINT("[OTA] Authenticating and closing file.\r\n");
 
@@ -353,7 +352,6 @@ OtaPalStatus_t prvPAL_CloseFile_amebaZ2(OtaFileContext_t *C)
             #endif
             /* TODO: Verify the file signature, close the file and return the signature verification result. */
             eResult = prvPAL_CheckFileSignature_amebaZ2( C );
-            //eResult = OtaPalSuccess;
         }
         else
         {
@@ -430,7 +428,7 @@ int16_t prvPAL_WriteBlock_amebaZ2(OtaFileContext_t *C, int32_t iOffset, uint8_t*
         {
             OTA_PRINT("[OTA][%s] OTA1 Sig Size is %d\n", __FUNCTION__, C->pSignature->size);
             #if OTA_DEBUG && OTA_MEMDUMP
-            vMemDump(C->pSignature->ucData, C->pSignature->size, "AWS_Signature");
+            vMemDump(C->pSignature->data, C->pSignature->size, "AWS_Signature");
             #endif
         }
         else
@@ -444,7 +442,7 @@ int16_t prvPAL_WriteBlock_amebaZ2(OtaFileContext_t *C, int32_t iOffset, uint8_t*
             C->pSignature->size = ota_size;
             memcpy(C->pSignature->data, pacData, ota_size);
             #if OTA_DEBUG && OTA_MEMDUMP
-            vMemDump(C->pSignature->ucData, C->pSignature->size, "Signature Write");
+            vMemDump(C->pSignature->data, C->pSignature->size, "Signature Write");
             #endif
         }
     }
@@ -562,6 +560,7 @@ OtaPalStatus_t prvPAL_SetPlatformImageState_amebaZ2 (OtaImageState_t eState)
             ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_VALID;
 
             device_mutex_lock(RT_DEV_LOCK_FLASH);
+            flash_erase_sector(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
             flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
             device_mutex_unlock(RT_DEV_LOCK_FLASH);
 
@@ -587,29 +586,28 @@ OtaPalStatus_t prvPAL_SetPlatformImageState_amebaZ2 (OtaImageState_t eState)
     else if ( eState == OtaImageStateRejected )
     {
 #ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS
-            ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
-            device_mutex_lock(RT_DEV_LOCK_FLASH);
-            flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
-            device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
+        device_mutex_lock(RT_DEV_LOCK_FLASH);
+        flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
         eResult = OtaPalSuccess;
 #else
-            u32 ota_target_reset_index;
+        u32 ota_target_reset_index;
         LogInfo( ( "Rejecting and invalidating image." ) );
-            //clean_upgrade_region();
-            //ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW;
-            ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
-            device_mutex_lock(RT_DEV_LOCK_FLASH);
-            flash_erase_sector(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
-            flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
-            device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        //clean_upgrade_region();
+        ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
+        device_mutex_lock(RT_DEV_LOCK_FLASH);
+        flash_erase_sector(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
+        flash_write_word(&flash_ota, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
 
-        eResult = OtaPalSuccess;
+        eResult = OtaPalSignatureCheckFailed;
 #endif
     }
     else if ( eState == OtaImageStateAborted )
     {
         LogInfo( ( "Aborting and invalidating image." ) );
-        eResult = OtaPalSuccess;
+        eResult = OtaPalAbortFailed;
     }
     else if ( eState == OtaImageStateTesting )
     {
@@ -626,7 +624,6 @@ OtaPalStatus_t prvPAL_SetPlatformImageState_amebaZ2 (OtaImageState_t eState)
 
 OtaPalImageState_t prvPAL_GetPlatformImageState_amebaZ2( void )
 {
-    //DEFINE_OTA_METHOD_NAME( "prvPAL_GetPlatformImageState_amebaZ2" );
     OtaPalImageState_t eImageState = OtaPalImageStateUnknown;
 
     uint32_t ota_imagestate =  AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
