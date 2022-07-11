@@ -31,6 +31,7 @@
 /* FreeRTOS Includes. */
 #include "FreeRTOS.h"
 #include "task.h"
+#include "semphr.h"
 #include "iot_crypto.h"
 #include "core_pkcs11.h"
 #include "core_pkcs11_config.h"
@@ -50,6 +51,8 @@
 #define PKCS11_CODE_SIGNING_KEEY_FILE_NAME  "sd:/AwsCodeSigningKey.dat"
 
 #define pkcs11OBJECT_CERTIFICATE_MAX_SIZE   4096
+
+static SemaphoreHandle_t pkcs11_obj_mutex;
 
 enum eObjectHandles
 {
@@ -118,6 +121,8 @@ CK_RV PKCS11_PAL_Initialize( void )
     vfs_init(NULL);
     vfs_user_register("sd", VFS_FATFS, VFS_INF_SD);
 
+    pkcs11_obj_mutex = xSemaphoreCreateMutex();
+
     return CKR_OK;
 }
 
@@ -139,6 +144,8 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
     CK_OBJECT_HANDLE xHandle = eInvalidHandle;
     char *pcFileName = NULL;
 
+    xSemaphoreTake(pkcs11_obj_mutex, portMAX_DELAY);
+
     /* Converts a label to its respective filename and handle. */
     prvLabelToFilenameHandle( pxLabel->pValue, &pcFileName, &xHandle );
 
@@ -146,11 +153,16 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
         FILE *fp = fopen(pcFileName, "wb+");
         if (fp == NULL) {
             //printf("fail to open file.\r\n");
-            return eInvalidHandle;
+            xHandle = eInvalidHandle;
+            goto exit;
         }
         fwrite(pucData, ulDataSize, 1, fp);
         fclose(fp);
     }
+
+exit:
+    xSemaphoreGive(pkcs11_obj_mutex);
+
     return xHandle;
 }
 
@@ -176,6 +188,8 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
     CK_OBJECT_HANDLE xHandle = eInvalidHandle;
     char *pcFileName = NULL;
 
+    xSemaphoreTake(pkcs11_obj_mutex, portMAX_DELAY);
+
     /* Converts a label to its respective filename and handle. */
     prvLabelToFilenameHandle( pxLabel, &pcFileName, &xHandle );
 
@@ -189,6 +203,8 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
             xHandle = eInvalidHandle;
         }
     }
+
+    xSemaphoreGive(pkcs11_obj_mutex);
 
     return xHandle;
 }
@@ -223,6 +239,8 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
 {
     CK_RV xReturn = CKR_OK;
     char *pcFileName = NULL;
+
+    xSemaphoreTake(pkcs11_obj_mutex, portMAX_DELAY);
 
     switch(xHandle)
     {
@@ -268,6 +286,7 @@ CK_RV PKCS11_PAL_GetObjectValue( CK_OBJECT_HANDLE xHandle,
     }
 
 exit:
+    xSemaphoreGive(pkcs11_obj_mutex);
 
     return xReturn;
 }
