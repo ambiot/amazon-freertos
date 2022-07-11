@@ -52,7 +52,7 @@ static flash_t flash_ota;
 //#define AWS_OTA_IMAGE_HEADER_LEN                      4
 #define AWS_OTA_IMAGE_SIGNATURE_LEN                     32
 
-#define AWS_OTA_IMAGE_STATE_FLASH_OFFSET		0x00008000 // Flash reserved section 0x0000_3000 - 0x0000_4000-1
+#define AWS_OTA_IMAGE_STATE_FLASH_OFFSET		0x00003000 // Flash reserved section 0x0000_3000 - 0x0000_4000-1
 
 #define AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW		0xffffffffU /* 11111111b A new image that hasn't yet been run. */
 #define AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT		0xfffffffeU /* 11111110b Image is pending commit and is ready for self test. */
