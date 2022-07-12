@@ -140,6 +140,10 @@
     #define DEMO_entryFUNCTION             RunOtaCoreMqttDemo
 #elif defined( CONFIG_OTA_HTTP_UPDATE_DEMO_ENABLED )
     #define DEMO_entryFUNCTION             RunOtaCoreHttpDemo
+#elif defined( CONFIG_FLEET_PROVISIONING_DEMO_ENABLED )
+    #define DEMO_entryFUNCTION             RunFleetProvisioningDemo
+    #undef democonfigDEMO_STACKSIZE
+    #define democonfigDEMO_STACKSIZE       4096
 #else /* if defined( CONFIG_CORE_MQTT_BASIC_TLS_DEMO_ENABLED ) */
 /* if no demo was defined there will be no entry point defined and we will not be able to run the demo */
     #error "No demo to run. One demo should be enabled"

@@ -214,9 +214,11 @@ void vApplicationDaemonTaskStartupHook( void )
         /* Connect to the Wi-Fi before running the tests. */
         //prvWifiConnect();
 
+        /* Key provisioning is done in the fleet_provisioning_demo.c*/
+#if !defined(CONFIG_FLEET_PROVISIONING_DEMO_ENABLED)
         /* Provision the device with AWS certificate and private key. */
         vDevModeKeyProvisioning();
-
+#endif
         /* Start the demo tasks. */
         DEMO_RUNNER_RunDemos();
     }

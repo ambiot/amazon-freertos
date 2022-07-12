@@ -407,6 +407,11 @@ static MQTTFixedBuffer_t xBuffer =
     democonfigNETWORK_BUFFER_SIZE
 };
 
+struct NetworkContext
+{
+    SecureSocketsTransportParams_t * pParams;
+};
+
 /*-----------------------------------------------------------*/
 
 /** \brief Provisions a private key using PKCS #11 library.
@@ -491,7 +496,7 @@ static BaseType_t prvCreateMQTTConnectionWithBroker( MQTTContext_t * pxMQTTConte
  *
  * @return pdFAIL on failure; pdPASS on successful SUBSCRIBE request.
  */
-static BaseType_t prvMQTTSubscribeWithBackoffRetries( MQTTContext_t * pxMQTTContext,  const char  *pcTopicFilter, 
+static BaseType_t prvMQTTSubscribeWithBackoffRetries( MQTTContext_t * pxMQTTContext,  const char  *pcTopicFilter,
                                         uint16_t  usTopicFilterLengthconst );
 
 /**
@@ -501,7 +506,7 @@ static BaseType_t prvMQTTSubscribeWithBackoffRetries( MQTTContext_t * pxMQTTCont
  *
  * @return pdFAIL on failure; pdPASS on successful PUBLISH operation.
  */
-static BaseType_t prvMQTTPublishToTopic( MQTTContext_t * pxMQTTContext , const char * pcTopicFilter, 
+static BaseType_t prvMQTTPublishToTopic( MQTTContext_t * pxMQTTContext , const char * pcTopicFilter,
                                         uint16_t usTopicFilterLengthconst, char * pcPayload, size_t xPayloadLength );
 
 /**
@@ -512,7 +517,7 @@ static BaseType_t prvMQTTPublishToTopic( MQTTContext_t * pxMQTTContext , const c
  *
  * @return pdFAIL on failure; pdPASS on successful UNSUBSCRIBE request.
  */
-static BaseType_t prvMQTTUnsubscribeFromTopic( MQTTContext_t * pxMQTTContext , const char * pcTopicFilter, 
+static BaseType_t prvMQTTUnsubscribeFromTopic( MQTTContext_t * pxMQTTContext , const char * pcTopicFilter,
                                         uint16_t  usTopicFilterLengthconst );
 
 /**
@@ -600,6 +605,7 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
     MQTTStatus_t xMQTTStatus;
     TransportSocketStatus_t xNetworkStatus;
     BaseType_t xIsConnectionEstablished = pdFALSE;
+    SecureSocketsTransportParams_t secureSocketsTransportParams = { 0 };
 
     CK_RV xResult = CKR_OK;
 
@@ -607,7 +613,7 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
     xCertificateLength = fpdemoCERT_BUFFER_LENGTH;
     xCertificateIdLength = fpdemoCERT_ID_BUFFER_LENGTH;
     xOwnershipTokenLength = fpdemoOWNERSHIP_TOKEN_BUFFER_LENGTH;
-    
+
     /* Upon return, pdPASS will indicate a successful demo execution.
     * pdFAIL will indicate some failures occurred during execution. The
     * user of this demo must check the logs for any failure codes. */
@@ -626,6 +632,7 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
      */
 
     ulGlobalEntryTimeMs = prvGetTimeMs();
+    xNetworkContext.pParams = &secureSocketsTransportParams;
 
     /* Open Pkcs11 Session to parse claim cert & generate Key and CSR */
     xResult = vfpDevModeKeyProvisioning();
@@ -652,7 +659,7 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
          * and waits for connection acknowledgment (CONNACK) packet. */
         LogInfo( ( "Creating an MQTT connection to %s.\n", democonfigMQTT_BROKER_ENDPOINT ) );
         xDemoStatus = prvCreateMQTTConnectionWithBroker( &xMQTTContext, &xNetworkContext );
-        
+
     }
 
     /**************************** Subscribe Fleet provisioning CSR Topics ******************************/
@@ -684,7 +691,7 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
     /**************************** Publish and Keep Alive Loop. ******************************/
 
     LogInfo( ( "Publish to the MQTT topic %s.\n", FP_CBOR_CREATE_CERT_PUBLISH_TOPIC ) );
-    xDemoStatus = prvMQTTPublishToTopic( &xMQTTContext, FP_CBOR_CREATE_CERT_PUBLISH_TOPIC, 
+    xDemoStatus = prvMQTTPublishToTopic( &xMQTTContext, FP_CBOR_CREATE_CERT_PUBLISH_TOPIC,
                                 FP_CBOR_CREATE_CERT_PUBLISH_LENGTH, ( char * ) pucPayloadBuffer, xPayloadLength);
 
 
@@ -711,7 +718,7 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
                          pcCertificateId,
                          &xCertificateIdLength,
                          pcOwnershipToken,
-                         &xOwnershipTokenLength ) != true ) 
+                         &xOwnershipTokenLength ) != true )
 
         {
             xDemoStatus = pdFAIL;
@@ -752,7 +759,7 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
                                      xOwnershipTokenLength,
                                      democonfigFP_DEMO_ID,
                                      fpdemoFP_DEMO_ID_LENGTH,
-                                     &xPayloadLength ) != true) 
+                                     &xPayloadLength ) != true)
         {
             xDemoStatus = pdFAIL;
         }
@@ -767,11 +774,11 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
         xDemoStatus = prvMQTTSubscribeWithBackoffRetries( &xMQTTContext, FP_CBOR_REGISTER_REJECTED_TOPIC( democonfigPROVISIONING_TEMPLATE_NAME ),
                                  FP_CBOR_REGISTER_REJECTED_LENGTH( fpdemoPROVISIONING_TEMPLATE_NAME_LENGTH ) );
      }
-    
+
     /* Publish the RegisterThing request. */
         if( xDemoStatus == pdPASS )
-    {        
-        
+    {
+
         LogInfo( ( "Publish to the MQTT topic %s.\n", FP_CBOR_REGISTER_PUBLISH_TOPIC( democonfigPROVISIONING_TEMPLATE_NAME ) ) );
         xDemoStatus = prvMQTTPublishToTopic( &xMQTTContext, FP_CBOR_REGISTER_PUBLISH_TOPIC( democonfigPROVISIONING_TEMPLATE_NAME ),
                          FP_CBOR_REGISTER_PUBLISH_LENGTH( fpdemoPROVISIONING_TEMPLATE_NAME_LENGTH ),
@@ -823,7 +830,7 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
         }
     }
 
-    /* Unsubscribe from RegisterThing Topics */    
+    /* Unsubscribe from RegisterThing Topics */
     if( xDemoStatus == pdPASS )
     {
         xDemoStatus = prvMQTTUnsubscribeFromTopic( &xMQTTContext, FP_CBOR_REGISTER_ACCEPTED_TOPIC( democonfigPROVISIONING_TEMPLATE_NAME ),
@@ -863,7 +870,7 @@ int RunFleetProvisioningDemo( bool awsIotMqttMode,
 /*-----------------------------------------------------------*/
 
 /* Perform device provisioning using the specified TLS client credentials
- * specifically done for fleet provisioning key & CSR creation. 
+ * specifically done for fleet provisioning key & CSR creation.
  */
 CK_RV vfpAlternateKeyProvisioning( ProvisioningParams_t * xParams )
 {
@@ -898,15 +905,15 @@ CK_RV vfpAlternateKeyProvisioning( ProvisioningParams_t * xParams )
     {
         LogError( ( "Failed to generate Key and Certificate Signing Request." ) );
     }
-    
+
     if( xResult == CKR_OK )
     {
         /* Provision device using Claim Certificate */
         xResult = xProvisionDevice( xSession, xParams );
     }
-    
+
     pxFunctionList->C_CloseSession( xSession );
-    
+
     return xResult;
 }
 
@@ -1146,7 +1153,7 @@ static BaseType_t prvCreateMQTTConnectionWithBroker( MQTTContext_t * pxMQTTConte
 
 /*-----------------------------------------------------------*/
 
-static BaseType_t prvMQTTSubscribeWithBackoffRetries( MQTTContext_t * pxMQTTContext , const char  *pcTopicFilter, 
+static BaseType_t prvMQTTSubscribeWithBackoffRetries( MQTTContext_t * pxMQTTContext , const char  *pcTopicFilter,
                                         uint16_t   usTopicFilterLengthconst )
 {
     MQTTStatus_t xResult = MQTTSuccess;
@@ -1211,7 +1218,7 @@ static BaseType_t prvMQTTSubscribeWithBackoffRetries( MQTTContext_t * pxMQTTCont
 /*-----------------------------------------------------------*/
 
 
-static BaseType_t prvMQTTPublishToTopic( MQTTContext_t * pxMQTTContext , const char * pcTopicFilter, 
+static BaseType_t prvMQTTPublishToTopic( MQTTContext_t * pxMQTTContext , const char * pcTopicFilter,
                                         uint16_t usTopicFilterLengthconst, char * pcPayload, size_t xPayloadLength )
 {
     MQTTStatus_t xResult;
@@ -1246,7 +1253,7 @@ static BaseType_t prvMQTTPublishToTopic( MQTTContext_t * pxMQTTContext , const c
 }
 /*-----------------------------------------------------------*/
 
-static BaseType_t prvMQTTUnsubscribeFromTopic( MQTTContext_t * pxMQTTContext , const char * pcTopicFilter, 
+static BaseType_t prvMQTTUnsubscribeFromTopic( MQTTContext_t * pxMQTTContext , const char * pcTopicFilter,
                                         uint16_t  usTopicFilterLengthconst )
 {
     MQTTStatus_t xResult = MQTTSuccess;
@@ -1326,7 +1333,7 @@ static void prvMQTTProcessResponse( MQTTPacketInfo_t * pxIncomingPacket,
             configASSERT( usSubscribePacketIdentifier == usPacketId );
             break;
 
-        case MQTT_PACKET_TYPE_UNSUBACK:            
+        case MQTT_PACKET_TYPE_UNSUBACK:
             /* Update the packet type received to UNSUBACK. */
             usPacketTypeReceived = MQTT_PACKET_TYPE_UNSUBACK;
 
@@ -1355,7 +1362,7 @@ static void prvProvisioningPublishCallback( MQTTPublishInfo_t * pPublishInfo,
     FleetProvisioningTopic_t api;
 
     usPacketTypeReceived = MQTT_PACKET_TYPE_PUBLISH;
-    
+
     /* Silence compiler warnings about unused variables. */
     ( void ) usPacketIdentifier;
 
@@ -1429,7 +1436,7 @@ static void prvEventCallback( MQTTContext_t * pxMQTTContext,
 
     if( ( pxPacketInfo->type & 0xF0U ) == MQTT_PACKET_TYPE_PUBLISH )
     {
-        
+
          configASSERT( pxDeserializedInfo->pPublishInfo != NULL );
 
         /* Utilisiing Fleet provisiong Freertos callback */

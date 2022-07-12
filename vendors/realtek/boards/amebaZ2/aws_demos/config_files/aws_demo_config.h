@@ -46,6 +46,7 @@
  *          CONFIG_POSIX_DEMO_ENABLED
  *          CONFIG_BLE_GATT_SERVER_DEMO_ENABLED
  *          CONFIG_BLE_NUMERIC_COMPARISON_DEMO_ENABLED
+ *          CONFIG_FLEET_PROVISIONING_DEMO_ENABLED
  *
  *  These defines are used in iot_demo_runner.h for demo selection */
 
@@ -56,6 +57,7 @@
 //#define CONFIG_OTA_MQTT_UPDATE_DEMO_ENABLED
 //#define CONFIG_OTA_HTTP_UPDATE_DEMO_ENABLED
 //#define CONFIG_JOBS_DEMO_ENABLED
+//#define CONFIG_FLEET_PROVISIONING_DEMO_ENABLED
 
 /* Default configuration for all demos. Individual demos can override these below */
 #define democonfigDEMO_STACKSIZE    ( configMINIMAL_STACK_SIZE * 8 )
