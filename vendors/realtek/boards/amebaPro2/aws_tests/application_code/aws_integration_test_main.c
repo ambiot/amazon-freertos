@@ -315,9 +315,23 @@ void SetupMqttTestParam(MqttTestParam_t *pTestParam)
 	vAlternateKeyProvisioning(&xParams);
 }
 
+#include "ota_8735.h"
+#include "sys_api.h"
+void SetupOtaPalTestParam(OtaPalTestParam_t * pTestParam)
+{
+	uint8_t boot_sel = sys_get_boot_sel();
+	if (0 == boot_sel) {
+		// boot from NOR flash
+		pTestParam->pageSize = NOR_BLOCK_SIZE;
+	} else if (1 == boot_sel) {
+		// boot from NAND flash
+		pTestParam->pageSize = NAND_BLOCK_SIZE;
+	}
+}
+
 /*-----------------------------------------------------------*/
 
-// RTK Amebapro2 wifi check
+/* RTK Amebapro2 wifi check */
 #include "wifi_conf.h"
 #include "lwip_netconf.h"
 #define wifi_wait_time 500 //Here we wait 5 second to wiat the fast connect 
@@ -335,7 +349,7 @@ static void wifi_common_init(void)
 	}
 }
 
-void prvWifiConnect(void)
+static void prvWifiConnect(void)
 {
 	wifi_common_init();
 }
