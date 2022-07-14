@@ -65,7 +65,7 @@
 /**
  * @brief The OTA agent task priority. Normally it runs at a low priority.
  */
-#define otaconfigAGENT_PRIORITY                 ( tskIDLE_PRIORITY + 3 )   /* FIX ME. */
+#define otaconfigAGENT_PRIORITY                 ( tskIDLE_PRIORITY + 6 )   /* FIX ME. */
 
 /**
  * @brief Log base 2 of the size of the file data block message (excluding the
@@ -73,7 +73,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer. <br>
  */
-#define otaconfigLOG2_FILE_BLOCK_SIZE           12UL /* TODO */
+#define otaconfigLOG2_FILE_BLOCK_SIZE           12UL
 
 /**
  * @brief Size of the file data block message (excluding the header).
@@ -211,7 +211,17 @@
  * Data over MQTT - ( OTA_DATA_OVER_MQTT ) <br>
  * Data over HTTP - ( OTA_DATA_OVER_HTTP ) <br>
  */
-
 #define configOTA_PRIMARY_DATA_PROTOCOL    ( OTA_DATA_OVER_MQTT )
+
+/**
+ * @brief Data type to represent a file.
+ *
+ * It is used to represent a file received via OTA. The file is declared as
+ * the pointer of this type: otaconfigOTA_FILE_TYPE * pFile.
+ *
+ * <b>Possible values:</b> Any data type. <br>
+ * <b>Default value:</b> FILE on Windows or Linux, uint8_t on other platforms.
+ */
+#define otaconfigOTA_FILE_TYPE    void
 
 #endif /* OTA_CONFIG_H_ */
