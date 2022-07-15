@@ -92,40 +92,7 @@ static uint8_t *otaPal_ReadAndAssumeCertificate(const uint8_t *const pucCertName
 
 /*-----------------------------------------------------------*/
 
-#if defined(CONFIG_PLATFORM_8711B)
-OtaPalStatus_t prvPAL_Abort_rtl8710b(OtaFileContext_t *C);
-OtaPalStatus_t prvPAL_CreateFileForRx_rtl8710b(OtaFileContext_t *C);
-OtaPalStatus_t prvPAL_CloseFile_rtl8710b(OtaFileContext_t *C);
-int16_t prvPAL_WriteBlock_rtl8710b(OtaFileContext_t *C, int32_t iOffset, uint8_t *pacData, uint32_t iBlockSize);
-OtaPalStatus_t prvPAL_ActivateNewImage_rtl8710b(void);
-OtaPalStatus_t prvPAL_SetPlatformImageState_rtl8710b(OtaImageState_t eState);
-OtaPalImageState_t prvPAL_GetPlatformImageState_rtl8710b(void);
-#elif defined(CONFIG_PLATFORM_8721D)
-OtaPalStatus_t prvPAL_Abort_rtl8721d(OtaFileContext_t *C);
-OtaPalStatus_t prvPAL_CreateFileForRx_rtl8721d(OtaFileContext_t *C);
-OtaPalStatus_t prvPAL_CloseFile_rtl8721d(OtaFileContext_t *C);
-OtaPalStatus_t prvPAL_CheckFileSignature_rtl8721d(OtaFileContext_t *const C);
-int16_t prvPAL_WriteBlock_rtl8721d(OtaFileContext_t *C, int32_t iOffset, uint8_t *pacData, uint32_t iBlockSize);
-OtaPalStatus_t prvPAL_ActivateNewImage_rtl8721d(void);
-OtaPalStatus_t prvPAL_SetPlatformImageState_rtl8721d(OtaImageState_t eState);
-OtaPalImageState_t prvPAL_GetPlatformImageState_rtl8721d(void);
-#elif defined(CONFIG_PLATFORM_8710C)
-OtaPalStatus_t prvPAL_Abort_amebaZ2(OtaFileContext_t *C);
-OtaPalStatus_t prvPAL_CreateFileForRx_amebaZ2(OtaFileContext_t *C);
-OtaPalStatus_t prvPAL_CloseFile_amebaZ2(OtaFileContext_t *C);
-int16_t prvPAL_WriteBlock_amebaZ2(OtaFileContext_t *C, int32_t iOffset, uint8_t *pacData, uint32_t iBlockSize);
-OtaPalStatus_t prvPAL_ActivateNewImage_amebaZ2(void);
-OtaPalStatus_t prvPAL_SetPlatformImageState_amebaZ2(OtaImageState_t eState);
-OtaPalImageState_t prvPAL_GetPlatformImageState_amebaZ2(void);
-#elif defined(CONFIG_PLATFORM_8195B) /* AmebaPro */
-OtaPalStatus_t prvPAL_Abort_amebaPro(OtaFileContext_t *C);
-OtaPalStatus_t prvPAL_CreateFileForRx_amebaPro(OtaFileContext_t *C);
-OtaPalStatus_t prvPAL_CloseFile_amebaPro(OtaFileContext_t *C);
-int16_t prvPAL_WriteBlock_amebaPro(OtaFileContext_t *C, int32_t iOffset, uint8_t *pacData, uint32_t iBlockSize);
-OtaPalStatus_t prvPAL_ActivateNewImage_amebaPro(void);
-OtaPalStatus_t prvPAL_SetPlatformImageState_amebaPro(OtaImageState_t eState);
-OtaPalImageState_t prvPAL_GetPlatformImageState_amebaPro(void);
-#elif defined(CONFIG_PLATFORM_8735B) /* AmebaPro2 */
+#if defined(CONFIG_PLATFORM_8735B) /* AmebaPro2 */
 OtaPalStatus_t prvPAL_Abort_amebaPro2(OtaFileContext_t *C);
 OtaPalStatus_t prvPAL_CreateFileForRx_amebaPro2(OtaFileContext_t *C);
 OtaPalStatus_t prvPAL_CloseFile_amebaPro2(OtaFileContext_t *C);
@@ -133,6 +100,9 @@ int16_t prvPAL_WriteBlock_amebaPro2(OtaFileContext_t *C, int32_t iOffset, uint8_
 OtaPalStatus_t prvPAL_ActivateNewImage_amebaPro2(void);
 OtaPalStatus_t prvPAL_SetPlatformImageState_amebaPro2(OtaImageState_t eState);
 OtaPalImageState_t prvPAL_GetPlatformImageState_amebaPro2(void);
+OtaPalStatus_t prvPAL_ResetDevice_amebaPro2(void);
+uint8_t *prvPAL_ReadAndAssumeCertificate_amebaPro2(const uint8_t *const pucCertName, uint32_t *const lSignerCertSize);
+OtaPalStatus_t prvPAL_CheckFileSignature_amebaPro2(OtaFileContext_t *const C);
 #else
 #error "This platform is not supported!"
 #endif
