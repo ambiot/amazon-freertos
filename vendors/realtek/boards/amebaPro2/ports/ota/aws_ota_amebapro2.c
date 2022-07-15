@@ -23,6 +23,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  http://www.FreeRTOS.org
 */
 
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+
 /* OTA PAL implementation for Realtek Ameba platform. */
 #include "ota.h"
 #include "ota_pal.h"
@@ -34,21 +39,35 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //================================================================================
 
 /* AmebaPro2 */
+#include <sys.h>
 #include "platform_stdlib.h"
 #include "ota_8735b.h"
 #include "hal_flash_boot.h"
-#include "ftl_common_api.h"
 #include "fwfs.h"
+#include <device_lock.h>
+#include "sys_api.h"
+#include "flash_api.h"
 
-#define RTK_OTA_IMAGE_LABEL_LEN                     8
-#define RTK_OTA_IMAGE_STATE_FLASH_OFFSET            0xF00000 + 0x5000 // Fix here!
+#define RTK_OTA_IMAGE_LABEL_LEN     8
 
 static uint32_t gNewImgLen = 0;
 static _file_checksum file_checksum;
-unsigned char label_backup[RTK_OTA_IMAGE_LABEL_LEN];
+static unsigned char label_backup[RTK_OTA_IMAGE_LABEL_LEN];
+static unsigned char label_readback[RTK_OTA_IMAGE_LABEL_LEN];
 
-/* test */
-static uint32_t gCheckSum = 0;
+#define OTA_STATE_FILE  "sd:/ota_state.dat"
+
+#define FLASH_API_MODE      0x01
+#define FWFS_API_MODE       0x02
+#define WRITE_BLOCK_MODE    FLASH_API_MODE
+
+typedef struct nor_flash_info_s {
+	uint32_t target_fw_addr;
+	uint32_t target_fw_len;
+	flash_t flash;
+} nor_flash_info_t;
+
+static nor_flash_info_t aws_flash_info;
 
 //================================================================================
 
@@ -120,7 +139,7 @@ OtaPalStatus_t prvPAL_Abort_amebaPro2(OtaFileContext_t *C)
 {
 	if (C != NULL && C->pFile != NULL) {
 		LogInfo(("Abort OTA update"));
-		pfw_close(C->pFile);
+		//pfw_close(C->pFile);
 	}
 	return OTA_PAL_COMBINE_ERR(OtaPalSuccess, 0);
 }
@@ -136,9 +155,32 @@ OtaPalStatus_t prvPAL_CreateFileForRx_amebaPro2(OtaFileContext_t *C)
 		goto exit;
 	}
 
+	/* check current flash index */
+	uint32_t target_fw_idx;
 	uint32_t curr_fw_idx = hal_sys_get_ld_fw_idx();
-	LogInfo(("Current firmware index is %d", curr_fw_idx));
+	LogInfo(("[%s]Current firmware index is %d", curr_fw_idx));
+	if (1 == curr_fw_idx) {
+		target_fw_idx = 2;
+	} else if (2 == curr_fw_idx) {
+		target_fw_idx = 1;
+	}
 
+	/* open flash for write block */
+#if WRITE_BLOCK_MODE==FLASH_API_MODE
+	device_mutex_lock(RT_DEV_LOCK_FLASH);
+	if (1 == target_fw_idx) {
+		// fw1 record in partition table
+		flash_read_word(&aws_flash_info.flash, 0x2060, &aws_flash_info.target_fw_addr);
+		flash_read_word(&aws_flash_info.flash, 0x2064, &aws_flash_info.target_fw_len);
+	} else if (2 == target_fw_idx) {
+		// fw2 record in partition table
+		flash_read_word(&aws_flash_info.flash, 0x2080, &aws_flash_info.target_fw_addr);
+		flash_read_word(&aws_flash_info.flash, 0x2084, &aws_flash_info.target_fw_len);
+	}
+	device_mutex_unlock(RT_DEV_LOCK_FLASH);
+	printf("\n\r[%s] target_fw_addr=0x%x, target_fw_len=0x%x\n\r", __FUNCTION__, aws_flash_info.target_fw_addr, aws_flash_info.target_fw_len);
+	C->pFile = (void *)&aws_flash_info;
+#elif WRITE_BLOCK_MODE==FWFS_API_MODE
 	char *part_name;
 	if (curr_fw_idx == 1) {
 		LogInfo(("fw2 address will be upgraded"));
@@ -147,7 +189,6 @@ OtaPalStatus_t prvPAL_CreateFileForRx_amebaPro2(OtaFileContext_t *C)
 		LogInfo(("fw1 address will be upgraded"));
 		part_name = "FW1";
 	}
-
 	C->pFile = pfw_open(part_name, M_RAW | M_RDWR);
 	if (!C->pFile) {
 		LogError(("Failed to open fw file system for OTA"));
@@ -155,6 +196,7 @@ OtaPalStatus_t prvPAL_CreateFileForRx_amebaPro2(OtaFileContext_t *C)
 		goto exit;
 	}
 	pfw_seek(C->pFile, 0, SEEK_SET);
+#endif
 
 	if (C->pFile) {
 		file_checksum.u = 0; //reset checksum
@@ -215,6 +257,24 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_amebaPro2(OtaFileContext_t 
 	int chklen = gNewImgLen - 4;    // skip 4byte ota length
 	uint8_t *pTempbuf = pvPortMalloc(OTA_FILE_BLOCK_SIZE);
 
+#if WRITE_BLOCK_MODE==FLASH_API_MODE
+	uint32_t cur_block = 0;
+	while (chklen > 0) {
+		int rdlen = chklen > OTA_FILE_BLOCK_SIZE ? OTA_FILE_BLOCK_SIZE : chklen;
+		device_mutex_lock(RT_DEV_LOCK_FLASH);
+		flash_stream_read(&aws_flash_info.flash, aws_flash_info.target_fw_addr + cur_block * NOR_BLOCK_SIZE, rdlen, pTempbuf);
+		device_mutex_unlock(RT_DEV_LOCK_FLASH);
+		for (int i = 0; i < rdlen; i++) {
+			if (chklen == (gNewImgLen - 4) && i < 8) {
+				chksum += label_backup[i];
+			} else {
+				chksum += pTempbuf[i];
+			}
+		}
+		chklen -= rdlen;
+		cur_block++;
+	}
+#elif WRITE_BLOCK_MODE==FWFS_API_MODE
 	void *chkfp = pfw_open(part_name, M_RAW | M_RDWR);
 	if (!chkfp) {
 		mainErr = OtaPalSignatureCheckFailed;
@@ -234,6 +294,7 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_amebaPro2(OtaFileContext_t 
 		chklen -= rdlen;
 	}
 	pfw_close(chkfp);
+#endif
 
 	printf("checksum Remote %x, Flash %x\n\r", file_checksum.u, chksum);
 	if (file_checksum.u != chksum) {
@@ -316,7 +377,11 @@ OtaPalStatus_t prvPAL_CloseFile_amebaPro2(OtaFileContext_t *C)
 
 	/* close the fw file */
 	if (C->pFile) {
+#if WRITE_BLOCK_MODE==FLASH_API_MODE
+		C->pFile = NULL;
+#elif WRITE_BLOCK_MODE==FWFS_API_MODE
 		pfw_close(C->pFile);
+#endif
 	}
 
 	if (C->pSignature != NULL) {
@@ -345,6 +410,10 @@ exit:
 	return OTA_PAL_COMBINE_ERR(mainErr, subErr);
 }
 
+static uint32_t target_fw_addr = 0;
+static uint32_t target_fw_len = 0;
+static flash_t flash;
+
 int16_t prvPAL_WriteBlock_amebaPro2(OtaFileContext_t *C, uint32_t ulOffset, uint8_t *pData, uint32_t ulBlockSize)
 {
 	static uint32_t buf_size = 4096;
@@ -361,7 +430,7 @@ int16_t prvPAL_WriteBlock_amebaPro2(OtaFileContext_t *C, uint32_t ulOffset, uint
 
 	OTA_PRINT("[OTA][%s] C->fileSize %d, iOffset: 0x%x: iBlockSize: 0x%x\r\n", __FUNCTION__, C->fileSize, ulOffset, ulBlockSize);
 
-	// config parameter
+	// mapping parameters to Pro2 SDK OTA example
 	buf_size = OTA_FILE_BLOCK_SIZE;
 	ota_len = C->fileSize;
 	total_blocks = (ota_len + buf_size - 1) / buf_size;
@@ -392,9 +461,7 @@ int16_t prvPAL_WriteBlock_amebaPro2(OtaFileContext_t *C, uint32_t ulOffset, uint
 	if (0 == cur_block) {
 		OTA_PRINT("[OTA] FIRST image data arrived %d, back up the first 8-bytes fw label\r\n", read_bytes);
 		memcpy(label_backup, buf, RTK_OTA_IMAGE_LABEL_LEN); // save 8-bytes fw label
-#if 0
 		memset(buf, 0xFF, RTK_OTA_IMAGE_LABEL_LEN); // not flash write 8-bytes fw label
-#endif
 		OTA_PRINT("[OTA] label_backup get [%llu]\r\n", label_backup);
 		gNewImgLen = ota_len;
 	}
@@ -402,19 +469,37 @@ int16_t prvPAL_WriteBlock_amebaPro2(OtaFileContext_t *C, uint32_t ulOffset, uint
 	// check final block
 	if (cur_block == (total_blocks - 1)) {
 		read_bytes -= 4; // remove final 4 bytes checksum
-		//memset(buf + read_bytes, 0xFF, buf_size - read_bytes);
 		OTA_PRINT("[OTA] LAST image data arrived %d\r\n", read_bytes);
 	}
-	if (read_bytes <= 0) {
-		goto exit;
-	}
 
-	// write block
+#if WRITE_BLOCK_MODE==FLASH_API_MODE
+	/* write block by flash api */
+	device_mutex_lock(RT_DEV_LOCK_FLASH);
+	flash_erase_sector(&aws_flash_info.flash, aws_flash_info.target_fw_addr + cur_block * NOR_BLOCK_SIZE);
+	if (flash_burst_write(&aws_flash_info.flash, aws_flash_info.target_fw_addr + cur_block * NOR_BLOCK_SIZE, read_bytes, buf) < 0) {
+		printf("[OTA WriteBlock][%s] flash write failed\r\n", __FUNCTION__);
+		device_mutex_unlock(RT_DEV_LOCK_FLASH);
+		return -1;
+	}
+	device_mutex_unlock(RT_DEV_LOCK_FLASH);
+#elif WRITE_BLOCK_MODE==FWFS_API_MODE
+	/* write block by fwfs */
 	int wr_status = pfw_write(C->pFile, buf, read_bytes);
 	if (wr_status < 0) {
 		printf("[OTA WriteBlock][%s] ota flash failed\r\n", __FUNCTION__);
 		return -1;
 	}
+#endif
+
+	//test test
+	// if (cur_block == (total_blocks - 1)) {
+	// if (fp_wr) {
+	// pfw_close(fp_wr);
+	// }
+
+	// osDelay(100);
+	// ota_platform_reset();
+	// }
 
 exit:
 
@@ -438,8 +523,24 @@ OtaPalStatus_t prvPAL_ActivateNewImage_amebaPro2(void)
 		part_name = "FW1";
 	}
 
-#if 0
-	// write back 8-bytes fw label
+	/* write back 8-bytes fw label to mark target flash as valid */
+#if WRITE_BLOCK_MODE==FLASH_API_MODE
+	printf("[%s] Append FW label\n\r", __FUNCTION__);
+	device_mutex_lock(RT_DEV_LOCK_FLASH);
+	if (flash_burst_write(&aws_flash_info.flash, aws_flash_info.target_fw_addr, 8, label_backup) < 0) {
+		LogError(("[%s]Failed to write flash for OTA label", __FUNCTION__));
+		mainErr = OtaPalActivateFailed;
+		goto exit;
+	}
+	flash_stream_read(&aws_flash_info.flash, aws_flash_info.target_fw_addr, 8, label_readback);
+	device_mutex_unlock(RT_DEV_LOCK_FLASH);
+
+	printf("\n\r[%s] FW label:\n\r", __FUNCTION__);
+	for (int i = 0; i < 8; i ++) {
+		printf(" %02X", label_readback[i]);
+	}
+	printf("\n\r");
+#elif WRITE_BLOCK_MODE==FWFS_API_MODE
 	void *fp = pfw_open(part_name, M_RAW | M_RDWR);
 	if (!fp) {
 		LogError(("Failed to open fw file system for OTA label"));
@@ -485,11 +586,14 @@ OtaPalStatus_t prvPAL_SetPlatformImageState_amebaPro2(OtaImageState_t eState)
 	OtaPalSubStatus_t subErr = 0;
 
 	if ((eState != OtaImageStateUnknown) && (eState <= OtaLastImageState)) {
-		/* write state to flash */
-		int ret = ftl_common_write(RTK_OTA_IMAGE_STATE_FLASH_OFFSET, &eState, sizeof(OtaImageState_t));
-		if (ret < 0) {
-			OTA_PRINT("[%s] ftl write eState failed\n\r", __func__);
+		/* write state to file */
+		FILE *fp = fopen(OTA_STATE_FILE, "wb+");
+		if (fp == NULL) {
+			OTA_PRINT("[%s] OTA_STATE_FILE open fail\n\r", __func__);
 			mainErr = OtaPalBadImageState;
+		} else {
+			fwrite(&eState, sizeof(OtaImageState_t), 1, fp);
+			fclose(fp);
 		}
 	} else { /* Image state invalid. */
 		LogError(("Invalid image state provided."));
@@ -503,14 +607,16 @@ OtaPalImageState_t prvPAL_GetPlatformImageState_amebaPro2(void)
 {
 	OtaPalImageState_t eImageState = OtaPalImageStateUnknown;
 
-	/* read the state from flash */
+	/* read the state from file */
 	OtaImageState_t eSavedAgentState = OtaImageStateUnknown;
-	int ret = ftl_common_read(RTK_OTA_IMAGE_STATE_FLASH_OFFSET, &eSavedAgentState, sizeof(OtaImageState_t));
-	if (ret < 0) {
-		OTA_PRINT("[%s] ftl read eSavedAgentState failed\n\r", __func__);
+	FILE *fp = fopen(OTA_STATE_FILE, "r+");
+	if (fp == NULL) {
+		OTA_PRINT("[%s] open OTA_STATE_FILE fail\n\r", __func__);
 		eImageState = OtaPalImageStateInvalid;
 		goto exit;
 	}
+	fread(&eSavedAgentState, sizeof(OtaImageState_t), 1, fp);
+	fclose(fp);
 
 	switch (eSavedAgentState) {
 	case OtaImageStateTesting:
