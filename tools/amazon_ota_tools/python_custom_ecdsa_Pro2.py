@@ -22,18 +22,15 @@ ota1_bin = f.read()
 ota1_bin_size = os.path.getsize(firmware_path)
 f.close()
 
-#Read checksum
+#Read ota firmware content without checksum
 f = open(firmware_path, 'br')
-checksum = f.read()[-4:]
-print(hex(checksum[0]))
-print(hex(checksum[1]))
-print(hex(checksum[2]))
-print(hex(checksum[3]))
+ota_fw = f.read()[:-4]
+print("ota_fw:", len(ota_fw))
 f.close()
 
-# sign and verify the checksum
-ota1_sig = crypto.sign(priv_key, checksum, 'sha256')
-crypto.verify(ss_cert, ota1_sig, checksum, 'sha256')
+# sign and verify the ota firmware
+ota1_sig = crypto.sign(priv_key, ota_fw, 'sha256')
+crypto.verify(ss_cert, ota1_sig, ota_fw, 'sha256')
 ota1_sig_size = len(ota1_sig)
 #print(ota1_sig_size)
 

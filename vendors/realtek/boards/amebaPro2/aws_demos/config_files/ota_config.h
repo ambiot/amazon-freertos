@@ -65,7 +65,7 @@
 /**
  * @brief The OTA agent task priority. Normally it runs at a low priority.
  */
-#define otaconfigAGENT_PRIORITY                 ( tskIDLE_PRIORITY + 6 )   /* FIX ME. */
+#define otaconfigAGENT_PRIORITY                 ( tskIDLE_PRIORITY + 3 )   /* FIX ME. */
 
 /**
  * @brief Log base 2 of the size of the file data block message (excluding the
@@ -98,7 +98,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer. <br>
  */
-#define otaconfigFILE_REQUEST_WAIT_MS           2500U /* TODO */
+#define otaconfigFILE_REQUEST_WAIT_MS           10000U /* TODO */
 
 /**
  * @brief The maximum allowed length of the thing name used by the OTA agent.

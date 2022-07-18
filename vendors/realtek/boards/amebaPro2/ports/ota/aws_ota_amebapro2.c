@@ -232,7 +232,7 @@ uint8_t *prvPAL_ReadAndAssumeCertificate_amebaPro2(const uint8_t *const pucCertN
 	}
 
 	/* Allocate memory for the signer certificate plus a terminating zero so we can load it and return to the caller. */
-	pucSignerCert = pvPortMalloc(ulCertSize +	1);
+	pucSignerCert = pvPortMalloc(ulCertSize + 1);
 	if (pucSignerCert != NULL) {
 		memcpy(pucSignerCert, pucCertData, ulCertSize);
 		/* The crypto code requires the terminating zero to be part of the length so add 1 to the size. */
@@ -268,12 +268,14 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_amebaPro2(OtaFileContext_t 
 		device_mutex_lock(RT_DEV_LOCK_FLASH);
 		flash_stream_read(&aws_flash_info.flash, aws_flash_info.target_fw_addr + cur_block * NOR_BLOCK_SIZE, rdlen, pTempbuf);
 		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		for (int i = 0; i < rdlen; i++) {
-			if (chklen == (gNewImgLen - 4) && i < 8) {
-				chksum += label_backup[i];
-			} else {
-				chksum += pTempbuf[i];
-			}
+		if (chklen == (gNewImgLen - 4)) {   // for first block
+			/* update label from backup buffer */
+			CRYPTO_SignatureVerificationUpdate(pvContext, (uint8_t *)label_backup, RTK_OTA_IMAGE_LABEL_LEN);
+			/* update content */
+			CRYPTO_SignatureVerificationUpdate(pvContext, (uint8_t *)pTempbuf + RTK_OTA_IMAGE_LABEL_LEN, rdlen - RTK_OTA_IMAGE_LABEL_LEN);
+		} else {
+			/* update content */
+			CRYPTO_SignatureVerificationUpdate(pvContext, (uint8_t *)pTempbuf, rdlen);
 		}
 		chklen -= rdlen;
 		cur_block++;
@@ -288,28 +290,21 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_amebaPro2(OtaFileContext_t 
 	while (chklen > 0) {
 		int rdlen = chklen > OTA_FILE_BLOCK_SIZE ? OTA_FILE_BLOCK_SIZE : chklen;
 		pfw_read(chkfp, pTempbuf, rdlen);
-		for (int i = 0; i < rdlen; i++) {
-			if (chklen == (gNewImgLen - 4) && i < 8) {
-				chksum += label_backup[i];
-			} else {
-				chksum += pTempbuf[i];
-			}
+		if (chklen == (gNewImgLen - 4)) {   // for first block
+			/* update label from backup buffer */
+			CRYPTO_SignatureVerificationUpdate(pvContext, (uint8_t *)label_backup, RTK_OTA_IMAGE_LABEL_LEN);
+			/* update content */
+			CRYPTO_SignatureVerificationUpdate(pvContext, (uint8_t *)pTempbuf + RTK_OTA_IMAGE_LABEL_LEN, rdlen - RTK_OTA_IMAGE_LABEL_LEN);
+		} else {
+			/* update content */
+			CRYPTO_SignatureVerificationUpdate(pvContext, (uint8_t *)pTempbuf, rdlen);
 		}
 		chklen -= rdlen;
 	}
 	pfw_close(chkfp);
 #endif
 
-	LogInfo(("[%s] checksum Remote %x, Flash %x", __FUNCTION__, file_checksum.u, chksum));
-	if (file_checksum.u != chksum) {
-		LogError(("[%s] checksum plaintext NOT correct!, Need to check here...", __FUNCTION__));
-		while (1);
-	} else {
-		LogInfo(("[%s] checksum plaintext correct!, go to check the Signature of checksum...", __FUNCTION__));
-	}
-
-	/* add checksum */
-	CRYPTO_SignatureVerificationUpdate(pvContext, (uint8_t *)&chksum, sizeof(uint32_t));
+	LogInfo(("[%s] Signature Verification Update done.", __FUNCTION__));
 
 exit:
 	if (pTempbuf) {
@@ -330,35 +325,34 @@ OtaPalStatus_t prvPAL_CheckFileSignature_amebaPro2(OtaFileContext_t *const C)
 	void *pvSigVerifyContext;
 	uint8_t *pucSignerCert = NULL;
 
-	while (true) {
-		/* Verify an ECDSA-SHA256 signature. */
-		if (CRYPTO_SignatureVerificationStart(&pvSigVerifyContext, cryptoASYMMETRIC_ALGORITHM_ECDSA,
-											  cryptoHASH_ALGORITHM_SHA256) == pdFALSE) {
-			mainErr = OtaPalSignatureCheckFailed;
-			break;
-		}
-
-		LogInfo(("[%s] Started %s signature verification, file: %s", __FUNCTION__, OTA_JsonFileSignatureKey, (const char *)C->pCertFilepath));
-
-		pucSignerCert = prvPAL_ReadAndAssumeCertificate_amebaPro2((const uint8_t *const)C->pCertFilepath, &lSignerCertSize);
-		if (pucSignerCert == NULL) {
-			mainErr = OtaPalBadSignerCert;
-			break;
-		}
-
-		mainErr = OTA_PAL_MAIN_ERR(prvSignatureVerificationUpdate_amebaPro2(C, pvSigVerifyContext));
-		if (mainErr != OtaPalSuccess) {
-			break;
-		}
-		if (CRYPTO_SignatureVerificationFinal(pvSigVerifyContext, (char *)pucSignerCert, lSignerCertSize,
-											  C->pSignature->data, C->pSignature->size) == pdFALSE) {
-			mainErr = OtaPalSignatureCheckFailed;
-			prvPAL_SetPlatformImageState_amebaPro2(OtaImageStateRejected);
-		} else {
-			mainErr = OtaPalSuccess;
-		}
-		break;
+	/* Verify an ECDSA-SHA256 signature. */
+	if (CRYPTO_SignatureVerificationStart(&pvSigVerifyContext, cryptoASYMMETRIC_ALGORITHM_ECDSA, cryptoHASH_ALGORITHM_SHA256) == pdFALSE) {
+		mainErr = OtaPalSignatureCheckFailed;
+		goto exit;
 	}
+
+	LogInfo(("[%s] Started %s signature verification, file: %s", __FUNCTION__, OTA_JsonFileSignatureKey, (const char *)C->pCertFilepath));
+
+	/* read certificate for verification */
+	if ((pucSignerCert = prvPAL_ReadAndAssumeCertificate_amebaPro2((const uint8_t *const)C->pCertFilepath, &lSignerCertSize)) == NULL) {
+		mainErr = OtaPalBadSignerCert;
+		goto exit;
+	}
+
+	/* update for integrety check */
+	if (OTA_PAL_MAIN_ERR(prvSignatureVerificationUpdate_amebaPro2(C, pvSigVerifyContext)) != OtaPalSuccess) {
+		mainErr = OtaPalSignatureCheckFailed;
+		goto exit;
+	}
+
+	/* verify the signature for integrety validation */
+	if (CRYPTO_SignatureVerificationFinal(pvSigVerifyContext, (char *)pucSignerCert, lSignerCertSize, C->pSignature->data, C->pSignature->size) == pdFALSE) {
+		mainErr = OtaPalSignatureCheckFailed;
+		prvPAL_SetPlatformImageState_amebaPro2(OtaImageStateRejected);
+		goto exit;
+	}
+
+exit:
 	/* Free the signer certificate that we now own after prvPAL_ReadAndAssumeCertificate(). */
 	if (pucSignerCert != NULL) {
 		vPortFree(pucSignerCert);
