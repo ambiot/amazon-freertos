@@ -32,6 +32,7 @@
 #include "mqtt_test.h"
 #include "qualification_test.h"
 #include "platform_function.h"
+#include "ota_pal_test.h"
 
 /* aws-iot library includes */
 #include "iot_system_init.h"
@@ -315,18 +316,10 @@ void SetupMqttTestParam(MqttTestParam_t *pTestParam)
 	vAlternateKeyProvisioning(&xParams);
 }
 
-#include "ota_8735.h"
-#include "sys_api.h"
+#include "ota_config.h"
 void SetupOtaPalTestParam(OtaPalTestParam_t * pTestParam)
 {
-	uint8_t boot_sel = sys_get_boot_sel();
-	if (0 == boot_sel) {
-		// boot from NOR flash
-		pTestParam->pageSize = NOR_BLOCK_SIZE;
-	} else if (1 == boot_sel) {
-		// boot from NAND flash
-		pTestParam->pageSize = NAND_BLOCK_SIZE;
-	}
+	pTestParam->pageSize = otaconfigFILE_BLOCK_SIZE;
 }
 
 /*-----------------------------------------------------------*/
@@ -356,11 +349,15 @@ static void prvWifiConnect(void)
 
 /*-----------------------------------------------------------*/
 
+#include "vfs.h"
 static void prvPlatformInitialization(void)
 {
 #if defined(MBEDTLS_PLATFORM_C)
 	mbedtls_platform_set_calloc_free(calloc, free);
 #endif
+
+	vfs_init(NULL);
+	vfs_user_register("sd", VFS_FATFS, VFS_INF_SD);
 }
 
 /*-----------------------------------------------------------*/

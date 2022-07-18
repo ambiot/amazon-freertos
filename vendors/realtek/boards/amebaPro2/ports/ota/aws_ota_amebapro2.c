@@ -49,8 +49,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #define RTK_OTA_IMAGE_LABEL_LEN     8
 
-static uint32_t gNewImgLen = 0;
-static _file_checksum file_checksum;
 static unsigned char label_backup[RTK_OTA_IMAGE_LABEL_LEN];
 static unsigned char label_readback[RTK_OTA_IMAGE_LABEL_LEN];
 
@@ -182,7 +180,7 @@ OtaPalStatus_t prvPAL_CreateFileForRx_amebaPro2(OtaFileContext_t *C)
 		flash_read_word(&aws_flash_info.flash, 0x2084, &aws_flash_info.target_fw_len);
 	}
 	device_mutex_unlock(RT_DEV_LOCK_FLASH);
-	LogInfo(("[%s] target_fw_addr=0x%x, target_fw_len=0x%x [%s]", __FUNCTION__, aws_flash_info.target_fw_addr, aws_flash_info.target_fw_len, __FUNCTION__));
+	LogInfo(("[%s] target_fw_addr=0x%x, target_fw_len=0x%x", __FUNCTION__, aws_flash_info.target_fw_addr, aws_flash_info.target_fw_len));
 	C->pFile = (void *)&aws_flash_info;
 #elif WRITE_BLOCK_MODE==FWFS_API_MODE
 	char *part_name;
@@ -201,10 +199,6 @@ OtaPalStatus_t prvPAL_CreateFileForRx_amebaPro2(OtaFileContext_t *C)
 	}
 	pfw_seek(C->pFile, 0, SEEK_SET);
 #endif
-
-	if (C->pFile) {
-		file_checksum.u = 0; //reset checksum
-	}
 
 exit:
 
@@ -258,7 +252,9 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_amebaPro2(OtaFileContext_t 
 	}
 
 	uint32_t chksum = 0;
-	int chklen = gNewImgLen - 4;    // skip 4byte ota length
+	int firmware_len = (C->fileSize % OTA_FILE_BLOCK_SIZE) == 4 ? (C->fileSize - 4) :
+					   C->fileSize;  // if fw length % 4096 = 4, it may include 4 bytes checksum at the end of fw
+	int chklen = firmware_len;    // skip 4byte ota length
 	uint8_t *pTempbuf = pvPortMalloc(OTA_FILE_BLOCK_SIZE);
 
 #if WRITE_BLOCK_MODE==FLASH_API_MODE
@@ -268,7 +264,7 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_amebaPro2(OtaFileContext_t 
 		device_mutex_lock(RT_DEV_LOCK_FLASH);
 		flash_stream_read(&aws_flash_info.flash, aws_flash_info.target_fw_addr + cur_block * NOR_BLOCK_SIZE, rdlen, pTempbuf);
 		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		if (chklen == (gNewImgLen - 4)) {   // for first block
+		if (chklen == firmware_len) {   // for first block
 			/* update label from backup buffer */
 			CRYPTO_SignatureVerificationUpdate(pvContext, (uint8_t *)label_backup, RTK_OTA_IMAGE_LABEL_LEN);
 			/* update content */
@@ -290,7 +286,7 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_amebaPro2(OtaFileContext_t 
 	while (chklen > 0) {
 		int rdlen = chklen > OTA_FILE_BLOCK_SIZE ? OTA_FILE_BLOCK_SIZE : chklen;
 		pfw_read(chkfp, pTempbuf, rdlen);
-		if (chklen == (gNewImgLen - 4)) {   // for first block
+		if (chklen == firmware_len) {   // for first block
 			/* update label from backup buffer */
 			CRYPTO_SignatureVerificationUpdate(pvContext, (uint8_t *)label_backup, RTK_OTA_IMAGE_LABEL_LEN);
 			/* update content */
@@ -442,27 +438,17 @@ int16_t prvPAL_WriteBlock_amebaPro2(OtaFileContext_t *C, uint32_t ulOffset, uint
 		goto exit;
 	}
 
-	// checksum attached at file end
-	if ((idx + read_bytes) > (ota_len - 4)) {
-		file_checksum.c[0] = buf[read_bytes - 4];
-		file_checksum.c[1] = buf[read_bytes - 3];
-		file_checksum.c[2] = buf[read_bytes - 2];
-		file_checksum.c[3] = buf[read_bytes - 1];
-	}
-
 	// for first block
 	if (0 == cur_block) {
 		LogInfo(("[%s] FIRST image data arrived %d, back up the first 8-bytes fw label", __FUNCTION__, read_bytes));
 		memcpy(label_backup, buf, RTK_OTA_IMAGE_LABEL_LEN); // save 8-bytes fw label
 		memset(buf, 0xFF, RTK_OTA_IMAGE_LABEL_LEN); // not flash write 8-bytes fw label
 		LogInfo(("[%s] label_backup get [%llu]", __FUNCTION__, label_backup));
-		gNewImgLen = ota_len;
 	}
 
 	// check final block
 	if (cur_block == (total_blocks - 1)) {
-		read_bytes -= 4; // remove final 4 bytes checksum
-		LogInfo(("[%s] LAST image data arrived %d", __FUNCTION__, read_bytes));
+		LogInfo(("[%s] LAST image data arrived", __FUNCTION__));
 	}
 
 #if WRITE_BLOCK_MODE==FLASH_API_MODE
@@ -555,31 +541,6 @@ exit:
 	return OTA_PAL_COMBINE_ERR(mainErr, subErr);
 }
 
-OtaPalStatus_t prvPAL_SetPlatformImageState_amebaPro2(OtaImageState_t eState)
-{
-	LogInfo(("%s", __FUNCTION__));
-
-	OtaPalMainStatus_t mainErr = OtaPalSuccess;
-	OtaPalSubStatus_t subErr = 0;
-
-	if ((eState != OtaImageStateUnknown) && (eState <= OtaLastImageState)) {
-		/* write state to file */
-		FILE *fp = fopen(OTA_STATE_FILE, "wb+");
-		if (fp == NULL) {
-			LogError(("[%s] OTA_STATE_FILE open fail", __FUNCTION__));
-			mainErr = OtaPalBadImageState;
-		} else {
-			fwrite(&eState, sizeof(OtaImageState_t), 1, fp);
-			fclose(fp);
-		}
-	} else { /* Image state invalid. */
-		LogError(("[%s] Invalid image state provided.", __FUNCTION__));
-		mainErr = OtaPalBadImageState;
-	}
-
-	return OTA_PAL_COMBINE_ERR(mainErr, subErr);
-}
-
 OtaPalImageState_t prvPAL_GetPlatformImageState_amebaPro2(void)
 {
 	OtaPalImageState_t eImageState = OtaPalImageStateUnknown;
@@ -614,6 +575,38 @@ exit:
 	LogInfo(("[%s] Image current state (0x%02x).", __FUNCTION__, eImageState));
 
 	return eImageState;
+}
+
+OtaPalStatus_t prvPAL_SetPlatformImageState_amebaPro2(OtaImageState_t eState)
+{
+	LogInfo(("%s", __FUNCTION__));
+
+	OtaPalMainStatus_t mainErr = OtaPalSuccess;
+	OtaPalSubStatus_t subErr = 0;
+
+	if (eState == OtaImageStateAccepted && prvPAL_GetPlatformImageState_amebaPro2() != OtaPalImageStatePendingCommit) {
+		mainErr = OtaPalCommitFailed;
+		goto exit;
+	}
+
+	if ((eState != OtaImageStateUnknown) && (eState <= OtaLastImageState)) {
+		/* write state to file */
+		FILE *fp = fopen(OTA_STATE_FILE, "wb+");
+		if (fp == NULL) {
+			LogError(("[%s] OTA_STATE_FILE open fail", __FUNCTION__));
+			mainErr = OtaPalBadImageState;
+		} else {
+			fwrite(&eState, sizeof(OtaImageState_t), 1, fp);
+			fclose(fp);
+		}
+	} else { /* Image state invalid. */
+		LogError(("[%s] Invalid image state provided.", __FUNCTION__));
+		mainErr = OtaPalBadImageState;
+	}
+
+exit:
+
+	return OTA_PAL_COMBINE_ERR(mainErr, subErr);
 }
 
 uint8_t *prvReadAndAssumeCertificate_amebaPro2(const uint8_t *const pucCertName, uint32_t *const lSignerCertSize)

@@ -191,8 +191,3 @@ static uint8_t *otaPal_ReadAndAssumeCertificate(const uint8_t *const pucCertName
 }
 
 /*-----------------------------------------------------------*/
-
-/* Provide access to private members for testing. */
-#ifdef FREERTOS_ENABLE_UNIT_TESTS
-#include "aws_ota_pal_test_access_define.h"
-#endif
