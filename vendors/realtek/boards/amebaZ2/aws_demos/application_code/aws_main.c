@@ -337,7 +337,7 @@ void prvWifiConnect( void )
  * implementation of vApplicationGetIdleTaskMemory() in order to provide memory to
  * the Idle task.
  */
-#if 0 //hank
+#if 0
 void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
                                     StackType_t ** ppxIdleTaskStackBuffer,
                                     uint32_t * pulIdleTaskStackSize )
@@ -370,7 +370,7 @@ void vApplicationGetIdleTaskMemory( StaticTask_t ** ppxIdleTaskTCBBuffer,
  * implementation of vApplicationGetTimerTaskMemory() in order to provide memory
  * to the RTOS daemon/time task.
  */
-#if 0 //hank
+#if 0
 void vApplicationGetTimerTaskMemory( StaticTask_t ** ppxTimerTaskTCBBuffer,
                                      StackType_t ** ppxTimerTaskStackBuffer,
                                      uint32_t * pulTimerTaskStackSize )
