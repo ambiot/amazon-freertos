@@ -45,6 +45,15 @@
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    15
 #define mainLOGGING_TASK_STACK_SIZE         configMINIMAL_STACK_SIZE * 8
 
+/* device key provisioning mode *
+ * one time device provisioning */
+#define AMEBA_PROVISIONING_MODE             1
+
+/* enable TLS (default: 1) */
+static int tls_enable = 1;
+
+static int RunDeviceOtaDemo(void);
+
 typedef struct NetworkCredentials {
 	/**
 	 * @brief To use ALPN, set this to a NULL-terminated list of supported
@@ -86,7 +95,7 @@ static SecureSocketsTransportParams_t SecondsecureSocketsTransportParams = { 0 }
 #define testonfigTRANSPORT_SEND_RECV_TIMEOUT_MS    ( 750 )
 
 #include "lwip_netconf.h"
-bool isIpAddress(const char *address)
+static bool isIpAddress(const char *address)
 {
 	struct sockaddr_in addr4 = {};
 	int result4 = inet_pton(AF_INET, address, (void *)(&addr4));
@@ -108,9 +117,9 @@ static NetworkConnectStatus_t prvTransportNetworkConnect(void *pNetworkContext,
 	xServerInfo.hostNameLength = strlen(pHostInfo->pHostName);
 	xServerInfo.port = pHostInfo->port;
 
-	//printf("pHostName, hostNameLength, port: %s, %d ,%d", xServerInfo.pHostName, xServerInfo.hostNameLength, xServerInfo.port);
+	//printf("pHostName, hostNameLength, port: %s, %d, %d\r\n", xServerInfo.pHostName, xServerInfo.hostNameLength, xServerInfo.port);
 
-	/* Configure credentials for TLS mutual authenticated session. */
+	/* Configure credentials for TLS mutual authenticated session (default) */
 	xSocketsConfig.enableTls = true;
 	xSocketsConfig.pAlpnProtos = NULL;
 	xSocketsConfig.maxFragmentLength = 0;
@@ -120,12 +129,18 @@ static NetworkConnectStatus_t prvTransportNetworkConnect(void *pNetworkContext,
 	xSocketsConfig.sendTimeoutMs = testonfigTRANSPORT_SEND_RECV_TIMEOUT_MS;
 	xSocketsConfig.recvTimeoutMs = testonfigTRANSPORT_SEND_RECV_TIMEOUT_MS;
 
-	if (isIpAddress(pHostInfo->pHostName)) {//(strstr(pHostInfo->pHostName, "192")) {
-		printf("Disable SNI...\r\n");
+	if (isIpAddress(pHostInfo->pHostName)) {
+		/* SNI(Server Name Indication) needs to be disabled for an server which only has an IP address but no hostname. */
+		printf("Disable SNI... Connect to server with its IP address...\r\n");
 		xSocketsConfig.disableSni = true;
 	}
 
-	//printf("pRootCa, rootCaSize: %s ,%d", xSocketsConfig.pRootCa, xSocketsConfig.rootCaSize);
+	if (tls_enable == 0) {
+		/* disable TLS for plain text test */
+		xSocketsConfig.enableTls = false;
+	}
+
+	//printf("pRootCa, rootCaSize: %s, %d\r\n", xSocketsConfig.pRootCa, xSocketsConfig.rootCaSize);
 
 	/* Attempt to create a mutually authenticated TLS connection. */
 	xNetworkStatus = SecureSocketsTransport_Connect(pNetworkContext, &xServerInfo, &xSocketsConfig);
@@ -140,7 +155,7 @@ static NetworkConnectStatus_t prvTransportNetworkConnect(void *pNetworkContext,
 static void prvTransportNetworkDisconnect(void *pNetworkContext)
 {
 	/* Disconnect the transport network. */
-	/* Close the network connection.  */
+	/* Close the network connection. */
 	TransportSocketStatus_t xNetworkStatus = TRANSPORT_SOCKET_STATUS_SUCCESS;
 	xNetworkStatus = SecureSocketsTransport_Disconnect(pNetworkContext);
 	if (xNetworkStatus != TRANSPORT_SOCKET_STATUS_SUCCESS) {
@@ -168,7 +183,7 @@ typedef struct TaskParam {
 
 static void ThreadWrapper(void *pParam)
 {
-	TaskParam_t *pTaskParam = pParam;
+	TaskParam_t *pTaskParam = (TaskParam_t *)pParam;
 
 	if ((pTaskParam != NULL) && (pTaskParam->threadFunc != NULL) && (pTaskParam->joinMutexHandle != NULL)) {
 		pTaskParam->threadFunc(pTaskParam->pParam);
@@ -182,6 +197,9 @@ static void ThreadWrapper(void *pParam)
 
 FRTestThreadHandle_t FRTest_ThreadCreate(FRTestThreadFunction_t threadFunc, void *pParam)
 {
+	if (threadFunc == NULL) {
+		return NULL;
+	}
 	TaskParam_t *pTaskParam = NULL;
 	FRTestThreadHandle_t threadHandle = NULL;
 	BaseType_t xReturned;
@@ -195,7 +213,7 @@ FRTestThreadHandle_t FRTest_ThreadCreate(FRTestThreadFunction_t threadFunc, void
 	pTaskParam->threadFunc = threadFunc;
 	pTaskParam->pParam = pParam;
 
-	xReturned = xTaskCreate(ThreadWrapper,     /* Task code. */
+	xReturned = xTaskCreate(ThreadWrapper,    /* Task code. */
 							"ThreadWrapper",  /* All tasks have same name. */
 							8192,             /* Task stack size. */
 							pTaskParam,       /* Where the task writes its result. */
@@ -210,7 +228,10 @@ FRTestThreadHandle_t FRTest_ThreadCreate(FRTestThreadFunction_t threadFunc, void
 
 int FRTest_ThreadTimedJoin(FRTestThreadHandle_t threadHandle, uint32_t timeoutMs)
 {
-	TaskParam_t *pTaskParam = threadHandle;
+	if (threadHandle == NULL) {
+		return -1;
+	}
+	TaskParam_t *pTaskParam = (TaskParam_t *)threadHandle;
 	BaseType_t xReturned;
 	int retValue = 0;
 
@@ -270,6 +291,7 @@ void SetupTransportTestParam(TransportTestParam_t *pTestParam)
 	pTestParam->pNetworkDisconnect = prvTransportNetworkDisconnect;
 	pTestParam->pNetworkCredentials = &xNetworkCredentials;
 
+#if (AMEBA_PROVISIONING_MODE == 0)
 	/* Provision the device with iot-core certs and key */
 	ProvisioningParams_t xParams;
 	xParams.pucClientCertificate = (uint8_t *)TRANSPORT_CLIENT_CERTIFICATE;
@@ -279,6 +301,7 @@ void SetupTransportTestParam(TransportTestParam_t *pTestParam)
 	xParams.ulJITPCertificateLength = 0; /* Do not provision JITP certificate. */
 	xParams.pucJITPCertificate = NULL;
 	vAlternateKeyProvisioning(&xParams);
+#endif
 }
 
 void SetupMqttTestParam(MqttTestParam_t *pTestParam)
@@ -305,6 +328,7 @@ void SetupMqttTestParam(MqttTestParam_t *pTestParam)
 	pTestParam->pNetworkDisconnect = prvTransportNetworkDisconnect;
 	pTestParam->pNetworkCredentials = &xNetworkCredentials;
 
+#if (AMEBA_PROVISIONING_MODE == 0)
 	/* Provision the device with iot-core certs and key */
 	ProvisioningParams_t xParams;
 	xParams.pucClientCertificate = (uint8_t *)MQTT_CLIENT_CERTIFICATE;
@@ -314,10 +338,11 @@ void SetupMqttTestParam(MqttTestParam_t *pTestParam)
 	xParams.ulJITPCertificateLength = 0; /* Do not provision JITP certificate. */
 	xParams.pucJITPCertificate = NULL;
 	vAlternateKeyProvisioning(&xParams);
+#endif
 }
 
 #include "ota_config.h"
-void SetupOtaPalTestParam(OtaPalTestParam_t * pTestParam)
+void SetupOtaPalTestParam(OtaPalTestParam_t *pTestParam)
 {
 	pTestParam->pageSize = otaconfigFILE_BLOCK_SIZE;
 }
@@ -376,10 +401,15 @@ int aws_integration_test_main(void)
 		/* Connect to the Wi-Fi before running the tests. */
 		prvWifiConnect();
 
+#if (AMEBA_PROVISIONING_MODE == 1)
 		/* Provision the device with AWS certificate and private key. */
-		// vDevModeKeyProvisioning();
+		vDevModeKeyProvisioning();
+#endif
 
 		/* Start the test tasks. */
+#if (OTA_E2E_TEST_ENABLED == 1)
+		RunDeviceOtaDemo();
+#endif
 		RunQualificationTest();
 	}
 
@@ -387,3 +417,35 @@ int aws_integration_test_main(void)
 }
 
 /*-----------------------------------------------------------*/
+
+/* Include common demo header. */
+#include "aws_demo.h"
+
+extern int RunCoreMqttMutualAuthDemo(bool awsIotMqttMode,
+									 const char *pIdentifier,
+									 void *pNetworkServerInfo,
+									 void *pNetworkCredentialInfo,
+									 const IotNetworkInterface_t *pNetworkInterface);
+
+int RunDeviceAdvisorDemo(void)
+{
+	BaseType_t xResult = pdPASS;
+	xResult = RunCoreMqttMutualAuthDemo(0, NULL, NULL, NULL, NULL);
+
+	return (xResult == pdPASS) ? 0 : -1;
+}
+
+extern int RunOtaCoreMqttDemo(bool xAwsIotMqttMode,
+							  const char *pIdentifier,
+							  void *pNetworkServerInfo,
+							  void *pNetworkCredentialInfo,
+							  const IotNetworkInterface_t *pxNetworkInterface);
+
+static int RunDeviceOtaDemo(void)
+{
+	BaseType_t xResult = pdPASS;
+	xResult = RunOtaCoreMqttDemo(0, NULL, NULL, NULL, NULL);
+
+	return (xResult == pdPASS) ? 0 : -1;
+}
+

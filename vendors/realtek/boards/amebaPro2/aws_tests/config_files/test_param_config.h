@@ -43,12 +43,21 @@
  *
  * #define MQTT_SERVER_ENDPOINT   "PLACE_HOLDER"
  */
+#define MQTT_SERVER_ENDPOINT   "PLACE_HOLDER"
+
+/*
+ * @brief Host name.
+ *
+ * @todo Set this to the unique name of your IoT Thing.
+ */
+#define MQTT_IOT_THING_NAME     "Ameba-IDT"
 
 /**
  * @brief Port of the MQTT broker to connect to in mqtt test.
  *
  * #define MQTT_SERVER_PORT       (8883)
  */
+#define MQTT_SERVER_PORT       (8883)
 
 /**
  * @brief Root certificate of the IoT Core.
@@ -62,6 +71,7 @@
  *
  * #define IOT_CORE_ROOT_CA NULL
  */
+#define IOT_CORE_ROOT_CA NULL
 
 /**
  * @brief Client certificate to connect to MQTT server.
@@ -75,6 +85,7 @@
  *
  * #define MQTT_CLIENT_CERTIFICATE NULL
  */
+#define MQTT_CLIENT_CERTIFICATE NULL
 
 /**
  * @brief Client private key to connect to MQTT server.
@@ -85,18 +96,21 @@
  *
  * #define MQTT_CLIENT_PRIVATE_KEY  NULL
  */
+#define MQTT_CLIENT_PRIVATE_KEY  NULL
 
 /**
  * @brief Endpoint of the echo server to connect to in transport interface test.
  *
  * #define ECHO_SERVER_ENDPOINT   "PLACE_HOLDER"
  */
+#define ECHO_SERVER_ENDPOINT   "PLACE_HOLDER"
 
 /**
  * @brief Port of the echo server to connect to in transport interface test.
  *
  * #define ECHO_SERVER_PORT       (9000)
  */
+#define ECHO_SERVER_PORT       (9000)
 
 /**
  * @brief Root certificate of the echo server.
@@ -110,6 +124,7 @@
  *
  * #define ECHO_SERVER_ROOT_CA "PLACE_HOLDER"
  */
+#define ECHO_SERVER_ROOT_CA "PLACE_HOLDER"
 
 /**
  * @brief Client certificate to connect to echo server.
@@ -123,6 +138,7 @@
  *
  * #define TRANSPORT_CLIENT_CERTIFICATE NULL
  */
+#define TRANSPORT_CLIENT_CERTIFICATE NULL
 
 /**
  * @brief Client private key to connect to echo server.
@@ -133,6 +149,8 @@
  *
  * #define TRANSPORT_CLIENT_PRIVATE_KEY  NULL
  */
+#define TRANSPORT_CLIENT_PRIVATE_KEY  NULL
+
 
 /**
  * @brief Microseconds to delay the start of test.
@@ -141,6 +159,7 @@
  *
  * #define TEST_START_DELAY_MS  5000
  */
+#define TEST_START_DELAY_MS  1000
 
 #define OTA_RSA_SHA1      1
 #define OTA_RSA_SHA256    2
@@ -151,6 +170,7 @@
  *
  * #define OTA_PAL_TEST_CERT_TYPE OTA_ECDSA_SHA256
  */
+#define OTA_PAL_TEST_CERT_TYPE OTA_ECDSA_SHA256
 
 /**
  * @brief Path to cert for OTA test PAL. Used to verify signature.
@@ -159,12 +179,14 @@
  *
  * #define OTA_PAL_CERTIFICATE_FILE    "ecdsa-sha256-signer.crt.pem"
  */
+#define OTA_PAL_CERTIFICATE_FILE    "ecdsa-sha256-signer.crt.pem"
 
 /**
  * @brief Some devices have a hard-coded name for the firmware image to boot.
  *
  * #define OTA_PAL_FIRMWARE_FILE   "dummy.bin"
  */
+#define OTA_PAL_FIRMWARE_FILE   "dummy.bin"
 
 /**
  * @brief Some boards OTA PAL layers will use the file names passed into it for the
@@ -173,6 +195,7 @@
  *
  * #define OTA_PAL_USE_FILE_SYSTEM                          0
  */
+#define OTA_PAL_USE_FILE_SYSTEM                          0
 
 /**
  * @brief The PKCS #11 supports RSA key function.
@@ -181,6 +204,7 @@
  *
  * #define PKCS11_TEST_RSA_KEY_SUPPORT                     ( 1 )
  */
+#define PKCS11_TEST_RSA_KEY_SUPPORT                     ( 1 )
 
 /**
  * @brief The PKCS #11 supports EC key function.
@@ -189,6 +213,7 @@
  *
  * #define PKCS11_TEST_EC_KEY_SUPPORT                      ( 1 )
  */
+#define PKCS11_TEST_EC_KEY_SUPPORT                      ( 1 )
 
 /**
  * @brief The PKCS #11 supports import key method.
@@ -197,6 +222,7 @@
  *
  * #define PKCS11_TEST_IMPORT_PRIVATE_KEY_SUPPORT          ( 1 )
  */
+#define PKCS11_TEST_IMPORT_PRIVATE_KEY_SUPPORT          ( 1 )
 
 /**
  * @brief The PKCS #11 supports generate keypair method.
@@ -205,6 +231,7 @@
  *
  * #define PKCS11_TEST_GENERATE_KEYPAIR_SUPPORT            ( 1 )
  */
+#define PKCS11_TEST_GENERATE_KEYPAIR_SUPPORT            ( 1 )
 
 /**
  * @brief The PKCS #11 supports preprovisioning method.
@@ -213,6 +240,7 @@
  *
  * #define PKCS11_TEST_PREPROVISIONED_SUPPORT              ( 0 )
  */
+#define PKCS11_TEST_PREPROVISIONED_SUPPORT              ( 0 )
 
 /**
  * @brief The PKCS #11 label for device private key for test.
@@ -223,6 +251,7 @@
  *
  * #define PKCS11_TEST_LABEL_DEVICE_PRIVATE_KEY_FOR_TLS    pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS
  */
+#define PKCS11_TEST_LABEL_DEVICE_PRIVATE_KEY_FOR_TLS    pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS
 
 /**
  * @brief The PKCS #11 label for device public key.
@@ -233,6 +262,7 @@
  *
  * #define PKCS11_TEST_LABEL_DEVICE_PUBLIC_KEY_FOR_TLS     pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS
  */
+#define PKCS11_TEST_LABEL_DEVICE_PUBLIC_KEY_FOR_TLS     pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS
 
 /**
  * @brief The PKCS #11 label for the device certificate.
@@ -243,6 +273,7 @@
  *
  * #define PKCS11_TEST_LABEL_DEVICE_CERTIFICATE_FOR_TLS    pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS
  */
+#define PKCS11_TEST_LABEL_DEVICE_CERTIFICATE_FOR_TLS    pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS
 
 /**
  * @brief The PKCS #11 supports storage for JITP.
@@ -256,6 +287,7 @@
  *
  * #define PKCS11_TEST_JITP_CODEVERIFY_ROOT_CERT_SUPPORTED pkcs11configJITP_CODEVERIFY_ROOT_CERT_SUPPORTED
  */
+#define PKCS11_TEST_JITP_CODEVERIFY_ROOT_CERT_SUPPORTED pkcs11configJITP_CODEVERIFY_ROOT_CERT_SUPPORTED
 
 /**
  * @brief The PKCS #11 label for the object to be used for code verification.
@@ -264,6 +296,7 @@
  *
  * #define PKCS11_TEST_LABEL_CODE_VERIFICATION_KEY    pkcs11configLABEL_CODE_VERIFICATION_KEY
  */
+#define PKCS11_TEST_LABEL_CODE_VERIFICATION_KEY    pkcs11configLABEL_CODE_VERIFICATION_KEY
 
 /**
  * @brief The PKCS #11 label for Just-In-Time-Provisioning.
@@ -272,6 +305,7 @@
  *
  * #define PKCS11_TEST_LABEL_JITP_CERTIFICATE    pkcs11configLABEL_JITP_CERTIFICATE
  */
+#define PKCS11_TEST_LABEL_JITP_CERTIFICATE    pkcs11configLABEL_JITP_CERTIFICATE
 
 /**
  * @brief The PKCS #11 label for the AWS Trusted Root Certificate.
@@ -280,30 +314,40 @@
  *
  * #define PKCS11_TEST_LABEL_ROOT_CERTIFICATE    pkcs11configLABEL_ROOT_CERTIFICATE
  */
+#define PKCS11_TEST_LABEL_ROOT_CERTIFICATE    pkcs11configLABEL_ROOT_CERTIFICATE
 
 /**
  * @brief The IoT Thing name for the device for OTA test.
  *
  * #define IOT_THING_NAME  "PLACE_HOLDER"
  */
+#define IOT_THING_NAME     "PLACE_HOLDER"
 
 /**
  * @brief Major version for OTA E2E test.
  *
  * #define OTA_APP_VERSION_MAJOR                            0
  */
+#define OTA_APP_VERSION_MAJOR                            0
 
 /**
  * @brief Major version for OTA E2E test.
  *
  * #define OTA_APP_VERSION_MINOR                            9
  */
+#define OTA_APP_VERSION_MINOR                            9
 
 /**
  * @brief Major version for OTA E2E test.
  *
  * #define OTA_APP_VERSION_BUILD                            1
  */
+#define OTA_APP_VERSION_BUILD                            1
+ 
+/* for integration test */
+#ifndef Sig256_t
+    #define Sig256_t    Sig_t
+#endif
 
 
 #endif /* TEST_PARAM_CONFIG_H */

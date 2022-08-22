@@ -128,7 +128,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer value greater than 0. <br>
  */
-#define otaconfigMAX_NUM_BLOCKS_REQUEST         20U /* TODO */
+#define otaconfigMAX_NUM_BLOCKS_REQUEST         1U /* TODO */
 
 /**
  * @brief The maximum number of requests allowed to send without a response
