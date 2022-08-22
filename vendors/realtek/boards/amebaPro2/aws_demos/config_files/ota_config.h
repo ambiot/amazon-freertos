@@ -128,7 +128,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer value greater than 0. <br>
  */
-#define otaconfigMAX_NUM_BLOCKS_REQUEST         1U /* TODO */
+#define otaconfigMAX_NUM_BLOCKS_REQUEST         16U /* TODO */
 
 /**
  * @brief The maximum number of requests allowed to send without a response
@@ -161,7 +161,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer. <br>
  */
-#define otaconfigMAX_NUM_OTA_DATA_BUFFERS       otaconfigMAX_NUM_BLOCKS_REQUEST + 1 /* TODO */
+#define otaconfigMAX_NUM_OTA_DATA_BUFFERS       (otaconfigMAX_NUM_BLOCKS_REQUEST * 2) /* TODO */
 
 /**
  * @brief Flag to enable booting into updates that have an identical or lower
