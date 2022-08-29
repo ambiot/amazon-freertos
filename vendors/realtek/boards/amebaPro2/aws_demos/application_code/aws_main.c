@@ -70,7 +70,7 @@ static void prvMiscInitialization( void );
 #include "wifi_conf.h"
 #include "lwip_netconf.h"
 #define wifi_wait_time 500 //Here we wait 5 second to wiat the fast connect 
-static void common_init()
+static void common_init(void)
 {
 	uint32_t wifi_wait_count = 0;
 
