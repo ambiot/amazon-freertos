@@ -1,5 +1,5 @@
 /*
- * FreeRTOS V202012.00
+ * FreeRTOS V202203.00
  * Copyright (C) 2020 Amazon.com, Inc. or its affiliates.  All Rights Reserved.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -26,12 +26,24 @@
 #ifndef __AWS_CLIENTCREDENTIAL__H__
 #define __AWS_CLIENTCREDENTIAL__H__
 
+/* @TEST_ANCHOR */
+
+#if defined(FREERTOS_ENABLE_UNIT_TESTS)
+    #include "test_param_config.h"
+#endif
+
 /*
  * @brief MQTT Broker endpoint.
  *
  * @todo Set this to the fully-qualified DNS name of your MQTT broker.
  */
-#define clientcredentialMQTT_BROKER_ENDPOINT         ""
+#ifndef clientcredentialMQTT_BROKER_ENDPOINT
+    #ifndef MQTT_SERVER_ENDPOINT
+        #define clientcredentialMQTT_BROKER_ENDPOINT         ""
+    #else
+        #define clientcredentialMQTT_BROKER_ENDPOINT         MQTT_SERVER_ENDPOINT
+    #endif
+#endif
 
 /*
  * @brief Host name.
@@ -43,30 +55,44 @@
  * by software, such as a production serial number, rather
  * than a hard coded constant.
  */
-#define clientcredentialIOT_THING_NAME               ""
+#ifndef clientcredentialIOT_THING_NAME
+    #ifndef IOT_THING_NAME
+        #define clientcredentialIOT_THING_NAME          ""
+    #else
+        #define clientcredentialIOT_THING_NAME          IOT_THING_NAME
+    #endif
+#endif
 
 /*
  * @brief Port number the MQTT broker is using.
  */
-#define clientcredentialMQTT_BROKER_PORT             8883
+#ifndef clientcredentialMQTT_BROKER_PORT
+    #define clientcredentialMQTT_BROKER_PORT    8883
+#endif
 
 /*
  * @brief Port number the Green Grass Discovery use for JSON retrieval from cloud is using.
  */
-#define clientcredentialGREENGRASS_DISCOVERY_PORT    8443
+#ifndef clientcredentialGREENGRASS_DISCOVERY_PORT
+    #define clientcredentialGREENGRASS_DISCOVERY_PORT    8443
+#endif
 
 /*
  * @brief Wi-Fi network to join.
  *
  * @todo If you are using Wi-Fi, set this to your network name.
  */
-#define clientcredentialWIFI_SSID                    ""
+#ifndef clientcredentialWIFI_SSID
+    #define clientcredentialWIFI_SSID       ""
+#endif
 
 /*
  * @brief Password needed to join Wi-Fi network.
  * @todo If you are using WPA, set this to your network password.
  */
-#define clientcredentialWIFI_PASSWORD                ""
+#ifndef clientcredentialWIFI_PASSWORD
+    #define clientcredentialWIFI_PASSWORD    ""
+#endif
 
 /*
  * @brief Wi-Fi network security type.
@@ -76,6 +102,8 @@
  * @note Possible values are eWiFiSecurityOpen, eWiFiSecurityWEP, eWiFiSecurityWPA,
  * eWiFiSecurityWPA2 (depending on the support of your device Wi-Fi radio).
  */
-#define clientcredentialWIFI_SECURITY                eWiFiSecurityWPA2
+#ifndef clientcredentialWIFI_SECURITY
+    #define clientcredentialWIFI_SECURITY    eWiFiSecurityWPA2
+#endif
 
 #endif /* ifndef __AWS_CLIENTCREDENTIAL__H__ */

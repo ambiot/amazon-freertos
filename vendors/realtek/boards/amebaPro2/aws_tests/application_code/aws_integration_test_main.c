@@ -427,18 +427,9 @@ extern int RunCoreMqttMutualAuthDemo(bool awsIotMqttMode,
 									 void *pNetworkCredentialInfo,
 									 const IotNetworkInterface_t *pNetworkInterface);
 
-static void vSubscribePublishTestTask(void *pvParameters)
-{
-
-	RunCoreMqttMutualAuthDemo(0, NULL, NULL, NULL, NULL);
-	vTaskDelete(NULL);
-}
-
 int RunDeviceAdvisorDemo(void)
 {
 	BaseType_t xResult = pdPASS;
-
-	//xResult = xTaskCreate(vSubscribePublishTestTask, "DeviceAdvisor", 4096, NULL, 1, NULL);
 	if (RunCoreMqttMutualAuthDemo(0, NULL, NULL, NULL, NULL) != EXIT_SUCCESS) {
 		xResult = pdFAIL;
 	}
@@ -452,16 +443,9 @@ extern int RunOtaCoreMqttDemo(bool xAwsIotMqttMode,
 							  void *pNetworkCredentialInfo,
 							  const IotNetworkInterface_t *pxNetworkInterface);
 
-static void vOTAUpdateTask(void *pvParam)
-{
-	RunOtaCoreMqttDemo(0, NULL, NULL, NULL, NULL);
-	vTaskDelete(NULL);
-}
-
 static int RunDeviceOtaDemo(void)
 {
 	BaseType_t xResult = pdPASS;
-	//xResult = xTaskCreate(vOTAUpdateTask, "OTAUpdate", 4096, NULL, 1, NULL);
 	if (RunOtaCoreMqttDemo(0, NULL, NULL, NULL, NULL) != EXIT_SUCCESS) {
 		xResult = pdFAIL;
 	}

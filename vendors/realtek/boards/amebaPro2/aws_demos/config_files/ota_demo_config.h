@@ -28,6 +28,10 @@
 #ifndef OTA_DEMO_CONFIG_H_
 #define OTA_DEMO_CONFIG_H_
 
+#if defined(FREERTOS_ENABLE_UNIT_TESTS)
+    #include "test_param_config.h"
+#endif
+
 /**
  * @brief Certificate used for validating code signing signatures in the OTA PAL.
  */

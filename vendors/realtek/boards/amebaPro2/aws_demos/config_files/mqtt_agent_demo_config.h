@@ -24,8 +24,8 @@
  *
  */
 
-#ifndef MQTT_DEMO_MUTUAL_AUTH_CONFIG_H
-#define MQTT_DEMO_MUTUAL_AUTH_CONFIG_H
+#ifndef MQTT_DEMO_CONNECTION_SHARING_CONFIG_H
+#define MQTT_DEMO_CONNECTION_SHARING_CONFIG_H
 
 /**************************************************/
 /******* DO NOT CHANGE the following order ********/
@@ -42,38 +42,31 @@
 
 /* Logging configuration for the Demo. */
 #ifndef LIBRARY_LOG_NAME
-    #define LIBRARY_LOG_NAME    "MQTT_MutualAuth_Demo"
+    #define LIBRARY_LOG_NAME    "MQTTDemo"
 #endif
 
 #ifndef LIBRARY_LOG_LEVEL
-    #define LIBRARY_LOG_LEVEL    LOG_DEBUG //LOG_INFO
+    #define LIBRARY_LOG_LEVEL    LOG_INFO
 #endif
 #include "logging_stack.h"
 
 /************ End of logging configuration ****************/
 
 /**
- * To use this demo, please configure the client's certificate and private key
- * in demos/include/aws_clientcredential_keys.h.
- * 
- * For the AWS IoT MQTT broker, refer to the AWS documentation below for details
- * regarding client authentication.
- * https://docs.aws.amazon.com/iot/latest/developerguide/client-authentication.html
+ * @brief The MQTT client identifier used in this example.  Each client identifier
+ * must be unique so edit as required to ensure no two clients connecting to the
+ * same broker use the same client identifier.
+ *
+ * #define democonfigCLIENT_IDENTIFIER				"insert here."
  */
 
-/**
- * @brief The MQTT client identifier used in this example.  Each client identifier
- * must be unique; so edit as required to ensure that no two clients connecting to
- * the same broker use the same client identifier.
- *
- * #define democonfigCLIENT_IDENTIFIER    "insert here."
- */
 
 /**
  * @brief Endpoint of the MQTT broker to connect to.
  *
- * This demo application can be run with any MQTT broker, that supports mutual
- * authentication.
+ * This demo application can be run with any MQTT broker, although it is
+ * recommended to use one that supports mutual authentication. If mutual
+ * authentication is not used, then #democonfigUSE_TLS should be set to 0.
  *
  * For AWS IoT MQTT broker, this is the Thing's REST API Endpoint.
  *
@@ -81,53 +74,56 @@
  * Settings/Custom Endpoint, or using the describe-endpoint REST API (with
  * AWS CLI command line tool).
  *
- * #define democonfigMQTT_BROKER_ENDPOINT    "...insert here..."
+ * #define democonfigMQTT_BROKER_ENDPOINT				"insert here."
  */
+
 
 /**
  * @brief The port to use for the demo.
  *
- * In general, port 8883 is for secured MQTT connections.
+ * In general, port 8883 is for secured MQTT connections, and port 1883 if not
+ * using TLS.
  *
  * @note Port 443 requires use of the ALPN TLS extension with the ALPN protocol
- * name. When using port 8883, ALPN is not required.
+ * name. Using ALPN with this demo would require additional changes, including
+ * setting the `pAlpnProtos` member of the `NetworkCredentials_t` struct before
+ * forming the TLS connection. When using port 8883, ALPN is not required.
  *
- * #define democonfigMQTT_BROKER_PORT    "...insert here..."
+ * #define democonfigMQTT_BROKER_PORT    ( insert here. )
  */
 
 /**
- * @brief Server's root CA certificate.
+ * @brief Dimensions the buffer used to serialize and deserialize MQTT packets.
  *
- * For AWS IoT MQTT broker, this certificate is used to identify the AWS IoT
- * server and is publicly available. Refer to the AWS documentation available
- * in the link below.
- * https://docs.aws.amazon.com/iot/latest/developerguide/server-authentication.html#server-authentication-certs
+ * @note Specified in bytes.  Must be large enough to hold the maximum
+ * anticipated MQTT payload.
  *
- * @note This certificate should be PEM-encoded.
- *
- * Must include the PEM header and footer:
- * "-----BEGIN CERTIFICATE-----\n"\
- * "...base64 data...\n"\
- * "-----END CERTIFICATE-----\n"
- *
- * #define democonfigROOT_CA_PEM    "...insert here..."
+ * #define MQTT_AGENT_NETWORK_BUFFER_SIZE    ( insert here. )
  */
 
 /**
- * @brief Size of the network buffer for MQTT packets.
+ * @brief The length of the queue used to hold commands for the agent.
+ *
+ * #define MQTT_AGENT_COMMAND_QUEUE_LENGTH    ( insert here. )
  */
-#define democonfigNETWORK_BUFFER_SIZE    ( 4096U )
 
 /**
- * @brief The maximum number of times to run the subscribe publish loop in the
- * demo.
+ * @brief Maximum number of subscriptions maintained by the subscription manager
+ * simultaneously in a list.
  *
- * #define democonfigMQTT_MAX_DEMO_COUNT    ( insert here )
+ * #define SUBSCRIPTION_MANAGER_MAX_SUBSCRIPTIONS    ( insert here. )
  */
-#if defined(FREERTOS_ENABLE_UNIT_TESTS)
-    #define democonfigMQTT_MAX_DEMO_COUNT    ( 300 )
-#else
-    #define democonfigMQTT_MAX_DEMO_COUNT    ( 3 )
-#endif
 
-#endif /* MQTT_DEMO_MUTUAL_AUTH_CONFIG_H */
+/**
+ * @brief The number of simple subscribe-publish tasks to create for the demo
+ */
+#define democonfigNUM_SIMPLE_SUB_PUB_TASKS_TO_CREATE       1
+#define democonfigSIMPLE_SUB_PUB_TASK_STACK_SIZE           ( configMINIMAL_STACK_SIZE * 4 )
+
+
+/**
+ * @brief The maximum number of times to run the demo's task creation loop.
+ */
+#define democonfigMQTT_MAX_DEMO_COUNT   ( 3 )
+
+#endif /* MQTT_DEMO_CONNECTION_SHARING_CONFIG_H */
