@@ -213,7 +213,7 @@
  *
  * #define PKCS11_TEST_EC_KEY_SUPPORT                      ( 1 )
  */
-#define PKCS11_TEST_EC_KEY_SUPPORT                      ( 1 )
+#define PKCS11_TEST_EC_KEY_SUPPORT                      ( 0 )
 
 /**
  * @brief The PKCS #11 supports import key method.
