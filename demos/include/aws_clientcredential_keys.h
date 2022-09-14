@@ -98,4 +98,9 @@
     #define keyCLIENT_PRIVATE_KEY_PEM                   NULL
 #endif
 
+
+#ifndef keyCLIENT_PUBLIC_KEY_PEM
+    #define keyCLIENT_PUBLIC_KEY_PEM                   NULL
+#endif
+
 #endif /* AWS_CLIENT_CREDENTIAL_KEYS_H */

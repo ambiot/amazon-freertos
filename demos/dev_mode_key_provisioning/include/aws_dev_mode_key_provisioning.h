@@ -63,6 +63,8 @@ typedef struct ProvisioningParams_t
                                          *   for more information about getting started with JITP */
     uint32_t ulJITPCertificateLength;   /**< Length of the Just-In-Time Provisioning (JITP) certificate in bytes.
                                          *   If JITP is not being used, this value should be set to 0. */
+    uint8_t * pucClientPublicKey;
+    uint32_t ulClientPublicKeyLength;
 } ProvisioningParams_t;
 
 /** \brief Provisions device with default credentials.
