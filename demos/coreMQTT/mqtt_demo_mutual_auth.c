@@ -186,13 +186,13 @@
 /**
  * @brief Timeout for MQTT_ProcessLoop in milliseconds.
  */
-#define mqttexamplePROCESS_LOOP_TIMEOUT_MS                ( 700U )
+#define mqttexamplePROCESS_LOOP_TIMEOUT_MS                ( 500U )
 
 /**
  * @brief The maximum number of times to call MQTT_ProcessLoop() when polling
  * for a specific packet from the broker.
  */
-#define MQTT_PROCESS_LOOP_PACKET_WAIT_COUNT_MAX           ( 30U )
+#define MQTT_PROCESS_LOOP_PACKET_WAIT_COUNT_MAX           ( 1U )
 
 /**
  * @brief Keep alive time reported to the broker while establishing
@@ -212,7 +212,7 @@
  * Note that the process loop also has a timeout, so the total time between
  * publishes is the sum of the two delays.
  */
-#define mqttexampleDELAY_BETWEEN_PUBLISHES_TICKS          ( pdMS_TO_TICKS( 2000U ) )
+#define mqttexampleDELAY_BETWEEN_PUBLISHES_TICKS          ( pdMS_TO_TICKS( 1000U ) )
 
 /**
  * @brief Transport timeout in milliseconds for transport send and receive.
