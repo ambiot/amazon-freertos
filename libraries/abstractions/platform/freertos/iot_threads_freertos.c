@@ -79,6 +79,9 @@
 
 static void _threadRoutineWrapper( void * pArgument )
 {
+#if defined(configENABLE_TRUSTZONE) && (configENABLE_TRUSTZONE == 1)  // add by RTK
+    rtw_create_secure_context(2048);
+#endif
     threadInfo_t * pThreadInfo = ( threadInfo_t * ) pArgument;
 
     /* Run the thread routine. */
