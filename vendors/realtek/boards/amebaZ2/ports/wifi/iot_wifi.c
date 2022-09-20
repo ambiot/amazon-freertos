@@ -169,14 +169,16 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
     int ret = eWiFiFailure;
     //uint32_t ipaddr = 0;
     WIFIIPConfiguration_t xIPInfo;
-
+    char *ssid_content = NULL;
+    
     if((pxNetworkParams == NULL) || ((char*)pxNetworkParams->ucSSID == NULL) || (pxNetworkParams->ucSSIDLength == 0))
         return eWiFiFailure;
     if((prvConvertSecurityAbstractedToRTW(pxNetworkParams->xSecurity) != RTW_SECURITY_OPEN) && ((char*)pxNetworkParams->xPassword.xWPA.cPassphrase == NULL))
         return eWiFiFailure;
 
     device_mutex_lock(RT_DEV_LOCK_WLAN);
-    char ssid_content[pxNetworkParams->ucSSIDLength];
+    //char ssid_content[pxNetworkParams->ucSSIDLength];
+    ssid_content = malloc( pxNetworkParams->ucSSIDLength * sizeof(char));
     memcpy(ssid_content, pxNetworkParams->ucSSID, pxNetworkParams->ucSSIDLength);
     printf("\n\rJoining BSS by SSID %s...\n\r", (char*)ssid_content);
 
@@ -228,6 +230,7 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
 		ret = eWiFiSuccess;
     }
 
+    free(ssid_content);
     return ret;
 }
 /*-----------------------------------------------------------*/
