@@ -103,7 +103,6 @@ int aws_main( void )
     if( SYSTEM_Init() == pdPASS )
     {
         /* Connect to the Wi-Fi before running the tests. */
-        //prvWifiConnect();
         common_init();
 
         /* Provision the device with AWS certificate and private key. */
@@ -129,6 +128,7 @@ static void prvMiscInitialization( void )
      */
 }
 /*-----------------------------------------------------------*/
+
 #if 0  // [AmebaPro2] this function has been defined in component/os/freertos/freertos_cb.c
 void vApplicationDaemonTaskStartupHook( void )
 {
@@ -155,57 +155,3 @@ void vApplicationDaemonTaskStartupHook( void )
 }
 #endif
 /*-----------------------------------------------------------*/
-
-void prvWifiConnect( void )
-{
-    WIFINetworkParams_t xNetworkParams;
-    WIFIReturnCode_t xWifiStatus;
-    WIFIIPConfiguration_t xIPInfo;
-    uint8_t *ucTempIp;
-
-    xWifiStatus = WIFI_On();
-
-    if( xWifiStatus == eWiFiSuccess )
-    {
-        configPRINTF( ( "Wi-Fi module initialized. Connecting to AP...\r\n" ) );
-    }
-    else
-    {
-        configPRINTF( ( "Wi-Fi module failed to initialize.\r\n" ) );
-
-        /* Delay to allow the lower priority logging task to print the above status.
-         * The while loop below will block the above printing. */
-        vTaskDelay( mainLOGGING_WIFI_STATUS_DELAY );
-
-        while( 1 ){}
-    }
-
-    /* Setup parameters. */
-    memset( xNetworkParams.ucSSID, 0x00, wificonfigMAX_SSID_LEN );
-    memcpy( xNetworkParams.ucSSID, clientcredentialWIFI_SSID, sizeof( clientcredentialWIFI_SSID ) ); // xNetworkParams.pcSSID = clientcredentialWIFI_SSID;
-    xNetworkParams.ucSSIDLength = sizeof( clientcredentialWIFI_SSID );
-    memset( xNetworkParams.xPassword.xWPA.cPassphrase, 0x00, wificonfigMAX_PASSPHRASE_LEN );
-    memcpy( xNetworkParams.xPassword.xWPA.cPassphrase, clientcredentialWIFI_PASSWORD, sizeof( clientcredentialWIFI_PASSWORD )); // xNetworkParams.pcPassword = clientcredentialWIFI_PASSWORD;
-    xNetworkParams.xPassword.xWPA.ucLength = sizeof( clientcredentialWIFI_PASSWORD );
-    xNetworkParams.xSecurity = clientcredentialWIFI_SECURITY;
-    xNetworkParams.ucChannel = 0;
-
-    xWifiStatus = WIFI_ConnectAP( &( xNetworkParams ) );
-
-    if( xWifiStatus == eWiFiSuccess )
-    {
-        configPRINTF( ( "Wi-Fi Connected to AP. Creating tasks which use network...\r\n" ) );
-
-        xWifiStatus = WIFI_GetIPInfo( &xIPInfo );
-        ucTempIp = ( uint8_t * ) ( &xIPInfo.xIPAddress.ulAddress[0] );
-        if ( eWiFiSuccess == xWifiStatus )
-        {
-            configPRINTF( ( "IP Address acquired %d.%d.%d.%d\r\n",
-                            ucTempIp[ 0 ], ucTempIp[ 1 ], ucTempIp[ 2 ], ucTempIp[ 3 ] ) );
-        }
-    }
-    else
-    {
-        configPRINTF( ( "Wi-Fi failed to connect to AP.\r\n" ) );
-    }
-}

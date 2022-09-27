@@ -359,6 +359,54 @@ void runDemoTask( void * pArgument )
 
 /*-----------------------------------------------------------*/
 
+//add by RTK
+void runDemoTask_alt( void * pArgument )
+{
+    demoContext_t * pContext = ( demoContext_t * ) pArgument;
+    int status = EXIT_SUCCESS;
+
+    /* DO NOT EDIT - This demo start marker is used in the test framework to
+     * determine the start of a demo. */
+    IotLogInfo( "---------STARTING DEMO---------\n" );
+
+    if( status == EXIT_SUCCESS )
+    {
+        /* Run the demo. */
+        status = pContext->demoFunction( 0,
+                                         NULL,
+                                         NULL,
+                                         NULL,
+                                         NULL );
+
+        /* Give a chance to drain the logging queue to increase the probability
+         * of the following messages used by the test framework not getting
+         * dropped. */
+        vTaskDelay( pdMS_TO_TICKS( 1000 ) );
+
+        /* Log the demo status. */
+        if( status == EXIT_SUCCESS )
+        {
+            /* DO NOT EDIT - This message is used in the test framework to
+             * determine whether or not the demo was successful. */
+            IotLogInfo( "Demo completed successfully." );
+        }
+        else
+        {
+            IotLogError( "Error running demo." );
+        }
+    }
+    else
+    {
+        IotLogError( "Failed to initialize the demo. exiting..." );
+    }
+
+    /* DO NOT EDIT - This demo end marker is used in the test framework to
+     * determine the end of a demo. */
+    IotLogInfo( "-------DEMO FINISHED-------\n" );
+}
+
+/*-----------------------------------------------------------*/
+
 #if ( ipconfigUSE_LLMNR != 0 ) || ( ipconfigUSE_NBNS != 0 )
 
     BaseType_t xApplicationDNSQueryHook( const char * pcName )

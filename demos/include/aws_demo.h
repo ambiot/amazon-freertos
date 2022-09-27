@@ -50,6 +50,7 @@ typedef void (* networkConnectedCallback_t)( bool awsIotMqttMode,
 typedef void (* networkDisconnectedCallback_t)( const IotNetworkInterface_t * pNetworkInteface );
 
 void runDemoTask( void * pArgument );
+void runDemoTask_alt( void * pArgument );  //add by RTK
 
 void DEMO_RUNNER_RunDemos( void );
 

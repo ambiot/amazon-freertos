@@ -89,7 +89,7 @@ void DEMO_RUNNER_RunDemos( void )
         .networkDisconnectedCallback = DEMO_networkDisconnectedCallback
     };
 
-    Iot_CreateDetachedThread( runDemoTask,
+    Iot_CreateDetachedThread( runDemoTask,   //runDemoTask, runDemoTask_alt
                               &mqttDemoContext,
                               democonfigDEMO_PRIORITY,
                               democonfigDEMO_STACKSIZE );
