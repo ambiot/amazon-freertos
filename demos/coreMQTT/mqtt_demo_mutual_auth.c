@@ -542,6 +542,13 @@ int RunCoreMqttMutualAuthDemo( bool awsIotMqttMode,
             xDemoStatus = prvMQTTSubscribeWithBackoffRetries( &xMQTTContext );
         }
 
+        /*
+        ss_ctx_t * ctx_tmp = ( ss_ctx_t * ) xNetworkContext.pParams->tcpSocket;
+        TLSContext_t *pxCtx_tmp = ( TLSContext_t *)ctx_tmp->tls_ctx;
+        mbedtls_ssl_context *ssl_context_tmp = &pxCtx_tmp->xMbedSslCtx;
+        LogInfo( ( "Use ciphersuite %s \r\n", mbedtls_ssl_get_ciphersuite(ssl_context_tmp) ) );
+        */
+
         /**************************** Publish and Keep Alive Loop. ******************************/
 
         /* Publish messages with QoS1, send and process Keep alive messages. */
