@@ -627,6 +627,40 @@ static int prvInitializeClientCredential( TLSContext_t * pxCtx )
     return xResult;
 }
 
+/* development mode - parse key from plain text code */
+static int prvInitializeClientCredential_alt( TLSContext_t * pxCtx )
+{
+    BaseType_t xResult = CKR_OK;
+
+    mbedtls_x509_crt_init( &pxCtx->xMbedX509Cli );
+    mbedtls_pk_init( &pxCtx->xMbedPkCtx );
+
+    if( xResult == CKR_OK )
+    {
+        xResult = mbedtls_x509_crt_parse( &pxCtx->xMbedX509Cli,
+                                          (const unsigned char *)keyCLIENT_CERTIFICATE_PEM,
+                                          strlen(keyCLIENT_CERTIFICATE_PEM) + 1 );
+    }
+
+    if ( xResult == CKR_OK ) 
+    {
+        xResult = mbedtls_pk_parse_key( &pxCtx->xMbedPkCtx,
+                                        (const unsigned char *)keyCLIENT_PRIVATE_KEY_PEM,
+                                        strlen(keyCLIENT_PRIVATE_KEY_PEM) + 1,
+                                        NULL,
+                                        0 );
+    }
+
+    if( 0 == xResult ) 
+    {
+        xResult = mbedtls_ssl_conf_own_cert( &pxCtx->xMbedSslConfig,
+                                             &pxCtx->xMbedX509Cli,
+                                             &pxCtx->xMbedPkCtx );
+    }
+
+    return xResult;
+}
+
 /*-----------------------------------------------------------*/
 
 /**
@@ -858,6 +892,7 @@ BaseType_t TLS_Connect( void * pvContext )
         /* Set issuer certificate. */
         mbedtls_ssl_conf_ca_chain( &pxCtx->xMbedSslConfig, &pxCtx->xMbedX509CA, NULL );
 
+#if 1
         /* Configure the SSL context to contain device credentials (eg device cert
          * and private key) obtained from the PKCS #11 layer.  The result of
          * loading device key and certificate is placed in a separate variable
@@ -867,6 +902,9 @@ BaseType_t TLS_Connect( void * pvContext )
          * that do not require mutual authentication. If the server does
          * require mutual authentication, the handshake will fail. */
         xPKCSResult = prvInitializeClientCredential( pxCtx );
+#else
+        xPKCSResult = prvInitializeClientCredential_alt( pxCtx );
+#endif
     }
 
     if( ( 0 == xResult ) && ( NULL != pxCtx->ppcAlpnProtocols ) )
