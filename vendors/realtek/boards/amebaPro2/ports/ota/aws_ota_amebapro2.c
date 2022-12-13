@@ -547,6 +547,14 @@ OtaPalImageState_t prvPAL_GetPlatformImageState_amebaPro2(void)
 
 	/* read the state from file */
 	OtaImageState_t eSavedAgentState = OtaImageStateUnknown;
+#if defined(AWS_OTA_STATUS_FTL) && (AWS_OTA_STATUS_FTL == 1)
+	int ret = ftl_common_read(AWSIOT_OTA_STATUS, &eSavedAgentState, sizeof(OtaImageState_t));
+	if (ret < 0) {
+		printf("[%s] ftl read OTA status failed\n\r", __func__);
+		eImageState = OtaPalImageStateInvalid;
+		goto exit;
+	}
+#else
 	FILE *fp = fopen(OTA_STATE_FILE, "r+");
 	if (fp == NULL) {
 		LogError(("[%s] open OTA_STATE_FILE fail", __FUNCTION__));
@@ -555,6 +563,7 @@ OtaPalImageState_t prvPAL_GetPlatformImageState_amebaPro2(void)
 	}
 	fread(&eSavedAgentState, sizeof(OtaImageState_t), 1, fp);
 	fclose(fp);
+#endif
 
 	switch (eSavedAgentState) {
 	case OtaImageStateTesting:
@@ -590,15 +599,25 @@ OtaPalStatus_t prvPAL_SetPlatformImageState_amebaPro2(OtaImageState_t eState)
 	}
 
 	if ((eState != OtaImageStateUnknown) && (eState <= OtaLastImageState)) {
+#if defined(AWS_OTA_STATUS_FTL) && (AWS_OTA_STATUS_FTL == 1)
+		int ret = ftl_common_write(AWSIOT_OTA_STATUS, &eState, sizeof(OtaImageState_t));
+		if (ret < 0) {
+			printf("[%s] ftl write OTA status failed\n\r", __FUNCTION__);
+			mainErr = OtaPalBadImageState;
+			goto exit;
+		}
+#else
 		/* write state to file */
 		FILE *fp = fopen(OTA_STATE_FILE, "wb+");
 		if (fp == NULL) {
 			LogError(("[%s] OTA_STATE_FILE open fail", __FUNCTION__));
 			mainErr = OtaPalBadImageState;
+			goto exit;
 		} else {
 			fwrite(&eState, sizeof(OtaImageState_t), 1, fp);
 			fclose(fp);
 		}
+#endif
 	} else { /* Image state invalid. */
 		LogError(("[%s] Invalid image state provided.", __FUNCTION__));
 		mainErr = OtaPalBadImageState;
