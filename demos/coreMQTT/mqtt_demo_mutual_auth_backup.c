@@ -186,13 +186,13 @@
 /**
  * @brief Timeout for MQTT_ProcessLoop in milliseconds.
  */
-#define mqttexamplePROCESS_LOOP_TIMEOUT_MS                ( 700U )
+#define mqttexamplePROCESS_LOOP_TIMEOUT_MS                ( 500U )
 
 /**
  * @brief The maximum number of times to call MQTT_ProcessLoop() when polling
  * for a specific packet from the broker.
  */
-#define MQTT_PROCESS_LOOP_PACKET_WAIT_COUNT_MAX           ( 30U )
+#define MQTT_PROCESS_LOOP_PACKET_WAIT_COUNT_MAX           ( 1U )
 
 /**
  * @brief Keep alive time reported to the broker while establishing
@@ -212,7 +212,7 @@
  * Note that the process loop also has a timeout, so the total time between
  * publishes is the sum of the two delays.
  */
-#define mqttexampleDELAY_BETWEEN_PUBLISHES_TICKS          ( pdMS_TO_TICKS( 2000U ) )
+#define mqttexampleDELAY_BETWEEN_PUBLISHES_TICKS          ( pdMS_TO_TICKS( 1000U ) )
 
 /**
  * @brief Transport timeout in milliseconds for transport send and receive.
@@ -541,6 +541,13 @@ int RunCoreMqttMutualAuthDemo( bool awsIotMqttMode,
              * implemented in backoff_algorithm. */
             xDemoStatus = prvMQTTSubscribeWithBackoffRetries( &xMQTTContext );
         }
+
+        /*
+        ss_ctx_t * ctx_tmp = ( ss_ctx_t * ) xNetworkContext.pParams->tcpSocket;
+        TLSContext_t *pxCtx_tmp = ( TLSContext_t *)ctx_tmp->tls_ctx;
+        mbedtls_ssl_context *ssl_context_tmp = &pxCtx_tmp->xMbedSslCtx;
+        LogInfo( ( "Use ciphersuite %s \r\n", mbedtls_ssl_get_ciphersuite(ssl_context_tmp) ) );
+        */
 
         /**************************** Publish and Keep Alive Loop. ******************************/
 

@@ -41,7 +41,6 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <sys.h>
 #include "platform_stdlib.h"
 #include "ota_8735b.h"
-#include "hal_flash_boot.h"
 #include "fwfs.h"
 #include <device_lock.h>
 #include "sys_api.h"
@@ -127,9 +126,17 @@ void vMemDump(const u8 *start, u32 size, char *strHeader)
 
 //================================================================================
 
+static void prv_ota_platform_reset(void)
+{
+	sys_reset();
+	while (1) {
+		vTaskDelay(1000);
+	}
+}
+
 OtaPalStatus_t prvPAL_ResetDevice_amebaPro2(void)
 {
-	ota_platform_reset();
+	prv_ota_platform_reset();
 	return OTA_PAL_COMBINE_ERR(OtaPalSuccess, 0);
 }
 
