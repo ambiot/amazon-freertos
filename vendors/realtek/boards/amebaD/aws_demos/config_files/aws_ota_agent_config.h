@@ -34,7 +34,7 @@
 /**
  * @brief The number of words allocated to the stack for the OTA agent.
  */
-#define otaconfigSTACK_SIZE                     830U    /* FIX ME. */
+#define otaconfigSTACK_SIZE                     1024U    /* FIX ME. */
 
 /**
  * @brief Log base 2 of the size of the file data block message (excluding the header).
