@@ -29,6 +29,7 @@ def get_presigned_urls(bucket_name, key_name, region_name) -> None:
         url = s3.generate_presigned_url(
             ClientMethod=client_method_dict[method],
             Params={"Bucket": bucket_name, "Key": key_name},
+            ExpiresIn=604800,
         )
         print("#define democonfigS3_PRESIGNED_" + method + "_URL" + "    " + '"' + url + '"\n')
 
