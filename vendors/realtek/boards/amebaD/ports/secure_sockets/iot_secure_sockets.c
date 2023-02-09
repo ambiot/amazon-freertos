@@ -331,6 +331,11 @@ int32_t SOCKETS_Connect( Socket_t xSocket,
 
     ctx = ( ss_ctx_t * )xSocket;
 
+    if( NULL == ctx )
+    {
+        return SOCKETS_SOCKET_ERROR;
+    }
+
     if( 0 <= ctx->ip_socket )
     {
         struct sockaddr_in sa_addr = { 0 };
@@ -408,6 +413,11 @@ int32_t SOCKETS_Recv( Socket_t xSocket,
 {
     ss_ctx_t * ctx = ( ss_ctx_t * )xSocket;
 
+    if( NULL == ctx )
+    {
+        return SOCKETS_SOCKET_ERROR;
+    }
+
     if( SOCKETS_INVALID_SOCKET == xSocket )
     {
         return SOCKETS_SOCKET_ERROR;
@@ -461,6 +471,17 @@ int32_t SOCKETS_Send( Socket_t xSocket,
     }
 
     ctx            = ( ss_ctx_t * )xSocket;
+
+    if( NULL == ctx )
+    {
+        return SOCKETS_SOCKET_ERROR;
+    }
+
+    if( ( ctx->status & SS_STATUS_CONNECTED ) != SS_STATUS_CONNECTED )
+    {
+        return SOCKETS_ENOTCONN;
+    }
+
     ctx->send_flag = ulFlags;
 
     if( 0 > ctx->ip_socket )
@@ -494,6 +515,11 @@ int32_t SOCKETS_Shutdown( Socket_t xSocket,
 
     ctx            = ( ss_ctx_t * )xSocket;
 
+    if( NULL == ctx )
+    {
+        return SOCKETS_SOCKET_ERROR;
+    }
+
     if( 0 > ctx->ip_socket )
     {
         return SOCKETS_SOCKET_ERROR;
@@ -523,6 +549,11 @@ int32_t SOCKETS_Close( Socket_t xSocket )
     }
 
     ctx = ( ss_ctx_t * )xSocket;
+
+    if( NULL == ctx )
+    {
+        return SOCKETS_SOCKET_ERROR;
+    }
 
     /* Clean-up application protocol array. */
     if( NULL != ctx->ppcAlpnProtocols )
@@ -599,6 +630,11 @@ int32_t SOCKETS_SetSockOpt( Socket_t xSocket,
     }
 
     ctx            = ( ss_ctx_t * )xSocket;
+
+    if( NULL == ctx )
+    {
+        return SOCKETS_SOCKET_ERROR;
+    }
 
     if( 0 > ctx->ip_socket )
     {
