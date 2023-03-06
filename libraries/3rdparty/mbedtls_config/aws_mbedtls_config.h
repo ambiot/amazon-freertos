@@ -817,7 +817,7 @@
  *
  * Uncomment this macro to disable some counter-measures in ECP.
  */
-//#define MBEDTLS_ECP_NO_INTERNAL_RNG
+#define MBEDTLS_ECP_NO_INTERNAL_RNG
 
 /**
  * \def MBEDTLS_ECP_RESTARTABLE

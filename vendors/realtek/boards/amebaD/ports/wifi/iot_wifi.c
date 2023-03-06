@@ -86,6 +86,10 @@ static rtw_security_t prvConvertSecurityAbstractedToRTW( WIFISecurity_t xSecurit
             ucConvertedSecurityType = RTW_SECURITY_WPA2_AES_PSK;
             break;
 
+        case eWiFiSecurityWPA3:
+            ucConvertedSecurityType = RTW_SECURITY_WPA3_AES_PSK;
+            break;
+
         default:
             break;
     }
@@ -112,6 +116,7 @@ static WIFISecurity_t prvConvertSecurityRTWToAbstracted( rtw_security_t ucSecuri
 
         case RTW_SECURITY_WPA_TKIP_PSK:
         case RTW_SECURITY_WPA_AES_PSK :
+        case RTW_SECURITY_WPA_MIXED_PSK:
            xConvertedSecurityType = eWiFiSecurityWPA;
            break;
 
@@ -122,6 +127,11 @@ static WIFISecurity_t prvConvertSecurityRTWToAbstracted( rtw_security_t ucSecuri
         case RTW_SECURITY_WPA_WPA2_AES_PSK:
         case RTW_SECURITY_WPA_WPA2_MIXED_PSK:
             xConvertedSecurityType = eWiFiSecurityWPA2;
+            break;
+
+        case RTW_SECURITY_WPA3_AES_PSK:
+        case RTW_SECURITY_WPA2_WPA3_MIXED:
+            xConvertedSecurityType = eWiFiSecurityWPA3;
             break;
 
         default:
