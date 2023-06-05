@@ -754,24 +754,26 @@ int32_t SOCKETS_SetSockOpt( Socket_t xSocket,
             }
             else
             {
-                ctx->ppcAlpnProtocols[
-                    ctx->ulAlpnProtocolsCount - 1 ] = NULL;
+                memset( ctx->ppcAlpnProtocols,
+                        0x00,
+                        ctx->ulAlpnProtocolsCount * sizeof( char * ) );
             }
 
             /* Copy each protocol string. */
             for( ulProtocol = 0; ( ulProtocol < ctx->ulAlpnProtocolsCount - 1 ) ; ulProtocol++ )
             {
-                xLength = strlen( ppcAlpnIn[ ulProtocol ] );
+                xLength = strlen( &ppcAlpnIn[ ulProtocol ] );
 
                 if( NULL == ( ctx->ppcAlpnProtocols[ ulProtocol ] =
                                   ( char * ) pvPortMalloc( 1 + xLength ) ) )
                 {
+                    ctx->ppcAlpnProtocols[ ulProtocol ] = NULL;
                     return SOCKETS_ENOMEM;
                 }
                 else
                 {
                     memcpy( ctx->ppcAlpnProtocols[ ulProtocol ],
-                            ppcAlpnIn[ ulProtocol ],
+                            &ppcAlpnIn[ ulProtocol ],
                             xLength );
                     ctx->ppcAlpnProtocols[ ulProtocol ][ xLength ] = '\0';
                 }
