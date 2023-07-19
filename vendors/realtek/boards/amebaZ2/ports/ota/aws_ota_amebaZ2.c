@@ -35,13 +35,14 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <device_lock.h>
 #include "ota_8710c.h"
 #include "platform_stdlib.h"
+#include "platform_opts.h"
 
 //================================================================================
 
-
 #define AWS_OTA_IMAGE_SIGNATURE_LEN                     32
+#if 0 // move to platform_opts.h
 #define AWS_OTA_IMAGE_STATE_FLASH_OFFSET        0x00003000 // Flash reserved section 0x0000_3000 - 0x0000_4000-1
-
+#endif
 
 extern uint32_t sys_update_ota_get_curr_fw_idx(void);
 extern uint32_t sys_update_ota_prepare_addr(void);

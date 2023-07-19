@@ -46,52 +46,22 @@
 #include "flash_api.h"
 #include <device_lock.h>
 #include "platform_stdlib.h"
+#include "platform_opts.h"
 #include "aws_clientcredential.h"
 
-#if defined(CONFIG_PLATFORM_8195A) || defined(CONFIG_PLATFORM_8711B) || defined(CONFIG_PLATFORM_8721D)
 #define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
 #define pkcs11OBJECT_FLASH_CERT_PRESENT      ( 0x22ABCDEFuL ) //magic number for check flash data
-#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x102000 ) //Flash location for CERT
-#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x103000 ) //Flash location for Priv Key
-#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x104000 ) //Flash location for Pub Key
-#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x105000 ) //Flash location for code verify Key
-
-#elif defined(CONFIG_PLATFORM_8710C)
-
-#define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
-#define pkcs11OBJECT_FLASH_CERT_PRESENT      ( 0x22ABCDEFuL ) //magic number for check flash data
+#if 0 // move to platform_opts.h
 #define pkcs11OBJECT_CERT_FLASH_OFFSET       (0x1D2000) //Flash location for CERT
 #define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   (0x1D3000) //Flash location for Priv Key
 #define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    (0x1D4000) //Flash location for Pub Key
 #define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET (0x1D5000) //Flash location for code verify Key
+#endif
 
 #define FLASH_SECTOR_SIZE		     0x1000
-
 #define FLASH_CHECKSUM_OFFSET  4
 #define FLASH_DATALEN_OFFSET   8
 #define FLASH_DATA_OFFSET     12
-
-#elif defined(CONFIG_PLATFORM_8195B)
-#define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
-#define pkcs11OBJECT_FLASH_CERT_PRESENT      ( 0x22ABCDEFuL ) //magic number for check flash data
-#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x4C0000 ) //Flash location for CERT
-#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x4C1000 ) //Flash location for Priv Key
-#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x4C2000 ) //Flash location for Pub Key
-#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x4C3000 ) //Flash location for code verify Key
-
-#define FLASH_SECTOR_SIZE                       0x1000
-
-/*
- * Flash Format
- * | Flash Mark(4) | checksum(4) | DataLen(4) |  Data |
- */
-#define FLASH_CHECKSUM_OFFSET  4
-#define FLASH_DATALEN_OFFSET   8
-#define FLASH_DATA_OFFSET     12
-
-#else
-#error "This platform is not supported!"
-#endif
 
 //Amazon-FreeRTOS 1.4.6
 
