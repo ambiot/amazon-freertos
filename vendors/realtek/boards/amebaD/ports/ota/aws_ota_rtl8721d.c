@@ -31,9 +31,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "aws_iot_ota_agent_internal.h"
 #include "aws_application_version.h"
 #include "platform_opts.h"
-#if CONFIG_EXAMPLE_AMAZON_AFQP_TESTS
-#include "aws_test_runner_config.h"
-#endif
+
 #include "flash_api.h"
 #include <device_lock.h>
 #include "rtl8721d_ota.h"
@@ -186,8 +184,7 @@ bool_t prvPAL_CreateFileForRx_rtl8721d(OTA_FileContext_t *C)
         aws_ota_imgaddr = C->lFileHandle;
         data = HAL_READ32(SPI_FLASH_BASE, FLASH_SYSTEM_DATA_ADDR);
         OTA_PRINT("[OTA] addr: 0x%08x, data 0x%08x\r\n", aws_ota_imgaddr, data);
-#ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS || testrunnerFULL_OTA_PAL_ENABLED
-#else
+
         device_mutex_lock(RT_DEV_LOCK_FLASH);
         for( i = 0; i < sector_cnt; i++)
         {
@@ -195,7 +192,6 @@ bool_t prvPAL_CreateFileForRx_rtl8721d(OTA_FileContext_t *C)
             flash_erase_sector(&flash, aws_ota_imgaddr - SPI_FLASH_BASE + i * 4096);
 	    }
 		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-#endif
     }
     else {
         OTA_PRINT("[OTA] invalid ota addr (%d) \r\n", C->lFileHandle);
@@ -265,17 +261,6 @@ static OTA_Err_t prvSignatureVerificationUpdate_rtl8721d(OTA_FileContext_t *C, v
         goto error;
     }
 
-#ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS || testrunnerFULL_OTA_PAL_ENABLED
-	/* read flash data back to check signature of the image */
-	for(i=0;i<len;i+=BUF_SIZE){
-		rlen = (len-i)>BUF_SIZE?BUF_SIZE:(len-i);
-		device_mutex_lock(RT_DEV_LOCK_FLASH);
-		flash_stream_read(&flash, addr - SPI_FLASH_BASE+i, rlen, pTempbuf);
-		Cache_Flush();
-		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-		CRYPTO_SignatureVerificationUpdate(pvContext, pTempbuf, rlen);
-	}
-#else
     /*add image signature(81958711)*/
 	CRYPTO_SignatureVerificationUpdate(pvContext, aws_ota_signature, 8);
 
@@ -289,26 +274,6 @@ static OTA_Err_t prvSignatureVerificationUpdate_rtl8721d(OTA_FileContext_t *C, v
     	device_mutex_unlock(RT_DEV_LOCK_FLASH);
 		CRYPTO_SignatureVerificationUpdate(pvContext, pTempbuf, rlen);
     }
-#endif
-
-#if 0
-    /*mask the rdp flash space to read the rdp image and calculate the checksum*/
-    if(aws_ota_target_hdr.RdpStatus == ENABLE) {
-#if 0
-        for(i = 0; i < aws_ota_target_hdr.FileRdpHdr.ImgLen; i++) {
-            flash_stream_read(&flash, RDP_FLASH_ADDR - SPI_FLASH_BASE+i, 1, pTempbuf);
-            Cache_Flush();
-            CRYPTO_SignatureVerificationUpdate(pvContext, pTempbuf, 1);
-        }
-#else
-        OTA_PRINT("OTA RDP not implemented yet\r\n");
-        configASSERT(0);
-        eResult = kOTA_Err_SignatureCheckFailed;
-        goto error;
-#endif
-    }
-    OTF_Mask(1, (addr - SPI_FLASH_BASE), NewImg2BlkSize, 0);
-#endif
 
 error:
     if(pTempbuf)
@@ -318,21 +283,6 @@ error:
 
 #if (defined(__ICCARM__))
 extern void *calloc_freertos(size_t nelements, size_t elementSize);
-#else
-/*
-static void * prvCalloc( size_t xNmemb,
-                         size_t xSize )
-{
-    void * pvNew = pvPortMalloc( xNmemb * xSize );
-
-    if( NULL != pvNew )
-    {
-        memset( pvNew, 0, xNmemb * xSize );
-    }
-
-    return pvNew;
-}
-*/
 #endif
 OTA_Err_t prvPAL_SetPlatformImageState_rtl8721d (OTA_ImageState_t eState);
 OTA_Err_t prvPAL_CheckFileSignature_rtl8721d(OTA_FileContext_t * const C)
@@ -345,8 +295,6 @@ OTA_Err_t prvPAL_CheckFileSignature_rtl8721d(OTA_FileContext_t * const C)
     uint8_t *pucSignerCert = NULL;
 #if (defined(__ICCARM__))
 	mbedtls_platform_set_calloc_free(calloc_freertos, vPortFree);
-#else
-    //mbedtls_platform_set_calloc_free( prvCalloc, vPortFree );
 #endif
 
     while(true)
@@ -423,13 +371,7 @@ OTA_Err_t prvPAL_CloseFile_rtl8721d(OTA_FileContext_t *C)
             eResult = kOTA_Err_SignatureCheckFailed;
         }
     }
-#ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS || testrunnerFULL_OTA_PAL_ENABLED
-	aws_ota_imgaddr = 0;
-    aws_ota_imgsz = 0;
-    aws_ota_target_hdr_get = false;
-    memset((void *)&aws_ota_target_hdr, 0, sizeof(update_ota_target_hdr));
-    memset((void *)aws_ota_signature, 0, sizeof(aws_ota_signature));
-#endif
+
     return eResult;
 }
 
@@ -444,35 +386,14 @@ int16_t prvPAL_WriteBlock_rtl8721d(OTA_FileContext_t *C, int32_t iOffset, uint8_
     uint32_t WriteLen, offset;
     uint32_t version=0,major=0,minor=0,build=0;
 
-#ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS || testrunnerFULL_OTA_PAL_ENABLED
-    OTA_PRINT("[OTA_TEST] Write %d bytes @ 0x%x\n", iBlockSize, address+iOffset);
-    device_mutex_lock(RT_DEV_LOCK_FLASH);
-    FLASH_EraseXIP(EraseSector, C->lFileHandle -SPI_FLASH_BASE);
-    if(ota_writestream_user(address+iOffset, iBlockSize, pacData) < 0){
-        OTA_PRINT("[%s] Write sector failed\n", __FUNCTION__);
-        device_mutex_unlock(RT_DEV_LOCK_FLASH);
-        return -1;
-    }
-    aws_ota_imgsz += iBlockSize;
-    device_mutex_unlock(RT_DEV_LOCK_FLASH);
-	memset((void *)aws_ota_signature, 0, sizeof(aws_ota_signature));
-	memcpy((void *)aws_ota_signature, pacData, sizeof(aws_ota_signature));
-	aws_ota_target_hdr.FileImgHdr[HdrIdx].FlashAddr = C->lFileHandle;
-    return iBlockSize;
-#endif
-
 	if (aws_ota_target_hdr_get != true)
 	{
         u32 RevHdrLen;
         int i;
         if(iOffset == 0)
         {
-            //OTA_PRINT("OTA header not found yet\r\n");
-            //configASSERT(0);
-            //return -1;
 	        wait_target_img = true;
 	        img_sign = 0;
-	        //aws_ota_imgsz = 0;
 	        memset((void *)&aws_ota_target_hdr, 0, sizeof(update_ota_target_hdr));
 	        memset((void *)aws_ota_signature, 0, sizeof(aws_ota_signature));
 	        memcpy((u8*)(&aws_ota_target_hdr.FileHdr), pacData, sizeof(aws_ota_target_hdr.FileHdr));
@@ -526,16 +447,6 @@ int16_t prvPAL_WriteBlock_rtl8721d(OTA_FileContext_t *C, int32_t iOffset, uint8_
 	        NewImg2BlkSize = ((NewImg2Len - 1)/4096) + 1;
 
 	        OTA_PRINT("[OTA][%s] NewImg2BlkSize %d\n", __FUNCTION__, NewImg2BlkSize);
-	        //device_mutex_lock(RT_DEV_LOCK_FLASH);
-	        //for( i = 0; i < NewImg2BlkSize; i++){
-	            //flash_erase_sector(&flash, C->lFileHandle -SPI_FLASH_BASE + i * 4096);
-	        //    FLASH_EraseXIP(EraseSector, C->lFileHandle -SPI_FLASH_BASE + i * 4096);
-	        //    OTA_PRINT("[OTA] Erase sector @ 0x%x\n", C->lFileHandle - SPI_FLASH_BASE + i * 4096);
-	        //}
-	        //device_mutex_unlock(RT_DEV_LOCK_FLASH);
-	        /*the upgrade space should be masked, because the encrypt firmware is used
-	        for checksum calculation*/
-	        //OTF_Mask(1, (C->lFileHandle -SPI_FLASH_BASE), NewImg2BlkSize, 1);
 	        aws_ota_target_hdr_get = true;
         }
         else
@@ -729,46 +640,22 @@ OTA_Err_t prvPAL_SetPlatformImageState_rtl8721d (OTA_ImageState_t eState)
     }
     else if ( eState == eOTA_ImageState_Rejected )
     {
-	/* The image in the program image bank (upper bank) is rejected so mark it invalid.  */
-#if 0
-        /* Copy the descriptor in program bank. */
-        xDescCopy = *pxAppImgDescProgImageBank;
+    	u32 ota_target_reset_index;
+        OTA_LOG_L1( "[%s] Rejecting and invalidating image.\r\n", OTA_METHOD_NAME );
+		if (ota_get_cur_index() == OTA_INDEX_1) {
+			ota_target_reset_index = OTA_INDEX_2;
+		}
+		else {
+			ota_target_reset_index = OTA_INDEX_1;
+		}
 
-        /* Mark the image in program bank as invalid */
-        xDescCopy.xImgHeader.ucImgFlags = AWS_BOOT_FLAG_IMG_INVALID;
+		ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW;
+		device_mutex_lock(RT_DEV_LOCK_FLASH);
+		flash_erase_sector(&flash, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
+		flash_write_word(&flash, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
+		device_mutex_unlock(RT_DEV_LOCK_FLASH);
 
-        if ( AWS_NVM_QuadWordWrite( pxAppImgDescProgImageBank->xImgHeader.ulAlign, xDescCopy.xImgHeader.ulAlign,
-                                    sizeof( xDescCopy ) / AWS_NVM_QUAD_SIZE ) == ( bool_t ) pdTRUE )
-#endif
-        {
-#ifdef AMAZON_FREERTOS_ENABLE_UNIT_TESTS || testrunnerFULL_OTA_PAL_ENABLED
-			ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
-			device_mutex_lock(RT_DEV_LOCK_FLASH);
-    		flash_write_word(&flash, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
-    		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-            eResult = kOTA_Err_None;
-#else
-        	u32 ota_target_reset_index;
-            OTA_LOG_L1( "[%s] Rejecting and invalidating image.\r\n", OTA_METHOD_NAME );
-			if (ota_get_cur_index() == OTA_INDEX_1) {
-				ota_target_reset_index = OTA_INDEX_2;
-			}
-			else {
-				ota_target_reset_index = OTA_INDEX_1;
-			}
-			//device_mutex_lock(RT_DEV_LOCK_FLASH);
-			//OTA_Change(ota_target_reset_index);
-			//device_mutex_unlock(RT_DEV_LOCK_FLASH);
-			//Preventing self timer reset
-			ota_imagestate = AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW;
-			device_mutex_lock(RT_DEV_LOCK_FLASH);
-			flash_erase_sector(&flash, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
-    		flash_write_word(&flash, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, ota_imagestate);
-    		device_mutex_unlock(RT_DEV_LOCK_FLASH);
-
-            eResult = kOTA_Err_None;
-#endif
-        }
+        eResult = kOTA_Err_None;
 #if 0
         else {
             OTA_LOG_L1( "[%s] Reject failed to invalidate the final image (%d).\r\n", OTA_METHOD_NAME,
@@ -779,21 +666,8 @@ OTA_Err_t prvPAL_SetPlatformImageState_rtl8721d (OTA_ImageState_t eState)
     }
     else if ( eState == eOTA_ImageState_Aborted )
     {
-	/* The OTA on program image bank (upper bank) is aborted so mark it as invalid.  */
-#if 0
-        /* Copy the descriptor in program bank. */
-        xDescCopy = *pxAppImgDescProgImageBank;
-
-        /* Mark the image in upper bank as invalid */
-        xDescCopy.xImgHeader.ucImgFlags = AWS_BOOT_FLAG_IMG_INVALID;
-
-        if ( AWS_NVM_QuadWordWrite( pxAppImgDescProgImageBank->xImgHeader.ulAlign, xDescCopy.xImgHeader.ulAlign,
-                                    sizeof (xDescCopy ) / AWS_NVM_QUAD_SIZE ) == ( bool_t ) pdTRUE  )
-#endif
-        {
-            OTA_LOG_L1( "[%s] Aborting and invalidating image.\r\n", OTA_METHOD_NAME );
-            eResult = kOTA_Err_None;
-        }
+        OTA_LOG_L1( "[%s] Aborting and invalidating image.\r\n", OTA_METHOD_NAME );
+        eResult = kOTA_Err_None;
 #if 0
         else {
             OTA_LOG_L1( "[%s] Abort failed to invalidate the final image (%d).\r\n", OTA_METHOD_NAME,
@@ -819,12 +693,7 @@ OTA_PAL_ImageState_t prvPAL_GetPlatformImageState_rtl8721d( void )
 {
     DEFINE_OTA_METHOD_NAME( "prvPAL_GetPlatformImageState_rtl8721d" );
 
-    //OTA_PRINT("[OTA] %s not implemented yet.\r\n", __func__);
-    //BootImageDescriptor_t xDescCopy;
     OTA_PAL_ImageState_t eImageState = eOTA_PAL_ImageState_Unknown;
-    //const BootImageDescriptor_t* pxAppImgDesc;
-    //pxAppImgDesc = ( const BootImageDescriptor_t* ) KVA0_TO_KVA1( pcFlashLowerBankStart ); /*lint !e923 !e9027 !e9029 !e9033 !e9079 !e9078 !e9087 Please see earlier lint comment header. */
-    //xDescCopy = *pxAppImgDesc;
     uint32_t ota_imagestate =  AWS_OTA_IMAGE_STATE_FLAG_IMG_INVALID;
     flash_t flash;
 
