@@ -119,7 +119,7 @@ OTA_Err_t prvPAL_CloseFile( OTA_FileContext_t * const C );
  *
  * @return The number of bytes written on a success, or a negative error code from the platform abstraction layer.
  */
-int16_t prvPAL_WriteBlock( OTA_FileContext_t * const C,
+int32_t prvPAL_WriteBlock( OTA_FileContext_t * const C,
                            uint32_t ulOffset,
                            uint8_t * const pcData,
                            uint32_t ulBlockSize );

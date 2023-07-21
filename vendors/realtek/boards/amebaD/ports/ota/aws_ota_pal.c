@@ -93,7 +93,7 @@ OTA_Err_t prvPAL_Abort_rtl8721d(OTA_FileContext_t *C);
 OTA_Err_t prvPAL_CreateFileForRx_rtl8721d(OTA_FileContext_t *C);
 OTA_Err_t prvPAL_CloseFile_rtl8721d(OTA_FileContext_t *C);
 OTA_Err_t prvPAL_CheckFileSignature_rtl8721d(OTA_FileContext_t * const C);
-int16_t prvPAL_WriteBlock_rtl8721d(OTA_FileContext_t *C, int32_t iOffset, uint8_t* pacData, uint32_t iBlockSize);
+int32_t prvPAL_WriteBlock_rtl8721d(OTA_FileContext_t *C, int32_t iOffset, uint8_t* pacData, uint32_t iBlockSize);
 OTA_Err_t prvPAL_ActivateNewImage_rtl8721d(void);
 OTA_Err_t prvPAL_SetPlatformImageState_rtl8721d (OTA_ImageState_t eState);
 OTA_PAL_ImageState_t prvPAL_GetPlatformImageState_rtl8721d( void );
@@ -116,7 +116,7 @@ OTA_Err_t prvPAL_Abort( OTA_FileContext_t * const C )
 /*-----------------------------------------------------------*/
 
 /* Write a block of data to the specified file. */
-int16_t prvPAL_WriteBlock( OTA_FileContext_t * const C,
+int32_t prvPAL_WriteBlock( OTA_FileContext_t * const C,
                            uint32_t ulOffset,
                            uint8_t * const pacData,
                            uint32_t ulBlockSize )

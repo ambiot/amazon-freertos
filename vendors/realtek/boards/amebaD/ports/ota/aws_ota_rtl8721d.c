@@ -157,19 +157,19 @@ OTA_Err_t prvPAL_Abort_rtl8721d(OTA_FileContext_t *C)
 bool_t prvPAL_CreateFileForRx_rtl8721d(OTA_FileContext_t *C)
 {
 	int sector_cnt = 0;
-        int i=0;
+	int i=0;
 	uint32_t data;
 	flash_t flash;
 
 	if (ota_get_cur_index() == OTA_INDEX_1) {
 		ota_target_index = OTA_INDEX_2;
 		C->lFileHandle = OTA2_FLASH_START_ADDRESS;
-		sector_cnt = ((OTA2_FLASH_SIZE - 1)/4096) + 1;
+		sector_cnt = ((C->ulFileSize - 1) / (1024 * 4)) + 1;
 		OTA_PRINT("\n\r[%s] OTA2 address space will be upgraded\n", __FUNCTION__);
 	} else {
 		ota_target_index = OTA_INDEX_1;
 		C->lFileHandle = OTA1_FLASH_START_ADDRESS;
-		sector_cnt = ((OTA1_FLASH_SIZE - 1)/4096) + 1;
+		sector_cnt = ((C->ulFileSize - 1) / (1024 * 4)) + 1;
 		OTA_PRINT("\n\r[%s] OTA1 address space will be upgraded\n", __FUNCTION__);
 	}
 
@@ -184,14 +184,11 @@ bool_t prvPAL_CreateFileForRx_rtl8721d(OTA_FileContext_t *C)
         aws_ota_imgaddr = C->lFileHandle;
         data = HAL_READ32(SPI_FLASH_BASE, FLASH_SYSTEM_DATA_ADDR);
         OTA_PRINT("[OTA] addr: 0x%08x, data 0x%08x\r\n", aws_ota_imgaddr, data);
-
-        device_mutex_lock(RT_DEV_LOCK_FLASH);
         for( i = 0; i < sector_cnt; i++)
         {
-            OTA_PRINT("[OTA] Erase sector @ 0x%x\n", C->lFileHandle - SPI_FLASH_BASE + i * 4096);
-            flash_erase_sector(&flash, aws_ota_imgaddr - SPI_FLASH_BASE + i * 4096);
+            OTA_PRINT("[OTA] Erase sector_cnt @ 0x%x\n", C->lFileHandle - SPI_FLASH_BASE + i * (1024*4));
+            erase_ota_target_flash(aws_ota_imgaddr - SPI_FLASH_BASE + i * (1024*4), (1024*4));
 	    }
-		device_mutex_unlock(RT_DEV_LOCK_FLASH);
     }
     else {
         OTA_PRINT("[OTA] invalid ota addr (%d) \r\n", C->lFileHandle);
@@ -375,7 +372,7 @@ OTA_Err_t prvPAL_CloseFile_rtl8721d(OTA_FileContext_t *C)
     return eResult;
 }
 
-int16_t prvPAL_WriteBlock_rtl8721d(OTA_FileContext_t *C, int32_t iOffset, uint8_t* pacData, uint32_t iBlockSize)
+int32_t prvPAL_WriteBlock_rtl8721d(OTA_FileContext_t *C, int32_t iOffset, uint8_t* pacData, uint32_t iBlockSize)
 {
     flash_t flash;
     uint32_t address = C->lFileHandle - SPI_FLASH_BASE;
@@ -576,7 +573,7 @@ OTA_Err_t prvPAL_ActivateNewImage_rtl8721d(void)
     OTA_PRINT("[OTA] Resetting MCU to activate new image.\r\n");
     vTaskDelay( 500 );
     prvSysReset_rtl8721d(10);
-    return kOTA_Err_None;
+    //return kOTA_Err_None;
 }
 
 OTA_Err_t prvPAL_ResetDevice_rtl8721d ( void )

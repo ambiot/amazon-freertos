@@ -210,7 +210,7 @@ void vApplicationDaemonTaskStartupHook( void )
         if( SYSTEM_Init() == pdPASS )
         {
             /* Connect to the Wi-Fi before running the tests. */
-            prvWifiConnect();
+            // prvWifiConnect();
 
             /* Provision the device with AWS certificate and private key. */
             vDevModeKeyProvisioning();

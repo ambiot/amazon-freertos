@@ -41,7 +41,7 @@
  *
  * 10 bits yields a data block size of 1KB.
  */
-#define otaconfigLOG2_FILE_BLOCK_SIZE           10UL    /* FIX ME. */
+#define otaconfigLOG2_FILE_BLOCK_SIZE           15UL    /* FIX ME. */
 
 /**
  * @brief Milliseconds to wait for the self test phase to succeed before we force reset.
@@ -59,7 +59,7 @@
 /**
  * @brief The OTA agent task priority. Normally it runs at a low priority.
  */
-#define otaconfigAGENT_PRIORITY                 tskIDLE_PRIORITY + 1   /* FIX ME. */
+#define otaconfigAGENT_PRIORITY                 tskIDLE_PRIORITY + 3   /* FIX ME. */
 
 /**
  * @brief The maximum allowed length of the thing name used by the OTA agent.
@@ -83,7 +83,7 @@
  *  Please note that this must be set larger than zero.
  *
  */
-#define otaconfigMAX_NUM_BLOCKS_REQUEST         32U
+#define otaconfigMAX_NUM_BLOCKS_REQUEST         2U
 
 /**
  * @brief The maximum number of requests allowed to send without a response before we abort.
@@ -100,7 +100,7 @@
  * This configurations parameter sets the maximum number of static data buffers used by
  * the OTA agent for job and file data blocks received.
  */
-#define otaconfigMAX_NUM_OTA_DATA_BUFFERS       4U
+#define otaconfigMAX_NUM_OTA_DATA_BUFFERS       1U
 
 /**
  * @brief Allow update to same or lower version.
