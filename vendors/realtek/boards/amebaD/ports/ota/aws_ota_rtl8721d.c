@@ -455,31 +455,6 @@ int32_t prvPAL_WriteBlock_rtl8721d(OTA_FileContext_t *C, int32_t iOffset, uint8_
     }
 
     OTA_PRINT("[OTA][%s] iFileSize %d, iOffset: 0x%x: iBlockSize: 0x%x\n", __FUNCTION__, C->ulFileSize, iOffset, iBlockSize);
-	if((C->ulFileSize/OTA_FILE_BLOCK_SIZE) == (iOffset/OTA_FILE_BLOCK_SIZE)){
-
-		if(C->pxSignature != NULL && C->pxSignature->usSize > 10 )
-		{
-			OTA_PRINT("[OTA][%s] OTA1 Sig Size is %d\n", __FUNCTION__, C->pxSignature->usSize);
-			#if OTA_DEBUG && OTA_MEMDUMP
-			vMemDump(C->pxSignature->ucData, C->pxSignature->usSize, "AWS_Signature");
-			#endif
-		}
-		else
-		{
-			OTA_PRINT("[OTA] Final block with signature arrived\n");
-			#if OTA_DEBUG && OTA_MEMDUMP
-			vMemDump(pacData, iBlockSize, "Full signature");
-			#endif
-			uint32_t ota_size = iBlockSize-1;
-			OTA_PRINT("[OTA][%s] OTA1 Sig Size is %d\n", __FUNCTION__, ota_size);
-			C->pxSignature->usSize = ota_size;
-			memcpy(C->pxSignature->ucData, pacData, ota_size);
-			#if OTA_DEBUG && OTA_MEMDUMP
-			vMemDump(C->pxSignature->ucData, C->pxSignature->usSize, "Signature Write");
-			#endif
-		}
-	}
-
     if(aws_ota_imgsz >= aws_ota_target_hdr.FileImgHdr[HdrIdx].ImgLen){
         OTA_PRINT("[OTA] image download is already done, dropped, aws_ota_imgsz=0x%X, ImgLen=0x%X\n",aws_ota_imgsz,aws_ota_target_hdr.FileImgHdr[aws_ota_target_hdr.FileHdr.HdrNum].ImgLen);
         return iBlockSize;
