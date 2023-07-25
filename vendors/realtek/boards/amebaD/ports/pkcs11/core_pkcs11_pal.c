@@ -47,14 +47,18 @@
 #include <device_lock.h>
 #include "platform_stdlib.h"
 #include "aws_clientcredential.h"
+#include "platform_opts.h"
 
 #if defined(CONFIG_PLATFORM_8195A) || defined(CONFIG_PLATFORM_8711B) || defined(CONFIG_PLATFORM_8721D)
 #define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
 #define pkcs11OBJECT_FLASH_CERT_PRESENT      ( 0x22ABCDEFuL ) //magic number for check flash data
+
+#if 0 //move to platform_opts.h
 #define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x102000 ) //Flash location for CERT
 #define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x103000 ) //Flash location for Priv Key
 #define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x104000 ) //Flash location for Pub Key
 #define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x105000 ) //Flash location for code verify Key
+#endif
 
 /*
  * Flash Format

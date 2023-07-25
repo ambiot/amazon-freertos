@@ -36,6 +36,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <device_lock.h>
 #include "rtl8721d_ota.h"
 #include "platform_stdlib.h"
+#include "platform_opts.h"
 
 extern void PRCMHibernateCycleTrigger(void);
 extern uint32_t update_ota_prepare_addr(void);
@@ -53,14 +54,10 @@ static update_ota_target_hdr aws_ota_target_hdr;
 static uint8_t aws_ota_signature[9] = {0};
 
 #define OTA1_FLASH_START_ADDRESS 		LS_IMG2_OTA1_ADDR	//0x08006000
-#define OTA1_FLASH_END_ADDRESS 			0x08100000
-#define OTA1_FLASH_SIZE		 			(OTA1_FLASH_END_ADDRESS - OTA1_FLASH_START_ADDRESS-1)
-
 #define OTA2_FLASH_START_ADDRESS 		LS_IMG2_OTA2_ADDR	//0x08106000
-#define OTA2_FLASH_END_ADDRESS 			0x08200000
-#define OTA2_FLASH_SIZE		 			(OTA2_FLASH_END_ADDRESS - OTA2_FLASH_START_ADDRESS-1)
 
-#define AWS_OTA_IMAGE_STATE_FLASH_OFFSET                  ( 0x101000 ) // 0x0810_0000 - 0x0810_2000-1
+//move to platform_opts.h
+//#define AWS_OTA_IMAGE_STATE_FLASH_OFFSET          ( 0x101000 ) // 0x0810_0000 - 0x0810_2000-1
 #define AWS_OTA_IMAGE_STATE_FLAG_IMG_NEW                  0xffffffffU /* 11111111b A new image that hasn't yet been run. */
 #define AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT              0xfffffffeU /* 11111110b Image is pending commit and is ready for self test. */
 #define AWS_OTA_IMAGE_STATE_FLAG_IMG_VALID               0xfffffffcU /* 11111100b The image was accepted as valid by the self test code. */
@@ -531,17 +528,13 @@ OTA_Err_t prvPAL_ActivateNewImage_rtl8721d(void)
             OTA_PRINT("[OTA] [%s], change signature failed\r\n", __FUNCTION__);
             return kOTA_Err_ActivateFailed;
         } else {
-            device_mutex_lock(RT_DEV_LOCK_FLASH);
             flash_erase_sector(&flash, AWS_OTA_IMAGE_STATE_FLASH_OFFSET);
             flash_write_word(&flash, AWS_OTA_IMAGE_STATE_FLASH_OFFSET, AWS_OTA_IMAGE_STATE_FLAG_PENDING_COMMIT);
-            device_mutex_unlock(RT_DEV_LOCK_FLASH);
             OTA_PRINT("[OTA] [%s] Update OTA success!\r\n", __FUNCTION__);
         }
     }else{
         /*if checksum error, clear the signature zone which has been written in flash in case of boot from the wrong firmware*/
-        device_mutex_lock(RT_DEV_LOCK_FLASH);
         flash_erase_sector(&flash, aws_ota_target_hdr.FileImgHdr[HdrIdx].FlashAddr - SPI_FLASH_BASE);
-        device_mutex_unlock(RT_DEV_LOCK_FLASH);
         OTA_PRINT("[OTA] [%s] The checksume is wrong!\n\r", __FUNCTION__);
         return kOTA_Err_ActivateFailed;
     }
