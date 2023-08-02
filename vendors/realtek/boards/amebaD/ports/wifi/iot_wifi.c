@@ -145,6 +145,12 @@ static WIFISecurity_t prvConvertSecurityRTWToAbstracted( rtw_security_t ucSecuri
 
 WIFIReturnCode_t WIFI_On( void )
 {
+    if(rltk_wlan_running(WLAN0_IDX) == 1)
+    {
+        printf("\n\rWIFI is running\n");
+        return eWiFiSuccess;
+    }
+
 #if CONFIG_INIT_NET
 #if CONFIG_LWIP_LAYER
 extern int lwip_init_done;
@@ -180,8 +186,15 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
     //uint32_t ipaddr = 0;
     WIFIIPConfiguration_t xIPInfo;
 
+    if (wifi_is_connected_to_ap() == RTW_SUCCESS)
+    {
+        printf("wifi_is_connected_to_ap\n");
+        return eWiFiSuccess;
+    }
+
     if((pxNetworkParams == NULL) || ((char*)pxNetworkParams->ucSSID == NULL))
-    return eWiFiFailure;
+        return eWiFiFailure;
+
     if((prvConvertSecurityAbstractedToRTW(pxNetworkParams->xSecurity) != RTW_SECURITY_OPEN) && ((char*)pxNetworkParams->xPassword.xWPA.cPassphrase == NULL))
         return eWiFiFailure;
 
