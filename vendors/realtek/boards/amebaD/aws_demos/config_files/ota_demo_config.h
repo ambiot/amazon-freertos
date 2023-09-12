@@ -94,7 +94,7 @@
  * @note Specified in bytes. Must be large enough to hold the maximum
  * anticipated MQTT payload.
  */
-#define MQTT_AGENT_NETWORK_BUFFER_SIZE          ( 5000 ) /* TODO */
+#define MQTT_AGENT_NETWORK_BUFFER_SIZE          ( 1UL << otaconfigLOG2_FILE_BLOCK_SIZE ) + 4096
 
 /**
  * @brief Maximum time MQTT agent waits in the queue for any pending MQTT
