@@ -244,10 +244,10 @@ static BaseType_t prvVerifySignature( char * pcSignerCertificate,
  * Interface routines
  */
 
-void CRYPTO_Init( void )
-{
-    CRYPTO_ConfigureThreading();
-}
+//void CRYPTO_Init( void )
+//{
+//    CRYPTO_ConfigureThreading();
+//}
 
 void CRYPTO_ConfigureThreading( void )
 {

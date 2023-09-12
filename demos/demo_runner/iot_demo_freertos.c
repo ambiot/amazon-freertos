@@ -403,6 +403,7 @@ void runDemoTask( void * pArgument )
  * configTOTAL_HEAP_SIZE configuration constant in FreeRTOSConfig.h.
  *
  */
+#if 0
     void vApplicationMallocFailedHook()
     {
         configPRINT_STRING( ( "ERROR: Malloc failed to allocate memory\r\n" ) );
@@ -413,7 +414,7 @@ void runDemoTask( void * pArgument )
         {
         }
     }
-
+#endif
 /*-----------------------------------------------------------*/
 
 /**
@@ -427,6 +428,7 @@ void runDemoTask( void * pArgument )
  * has occurred.
  *
  */
+#if 0
     void vApplicationStackOverflowHook( TaskHandle_t xTask,
                                         char * pcTaskName )
     {
@@ -442,5 +444,6 @@ void runDemoTask( void * pArgument )
         {
         }
     }
+#endif
 #endif /* iotconfigUSE_PORT_SPECIFIC_HOOKS */
 /*-----------------------------------------------------------*/

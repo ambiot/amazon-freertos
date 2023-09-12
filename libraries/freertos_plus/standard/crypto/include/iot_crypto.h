@@ -38,7 +38,7 @@
 /**
  * @brief Initializes the heap and threading functions for cryptography libraries.
  */
-void CRYPTO_Init( void );
+//void CRYPTO_Init( void );
 
 /**
  * @brief Initializes the mbedTLS mutex functions.
