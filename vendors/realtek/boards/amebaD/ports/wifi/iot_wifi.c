@@ -62,7 +62,7 @@ static int ota_recover = ENABLE;
 static int reconnect_count = 0;
 /*-----------------------------------------------------------*/
 
-static WIFIEventHandler_t xWifiEventHandlers[ eWiFiEventMax ]; 
+static WIFIEventHandler_t xWifiEventHandlers[ eWiFiEventMax ];
 
 static rtw_security_t prvConvertSecurityAbstractedToRTW( WIFISecurity_t xSecurity )
 {
@@ -145,9 +145,9 @@ static WIFISecurity_t prvConvertSecurityRTWToAbstracted( rtw_security_t ucSecuri
 
 WIFIReturnCode_t WIFI_On( void )
 {
-    if(rltk_wlan_running(WLAN0_IDX) == 1)
+    if (wifi_is_connected_to_ap() == RTW_SUCCESS)
     {
-        printf("\n\rWIFI is running\n");
+        printf("wifi_is_connected_to_ap\n");
         return eWiFiSuccess;
     }
 
@@ -199,8 +199,6 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
         return eWiFiFailure;
 
     device_mutex_lock(RT_DEV_LOCK_WLAN);
-    printf("\n\rJoining BSS by SSID %s...\n\r", (char*)pxNetworkParams->ucSSID);
-
 	if(pxNetworkParams->xPassword.xWPA.cPassphrase != NULL)
 	{
     	ret = wifi_connect((char*)pxNetworkParams->ucSSID, prvConvertSecurityAbstractedToRTW(pxNetworkParams->xSecurity), (char*)pxNetworkParams->xPassword.xWPA.cPassphrase,
@@ -211,7 +209,6 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
 		ret = wifi_connect((char*)pxNetworkParams->ucSSID, prvConvertSecurityAbstractedToRTW(pxNetworkParams->xSecurity), (char*)pxNetworkParams->xPassword.xWPA.cPassphrase,
 						pxNetworkParams->ucSSIDLength, 0, -1, NULL);
     }
-
     device_mutex_unlock(RT_DEV_LOCK_WLAN);
 
     if(ret!= RTW_SUCCESS){
@@ -436,7 +433,7 @@ WIFIReturnCode_t WIFI_GetIPInfo( WIFIIPConfiguration_t * pxIPInfo )
 {
     if(pxIPInfo == NULL)
         return eWiFiFailure;
-    
+
     memset( pxIPInfo, 0x00, sizeof( WIFIIPConfiguration_t ) );
 #if (CONFIG_LWIP_LAYER == 1)
 //    uint8_t *ip = (uint8_t *)LwIP_GetIP(&xnetif[0]);
