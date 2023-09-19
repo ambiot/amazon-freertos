@@ -160,7 +160,10 @@ static void prvMiscInitialization( void );
  */
 int aws_main( void )
 {
-   BaseType_t ret;
+    BaseType_t ret;
+
+    /* wait wifi ready */
+    vTaskDelay(5000);
 
     /* Perform any hardware initialization that does not require the RTOS to be
      * running.  */
