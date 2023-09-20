@@ -64,3 +64,6 @@
 [submodule "libraries/Fleet-Provisioning-for-AWS-IoT-embedded-sdk"]
 	path = libraries/fleet-provisioning
 	url = https://github.com/aws/Fleet-Provisioning-for-AWS-IoT-embedded-sdk.git
+[submodule "libraries/llhttp"]
+	path = libraries/llhttp
+	url = https://github.com/nodejs/llhttp.git
