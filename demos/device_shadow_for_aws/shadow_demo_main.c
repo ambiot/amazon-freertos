@@ -366,29 +366,37 @@ static BaseType_t prvWaitForDeleteResponse( MQTTContext_t * pxMQTTContext );
 
 static BaseType_t prvWaitForDeleteResponse( MQTTContext_t * pxMQTTContext )
 {
-    uint8_t ucCount = 0U;
     MQTTStatus_t xMQTTStatus = MQTTSuccess;
     BaseType_t xReturnStatus = pdPASS;
+    uint32_t ulMqttProcessLoopTimeoutTime;
+    uint32_t ulCurrentTime;
 
     assert( pxMQTTContext != NULL );
 
+    ulCurrentTime = pxMQTTContext->getTime();
+    ulMqttProcessLoopTimeoutTime = ulCurrentTime + MQTT_PROCESS_LOOP_TIMEOUT_MS;
+
     while( ( xDeleteResponseReceived != pdTRUE ) &&
-           ( ucCount++ < MQTT_PROCESS_LOOP_DELETE_RESPONSE_COUNT_MAX ) &&
-           ( xMQTTStatus == MQTTSuccess ) )
+           ( ulCurrentTime < ulMqttProcessLoopTimeoutTime ) &&
+           ( xMQTTStatus == MQTTSuccess || xMQTTStatus == MQTTNeedMoreBytes ) )
     {
         /* Event callback will set #xDeleteResponseReceived when receiving an
          * incoming publish on either `delete/accepted` or `delete/rejected`
          * Shadow topics. */
-        xMQTTStatus = MQTT_ProcessLoop( pxMQTTContext, MQTT_PROCESS_LOOP_TIMEOUT_MS );
+        xMQTTStatus = MQTT_ProcessLoop( pxMQTTContext );
+        ulCurrentTime = pxMQTTContext->getTime();
     }
 
     if( ( xMQTTStatus != MQTTSuccess ) || ( xDeleteResponseReceived != pdTRUE ) )
     {
         LogError( ( "MQTT_ProcessLoop failed to receive a response for Shadow delete operation:"
-                    " LoopDuration=%u, MQTT Status=%s.",
-                    ( MQTT_PROCESS_LOOP_TIMEOUT_MS * ucCount ),
+                    " MQTT Status=%s.",
                     MQTT_Status_strerror( xMQTTStatus ) ) );
         xReturnStatus = pdFAIL;
+    }
+	else if( xMQTTStatus == MQTTNeedMoreBytes )
+    {
+        xReturnStatus = pdTRUE;
     }
 
     return xReturnStatus;

@@ -186,7 +186,7 @@
 /**
  * @brief Timeout for MQTT_ProcessLoop in milliseconds.
  */
-#define mqttexamplePROCESS_LOOP_TIMEOUT_MS                ( 700U )
+#define mqttexamplePROCESS_LOOP_TIMEOUT_MS                ( 2000U )
 
 /**
  * @brief The maximum number of times to call MQTT_ProcessLoop() when polling
@@ -228,6 +228,22 @@
  * @brief Milliseconds per FreeRTOS tick.
  */
 #define MILLISECONDS_PER_TICK                             ( MILLISECONDS_PER_SECOND / configTICK_RATE_HZ )
+
+/**
+ * @brief The length of the outgoing publish records array used by the coreMQTT
+ * library to track QoS > 0 packet ACKS for outgoing publishes.
+ * Number of publishes = ulMaxPublishCount * mqttexampleTOPIC_COUNT
+ * Update in ulMaxPublishCount needs updating mqttexampleOUTGOING_PUBLISH_RECORD_LEN.
+ */
+#define mqttexampleOUTGOING_PUBLISH_RECORD_LEN            ( 15U )
+
+/**
+ * @brief The length of the incoming publish records array used by the coreMQTT
+ * library to track QoS > 0 packet ACKS for incoming publishes.
+ * Number of publishes = ulMaxPublishCount * mqttexampleTOPIC_COUNT
+ * Update in ulMaxPublishCount needs updating mqttexampleINCOMING_PUBLISH_RECORD_LEN.
+ */
+#define mqttexampleINCOMING_PUBLISH_RECORD_LEN            ( 15U )
 
 /*-----------------------------------------------------------*/
 
@@ -455,6 +471,24 @@ static MQTTFixedBuffer_t xBuffer =
     ucSharedBuffer,
     democonfigNETWORK_BUFFER_SIZE
 };
+
+/**
+ * @brief Array to track the outgoing publish records for outgoing publishes
+ * with QoS > 0.
+ *
+ * This is passed into #MQTT_InitStatefulQoS to allow for QoS > 0.
+ *
+ */
+static MQTTPubAckInfo_t pOutgoingPublishRecords[ mqttexampleOUTGOING_PUBLISH_RECORD_LEN ];
+
+/**
+ * @brief Array to track the incoming publish records for incoming publishes
+ * with QoS > 0.
+ *
+ * This is passed into #MQTT_InitStatefulQoS to allow for QoS > 0.
+ *
+ */
+static MQTTPubAckInfo_t pIncomingPublishRecords[ mqttexampleINCOMING_PUBLISH_RECORD_LEN ];
 
 /*-----------------------------------------------------------*/
 
@@ -795,10 +829,18 @@ static BaseType_t prvCreateMQTTConnectionWithBroker( MQTTContext_t * pxMQTTConte
     xTransport.pNetworkContext = pxNetworkContext;
     xTransport.send = SecureSocketsTransport_Send;
     xTransport.recv = SecureSocketsTransport_Recv;
+    xTransport.writev = NULL;
 
     /* Initialize MQTT library. */
     xResult = MQTT_Init( pxMQTTContext, &xTransport, prvGetTimeMs, prvEventCallback, &xBuffer );
     configASSERT( xResult == MQTTSuccess );
+
+    xResult = MQTT_InitStatefulQoS( pxMQTTContext,
+                                    pOutgoingPublishRecords,
+                                    mqttexampleOUTGOING_PUBLISH_RECORD_LEN,
+                                    pIncomingPublishRecords,
+                                    mqttexampleINCOMING_PUBLISH_RECORD_LEN );
+
 
     /* Some fields are not used in this demo so start with everything at 0. */
     ( void ) memset( ( void * ) &xConnectInfo, 0x00, sizeof( xConnectInfo ) );
@@ -1180,17 +1222,23 @@ static MQTTStatus_t prvWaitForPacket( MQTTContext_t * pxMQTTContext,
 {
     uint8_t ucCount = 0U;
     MQTTStatus_t xMQTTStatus = MQTTSuccess;
+    uint32_t ulMqttProcessLoopTimeoutTime;
+    uint32_t ulCurrentTime;
+
+    ulCurrentTime = pxMQTTContext->getTime();
+    ulMqttProcessLoopTimeoutTime = ulCurrentTime + mqttexamplePROCESS_LOOP_TIMEOUT_MS;
 
     /* Reset the packet type received. */
     usPacketTypeReceived = 0U;
 
     while( ( usPacketTypeReceived != usPacketType ) &&
-           ( ucCount++ < MQTT_PROCESS_LOOP_PACKET_WAIT_COUNT_MAX ) &&
-           ( xMQTTStatus == MQTTSuccess ) )
+           ( ulCurrentTime < ulMqttProcessLoopTimeoutTime ) &&
+           ( xMQTTStatus == MQTTSuccess || xMQTTStatus == MQTTNeedMoreBytes ) )
     {
         /* Event callback will set #usPacketTypeReceived when receiving appropriate packet. This
          * will wait for at most mqttexamplePROCESS_LOOP_TIMEOUT_MS. */
-        xMQTTStatus = MQTT_ProcessLoop( pxMQTTContext, mqttexamplePROCESS_LOOP_TIMEOUT_MS );
+        xMQTTStatus = MQTT_ProcessLoop( pxMQTTContext );
+        ulCurrentTime = pxMQTTContext->getTime();
     }
 
     if( ( xMQTTStatus != MQTTSuccess ) || ( usPacketTypeReceived != usPacketType ) )
@@ -1199,6 +1247,10 @@ static MQTTStatus_t prvWaitForPacket( MQTTContext_t * pxMQTTContext,
                     usPacketType,
                     ( mqttexamplePROCESS_LOOP_TIMEOUT_MS * ucCount ),
                     MQTT_Status_strerror( xMQTTStatus ) ) );
+    }
+    else if( xMQTTStatus == MQTTNeedMoreBytes )
+    {
+        xMQTTStatus = MQTTSuccess;
     }
 
     return xMQTTStatus;

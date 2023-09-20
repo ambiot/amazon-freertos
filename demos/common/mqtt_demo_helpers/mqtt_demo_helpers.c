@@ -112,7 +112,7 @@
 /**
  * @brief Timeout for MQTT_ProcessLoop in milliseconds.
  */
-#define mqttexamplePROCESS_LOOP_TIMEOUT_MS           ( 500U )
+#define mqttexamplePROCESS_LOOP_TIMEOUT_MS           ( 2000U )
 
 /**
  * @brief The maximum number of times to call MQTT_ProcessLoop() when polling
@@ -156,6 +156,22 @@
  * @brief Milliseconds per FreeRTOS tick.
  */
 #define MILLISECONDS_PER_TICK                        ( MILLISECONDS_PER_SECOND / configTICK_RATE_HZ )
+
+/**
+ * @brief The length of the outgoing publish records array used by the coreMQTT
+ * library to track QoS > 0 packet ACKS for outgoing publishes.
+ * Number of publishes = ulMaxPublishCount * mqttexampleTOPIC_COUNT
+ * Update in ulMaxPublishCount needs updating mqttexampleOUTGOING_PUBLISH_RECORD_LEN.
+ */
+#define mqttexampleOUTGOING_PUBLISH_RECORD_LEN            ( 15U )
+
+/**
+ * @brief The length of the incoming publish records array used by the coreMQTT
+ * library to track QoS > 0 packet ACKS for incoming publishes.
+ * Number of publishes = ulMaxPublishCount * mqttexampleTOPIC_COUNT
+ * Update in ulMaxPublishCount needs updating mqttexampleINCOMING_PUBLISH_RECORD_LEN.
+ */
+#define mqttexampleINCOMING_PUBLISH_RECORD_LEN            ( 15U )
 
 /*-----------------------------------------------------------*/
 
@@ -259,6 +275,24 @@ static bool mqttSessionEstablished = false;
  */
 static SecureSocketsTransportParams_t xSecureSocketsTransportParams;
 
+/**
+ * @brief Array to track the outgoing publish records for outgoing publishes
+ * with QoS > 0.
+ *
+ * This is passed into #MQTT_InitStatefulQoS to allow for QoS > 0.
+ *
+ */
+static MQTTPubAckInfo_t pOutgoingPublishRecords[ mqttexampleOUTGOING_PUBLISH_RECORD_LEN ];
+
+/**
+ * @brief Array to track the incoming publish records for incoming publishes
+ * with QoS > 0.
+ *
+ * This is passed into #MQTT_InitStatefulQoS to allow for QoS > 0.
+ *
+ */
+static MQTTPubAckInfo_t pIncomingPublishRecords[ mqttexampleINCOMING_PUBLISH_RECORD_LEN ];
+
 /*-----------------------------------------------------------*/
 
 /**
@@ -309,6 +343,18 @@ static TransportSocketStatus_t prvConnectToServerWithBackoffRetries( NetworkCont
  */
 static BaseType_t prvWaitForPacket( MQTTContext_t * pxMQTTContext,
                                     uint16_t usPacketType );
+
+/**
+ * @brief Call #MQTT_ProcessLoop in a loop for the duration of a timeout or
+ * #MQTT_ProcessLoop returns a failure.
+ *
+ * @param[in] pMqttContext MQTT context pointer.
+ * @param[in] ulTimeoutMs Duration to call #MQTT_ProcessLoop for.
+ *
+ * @return Returns the return value of the last call to #MQTT_ProcessLoop.
+ */
+static MQTTStatus_t prvProcessLoopWithTimeout( MQTTContext_t * pMqttContext,
+                                               uint32_t ulTimeoutMs );
 
 /**
  * @brief Function to get the free index at which an outgoing publish
@@ -480,14 +526,47 @@ static TransportSocketStatus_t prvConnectToServerWithBackoffRetries( NetworkCont
     return xNetworkStatus;
 }
 
+
+static MQTTStatus_t prvProcessLoopWithTimeout( MQTTContext_t * pMqttContext,
+                                               uint32_t ulTimeoutMs )
+{
+    uint32_t ulMqttProcessLoopTimeoutTime;
+    uint32_t ulCurrentTime;
+
+    MQTTStatus_t eMqttStatus = MQTTSuccess;
+
+    ulCurrentTime = pMqttContext->getTime();
+    ulMqttProcessLoopTimeoutTime = ulCurrentTime + ulTimeoutMs;
+
+    /* Call MQTT_ProcessLoop multiple times a timeout happens, or
+     * MQTT_ProcessLoop fails. */
+    while( ( ulCurrentTime < ulMqttProcessLoopTimeoutTime ) &&
+           ( eMqttStatus == MQTTSuccess || eMqttStatus == MQTTNeedMoreBytes ) )
+    {
+        eMqttStatus = MQTT_ProcessLoop( pMqttContext );
+        ulCurrentTime = pMqttContext->getTime();
+    }
+
+    if( eMqttStatus == MQTTNeedMoreBytes )
+    {
+        eMqttStatus = MQTTSuccess;
+    }
+
+    return eMqttStatus;
+}
+
 /*-----------------------------------------------------------*/
 
 static BaseType_t prvWaitForPacket( MQTTContext_t * pxMQTTContext,
                                     uint16_t usPacketType )
 {
-    uint8_t ucCount = 0U;
     MQTTStatus_t xMQTTStatus = MQTTSuccess;
     BaseType_t xStatus = pdFAIL;
+    uint32_t ulMqttProcessLoopTimeoutTime;
+    uint32_t ulCurrentTime;
+
+    ulCurrentTime = pxMQTTContext->getTime();
+    ulMqttProcessLoopTimeoutTime = ulCurrentTime + mqttexamplePROCESS_LOOP_TIMEOUT_MS;
 
     /* Reset the packet type received. */
     globalPacketTypeReceived = 0U;
@@ -495,21 +574,25 @@ static BaseType_t prvWaitForPacket( MQTTContext_t * pxMQTTContext,
     /* Call MQTT_ProcessLoop multiple times over small timeouts instead of a single
      * large timeout so that we can unblock immediately on receiving the packet. */
     while( ( globalPacketTypeReceived != usPacketType ) &&
-           ( ucCount++ < MQTT_PROCESS_LOOP_PACKET_WAIT_COUNT_MAX ) &&
-           ( xMQTTStatus == MQTTSuccess ) )
+           ( ulCurrentTime < ulMqttProcessLoopTimeoutTime ) &&
+           ( xMQTTStatus == MQTTSuccess || xMQTTStatus == MQTTNeedMoreBytes) )
     {
         /* Event callback will set #usPacketTypeReceived when receiving appropriate packet. This
          * will wait for at most mqttexamplePROCESS_LOOP_TIMEOUT_MS. */
-        xMQTTStatus = MQTT_ProcessLoop( pxMQTTContext, mqttexamplePROCESS_LOOP_TIMEOUT_MS );
+			xMQTTStatus = MQTT_ProcessLoop( pxMQTTContext );
+			ulCurrentTime = pxMQTTContext->getTime();
     }
 
     if( ( xMQTTStatus != MQTTSuccess ) || ( globalPacketTypeReceived != usPacketType ) )
     {
         xStatus = pdFAIL;
-        LogError( ( "MQTT_ProcessLoop failed to receive packet: Packet type=%02X, LoopDuration=%u, Status=%s",
+        LogError( ( "MQTT_ProcessLoop failed to receive packet: Packet type=%02X, Status=%s",
                     usPacketType,
-                    ( mqttexamplePROCESS_LOOP_TIMEOUT_MS * ucCount ),
                     MQTT_Status_strerror( xMQTTStatus ) ) );
+    }
+    else if( xMQTTStatus == MQTTNeedMoreBytes )
+    {
+        xStatus = pdPASS;
     }
     else
     {
@@ -842,6 +925,7 @@ BaseType_t EstablishMqttSession( MQTTContext_t * pxMqttContext,
         xTransport.pNetworkContext = pxNetworkContext;
         xTransport.send = SecureSocketsTransport_Send;
         xTransport.recv = SecureSocketsTransport_Recv;
+        xTransport.writev = NULL;
 
         /* Initialize MQTT library. */
         eMqttStatus = MQTT_Init( pxMqttContext,
@@ -849,6 +933,12 @@ BaseType_t EstablishMqttSession( MQTTContext_t * pxMqttContext,
                                  prvGetTimeMs,
                                  eventCallback,
                                  pxNetworkBuffer );
+
+        eMqttStatus = MQTT_InitStatefulQoS( pxMqttContext,
+                                        pOutgoingPublishRecords,
+                                        mqttexampleOUTGOING_PUBLISH_RECORD_LEN,
+                                        pIncomingPublishRecords,
+                                        mqttexampleINCOMING_PUBLISH_RECORD_LEN );
 
         if( eMqttStatus != MQTTSuccess )
         {
@@ -1105,12 +1195,13 @@ BaseType_t PublishToTopic( MQTTContext_t * pxMqttContext,
              * sends ping request to broker if MQTT_KEEP_ALIVE_INTERVAL_SECONDS
              * has expired since the last MQTT packet sent and receive
              * ping responses. */
-            eMqttStatus = MQTT_ProcessLoop( pxMqttContext, mqttexamplePROCESS_LOOP_TIMEOUT_MS );
+            eMqttStatus = prvProcessLoopWithTimeout( pxMqttContext, mqttexamplePROCESS_LOOP_TIMEOUT_MS );
 
             if( eMqttStatus != MQTTSuccess )
             {
-                LogWarn( ( "MQTT_ProcessLoop returned with status = %s.",
-                           MQTT_Status_strerror( eMqttStatus ) ) );
+                LogError( ( "MQTT_ProcessLoop returned with status = %s.",
+                            MQTT_Status_strerror( eMqttStatus ) ) );
+                xReturnStatus = pdFAIL;
             }
         }
     }
@@ -1126,7 +1217,7 @@ BaseType_t ProcessLoop( MQTTContext_t * pxMqttContext,
     BaseType_t xReturnStatus = pdFAIL;
     MQTTStatus_t eMqttStatus = MQTTSuccess;
 
-    eMqttStatus = MQTT_ProcessLoop( pxMqttContext, ulTimeoutMs );
+    eMqttStatus = prvProcessLoopWithTimeout( pxMqttContext, ulTimeoutMs );
 
     if( eMqttStatus != MQTTSuccess )
     {

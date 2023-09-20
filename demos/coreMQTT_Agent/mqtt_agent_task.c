@@ -512,6 +512,7 @@ static MQTTStatus_t prvMQTTAgentInit( void )
     xTransport.pNetworkContext = &xNetworkContext;
     xTransport.send = SecureSocketsTransport_Send;
     xTransport.recv = SecureSocketsTransport_Recv;
+    xTransport.writev = NULL;
 
     /* Initialize MQTT library. */
     xReturn = MQTTAgent_Init( &xGlobalMqttAgentContext,

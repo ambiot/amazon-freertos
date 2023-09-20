@@ -893,10 +893,20 @@ int RunJobsDemo( bool awsIotMqttMode,
                ( xDemoStatus == pdPASS ) )
         {
             MQTTStatus_t xMqttStatus = MQTTSuccess;
+            uint32_t ulMqttProcessLoopTimeoutTime;
+            uint32_t ulCurrentTime;
 
-            /* Check if we have notification for the next pending job in the queue from the
-             * NextJobExecutionChanged API of the AWS IoT Jobs service. */
-            xMqttStatus = MQTT_ProcessLoop( &xMqttContext, 300U );
+            ulCurrentTime = xMqttContext.getTime();
+            ulMqttProcessLoopTimeoutTime = ulCurrentTime + 300;
+
+            while( ( ulCurrentTime < ulMqttProcessLoopTimeoutTime ) &&
+                   ( xMqttStatus == MQTTSuccess || xMqttStatus == MQTTNeedMoreBytes ) )
+            {
+                /* Check if we have notification for the next pending job in the queue from the
+                  * NextJobExecutionChanged API of the AWS IoT Jobs service. */
+                xMqttStatus = MQTT_ProcessLoop( &xMqttContext );
+                ulCurrentTime = xMqttContext.getTime();
+            }
 
             if( xMqttStatus != MQTTSuccess )
             {
@@ -904,6 +914,11 @@ int RunJobsDemo( bool awsIotMqttMode,
                 LogError( ( "Failed to receive notification about next pending job: "
                             "MQTT_ProcessLoop failed" ) );
             }
+			else if( xMqttStatus == MQTTNeedMoreBytes )
+			{
+				xDemoStatus = pdTRUE;
+			}
+
         }
 
         /* Increment the demo run count. */
