@@ -1,7 +1,3 @@
-[submodule "libraries/3rdparty/unity"]
-	path = libraries/3rdparty/unity
-	url = https://github.com/ThrowTheSwitch/Unity.git
-	branch = v2.4.3
 [submodule "freertos_kernel"]
 	path = freertos_kernel
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
@@ -9,9 +5,6 @@
 	path = libraries/3rdparty/pkcs11
 	url = https://github.com/amazon-freertos/pkcs11.git
 	branch = v2.40_errata01
-[submodule "libraries/3rdparty/lwip"]
-	path = libraries/3rdparty/lwip
-	url = https://github.com/lwip-tcpip/lwip.git
 [submodule "libraries/3rdparty/CMock"]
 	path = libraries/3rdparty/CMock
 	url = https://github.com/ThrowTheSwitch/CMock.git
@@ -58,12 +51,6 @@
 [submodule "libraries/ota_for_aws"]
 	path = libraries/ota_for_aws
 	url = https://github.com/aws/ota-for-aws-iot-embedded-sdk.git
-[submodule "libraries/abstractions/ota_pal_psa"]
-	path = libraries/abstractions/ota_pal_psa
-	url = https://github.com/Linaro/freertos-ota-pal-psa.git
 [submodule "libraries/Fleet-Provisioning-for-AWS-IoT-embedded-sdk"]
 	path = libraries/fleet-provisioning
 	url = https://github.com/aws/Fleet-Provisioning-for-AWS-IoT-embedded-sdk.git
-[submodule "libraries/llhttp"]
-	path = libraries/llhttp
-	url = https://github.com/nodejs/llhttp.git
