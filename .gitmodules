@@ -1,17 +1,10 @@
 [submodule "freertos_kernel"]
 	path = freertos_kernel
 	url = https://github.com/FreeRTOS/FreeRTOS-Kernel.git
-[submodule "libraries/3rdparty/pkcs11"]
-	path = libraries/3rdparty/pkcs11
-	url = https://github.com/amazon-freertos/pkcs11.git
-	branch = v2.40_errata01
 [submodule "libraries/3rdparty/mbedtls"]
 	path = libraries/3rdparty/mbedtls
 	url = https://github.com/ARMmbed/mbedtls.git
 	branch = mbedtls-2.16.8
-[submodule "libraries/abstractions/pkcs11/psa"]
-	path = libraries/abstractions/pkcs11/psa
-	url = https://github.com/Linaro/freertos-pkcs11-psa.git
 [submodule "libraries/coreMQTT"]
 	path = libraries/coreMQTT
 	url = https://github.com/FreeRTOS/coreMQTT.git
@@ -21,9 +14,6 @@
 [submodule "libraries/abstractions/pkcs11/corePKCS11"]
 	path = libraries/abstractions/pkcs11/corePKCS11
 	url = https://github.com/FreeRTOS/corePKCS11.git
-[submodule "libraries/freertos_plus/standard/freertos_plus_tcp"]
-	path = libraries/freertos_plus/standard/freertos_plus_tcp
-	url = https://github.com/FreeRTOS/FreeRTOS-Plus-TCP/
 [submodule "libraries/device_shadow_for_aws"]
 	path = libraries/device_shadow_for_aws
 	url = https://github.com/aws/device-shadow-for-aws-iot-embedded-sdk.git
@@ -39,9 +29,6 @@
 [submodule "libraries/abstractions/backoff_algorithm"]
 	path = libraries/abstractions/backoff_algorithm
 	url = https://github.com/FreeRTOS/backoffAlgorithm.git
-[submodule "tools/litani"]
-	path = tools/litani
-	url = https://github.com/awslabs/aws-build-accumulator
 [submodule "libraries/coreMQTT-Agent"]
 	path = libraries/coreMQTT-Agent
 	url = https://github.com/FreeRTOS/coreMQTT-Agent.git
