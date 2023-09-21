@@ -5,9 +5,6 @@
 	path = libraries/3rdparty/pkcs11
 	url = https://github.com/amazon-freertos/pkcs11.git
 	branch = v2.40_errata01
-[submodule "libraries/3rdparty/CMock"]
-	path = libraries/3rdparty/CMock
-	url = https://github.com/ThrowTheSwitch/CMock.git
 [submodule "libraries/3rdparty/mbedtls"]
 	path = libraries/3rdparty/mbedtls
 	url = https://github.com/ARMmbed/mbedtls.git
@@ -51,6 +48,3 @@
 [submodule "libraries/ota_for_aws"]
 	path = libraries/ota_for_aws
 	url = https://github.com/aws/ota-for-aws-iot-embedded-sdk.git
-[submodule "libraries/Fleet-Provisioning-for-AWS-IoT-embedded-sdk"]
-	path = libraries/fleet-provisioning
-	url = https://github.com/aws/Fleet-Provisioning-for-AWS-IoT-embedded-sdk.git
