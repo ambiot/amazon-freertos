@@ -144,7 +144,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_SaveObject( CK_ATTRIBUTE_PTR pxLabel,
                                         CK_BYTE_PTR pucData,
                                         CK_ULONG ulDataSize )
 {
-    CK_OBJECT_HANDLE xHandle = 0;
+    CK_OBJECT_HANDLE xHandle = eInvalidHandle;
 	uint32_t pcFlashAddr;
 	CK_RV xBytesWritten = 0;
 	CK_ULONG ulFlashMark = pkcs11OBJECT_FLASH_CERT_PRESENT;
@@ -193,7 +193,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 {
 	/* Avoid compiler warnings about unused variables. */
 	( void ) usLength;
-	
+
     CK_OBJECT_HANDLE xHandle = 0;
 	uint32_t pcFlashAddr = 0;
 	flash_t flash;
@@ -212,7 +212,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 		}
 		device_mutex_unlock(RT_DEV_LOCK_FLASH);
 	}
-		
+
     return xHandle;
 }
 
@@ -314,7 +314,6 @@ exit:
     return xReturn;
 }
 
-
 /**
 * @brief Cleanup after PKCS11_GetObjectValue().
 *
@@ -333,6 +332,94 @@ void PKCS11_PAL_GetObjectValueCleanup( CK_BYTE_PTR pucData,
 		vPortFree( pucData );
 }
 
+/* Converts a handle to its respective label. */
+void prvHandleToLabel( char ** pcLabel,
+                       CK_OBJECT_HANDLE xHandle )
+{
+    if( pcLabel != NULL )
+    {
+        switch( xHandle )
+        {
+            case eAwsDeviceCertificate:
+                *pcLabel = ( char * ) pkcs11configLABEL_DEVICE_CERTIFICATE_FOR_TLS;
+                break;
+
+            case eAwsDevicePrivateKey:
+                *pcLabel = ( char * ) pkcs11configLABEL_DEVICE_PRIVATE_KEY_FOR_TLS;
+                break;
+
+            case eAwsDevicePublicKey:
+                *pcLabel = ( char * ) pkcs11configLABEL_DEVICE_PUBLIC_KEY_FOR_TLS;
+                break;
+
+            case eAwsCodeSigningKey:
+                *pcLabel = ( char * ) pkcs11configLABEL_CODE_VERIFICATION_KEY;
+                break;
+
+            default:
+                *pcLabel = NULL;
+                break;
+        }
+    }
+}
+
+CK_RV PKCS11_PAL_DestroyObject( CK_OBJECT_HANDLE xHandle )
+{
+    CK_RV xResult = CKR_OK;
+    CK_BYTE_PTR pxZeroedData = NULL;
+    CK_BYTE_PTR pxObject = NULL;
+    CK_BBOOL xIsPrivate = ( CK_BBOOL ) CK_TRUE;
+    CK_OBJECT_HANDLE xPalHandle2 = CK_INVALID_HANDLE;
+    CK_ULONG ulObjectLength = sizeof( CK_BYTE );
+    char * pcLabel = NULL;
+    CK_ATTRIBUTE xLabel;
+
+    prvHandleToLabel( &pcLabel, xHandle );
+
+    if( pcLabel != NULL )
+    {
+        xLabel.type = CKA_LABEL;
+        xLabel.pValue = pcLabel;
+        xLabel.ulValueLen = strlen( pcLabel );
+
+        xResult = PKCS11_PAL_GetObjectValue( xHandle, &pxObject, &ulObjectLength, &xIsPrivate );
+    }
+    else
+    {
+        xResult = CKR_OBJECT_HANDLE_INVALID;
+    }
+
+    if( xResult == CKR_OK )
+    {
+        /* Some ports return a pointer to memory for which using memset directly won't work. */
+        pxZeroedData = pvPortMalloc( ulObjectLength * sizeof( CK_BYTE ) );
+
+        if( NULL != pxZeroedData )
+        {
+            /* Zero out the object. */
+            ( void ) memset( pxZeroedData, 0x0, ulObjectLength );
+            /* Create an object label attribute. */
+            /* Overwrite the object in NVM with zeros. */
+            xPalHandle2 = PKCS11_PAL_SaveObject( &xLabel, pxZeroedData, ( size_t ) ulObjectLength );
+
+            if( xPalHandle2 != xHandle )
+            {
+                xResult = CKR_GENERAL_ERROR;
+            }
+
+            vPortFree( pxZeroedData );
+        }
+        else
+        {
+            xResult = CKR_HOST_MEMORY;
+        }
+
+        PKCS11_PAL_GetObjectValueCleanup( pxObject, ulObjectLength );
+    }
+
+    return xResult;
+}
+
 #if defined(MBEDTLS_ENTROPY_HARDWARE_ALT)
 extern int rtw_get_random_bytes(void* dst, u32 size);
 int mbedtls_hardware_poll( void * data,
@@ -342,7 +429,7 @@ int mbedtls_hardware_poll( void * data,
 {
     rtw_get_random_bytes(output, len);
     *olen = len;
-	
+
     return 0;
 }
 #endif
