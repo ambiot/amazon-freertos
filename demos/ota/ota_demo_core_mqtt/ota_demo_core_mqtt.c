@@ -1798,7 +1798,7 @@ static BaseType_t prvRunOTADemo( void )
     if( ( xOtaError = OTA_Init( &xOtaBuffer,
                                 &xOtaInterfaces,
                                 ( const uint8_t * ) ( democonfigCLIENT_IDENTIFIER ),
-                                prvOtaAppCallback ) ) != OtaErrNone )
+                                (OtaAppCallback_t) prvOtaAppCallback ) ) != OtaErrNone )
     {
         LogError( ( "Failed to initialize OTA Agent, exiting = %u.",
                     xOtaError ) );
