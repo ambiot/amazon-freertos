@@ -285,7 +285,7 @@ static rtw_result_t aws_scan_result_handler( rtw_scan_handler_result_t* malloced
         ApNum = 0;
         if(malloced_scan_result->user_data) {
             scan_param = (WIFIScanParam_t *) malloced_scan_result->user_data;
-            rtw_up_sema(&scan_param->xScanSemaphore);
+            rtw_up_sema((_sema*)&scan_param->xScanSemaphore);
         }
     }
     return RTW_SUCCESS;
@@ -305,14 +305,14 @@ WIFIReturnCode_t WIFI_Scan( WIFIScanResult_t * pxBuffer,
     //if (xSemaphoreTake(g_wifi_semaph, portMAX_DELAY) == pdTRUE)
     //{}
     if (scan_param.xScanSemaphore== NULL)
-        rtw_init_sema(&scan_param.xScanSemaphore, 0);
+        rtw_init_sema((_sema*)&scan_param.xScanSemaphore, 0);
     scan_param.pxBuffer = pxBuffer;
     scan_param.ucNumNetworks = ucNumNetworks;
     if((ret = wifi_scan_networks(aws_scan_result_handler, &scan_param)) != RTW_SUCCESS){
         printf("wifi scan failed\n\r");
         goto exit;
     }
-    rtw_down_timeout_sema(&scan_param.xScanSemaphore, 5000);
+    rtw_down_timeout_sema((_sema*)&scan_param.xScanSemaphore, 5000);
     return eWiFiSuccess;
 exit:
     return eWiFiFailure;
