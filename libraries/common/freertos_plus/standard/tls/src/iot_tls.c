@@ -1006,6 +1006,7 @@ BaseType_t TLS_Connect( void * pvContext )
     /* Free up allocated memory. */
     mbedtls_x509_crt_free( &pxCtx->xMbedX509CA );
     mbedtls_x509_crt_free( &pxCtx->xMbedX509Cli );
+    mbedtls_pk_free( &pxCtx->xMbedPkCtx );
 
     return xResult;
 }
