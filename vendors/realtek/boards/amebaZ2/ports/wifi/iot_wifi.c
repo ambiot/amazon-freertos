@@ -58,8 +58,6 @@ typedef struct {
 } WIFIScanParam_t;
 
 //static IotNetworkStateChangeEventCallback_t xEventCallback = NULL;
-static int ota_recover = ENABLE;
-static int reconnect_count = 0;
 /*-----------------------------------------------------------*/
 
 static WIFIEventHandler_t xWifiEventHandlers[ eWiFiEventMax ];
@@ -212,22 +210,9 @@ WIFIReturnCode_t WIFI_ConnectAP( const WIFINetworkParams_t * const pxNetworkPara
 
         printf("\n\rERROR: Can't connect to AP");
         ret = eWiFiFailure;
-        if(ota_recover==1)
-        {
-			if(reconnect_count>=5)
-			{
-				printf("sys_recover_ota_signature.\n");
-				sys_recover_ota_signature();
-				printf("watchdog_start : 60s\n");
-				watchdog_init(60000);
-				watchdog_start();
-			}
-			reconnect_count++;
-        }
     }
     else
     {
-		reconnect_count=0;
 #if CONFIG_LWIP_LAYER
 		LwIP_DHCP(0, DHCP_START);
 #endif
