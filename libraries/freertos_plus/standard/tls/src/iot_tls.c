@@ -628,6 +628,8 @@ static int prvInitializeClientCredential( TLSContext_t * pxCtx )
 }
 
 /* development mode - parse key from plain text code */
+#define KEY_WITHOUT_PKCS11 0
+#if KEY_WITHOUT_PKCS11
 static int prvInitializeClientCredential_alt( TLSContext_t * pxCtx )
 {
     BaseType_t xResult = CKR_OK;
@@ -660,7 +662,7 @@ static int prvInitializeClientCredential_alt( TLSContext_t * pxCtx )
 
     return xResult;
 }
-
+#endif
 /*-----------------------------------------------------------*/
 
 /**
@@ -892,7 +894,7 @@ BaseType_t TLS_Connect( void * pvContext )
         /* Set issuer certificate. */
         mbedtls_ssl_conf_ca_chain( &pxCtx->xMbedSslConfig, &pxCtx->xMbedX509CA, NULL );
 
-#if 1
+#if !KEY_WITHOUT_PKCS11
         /* Configure the SSL context to contain device credentials (eg device cert
          * and private key) obtained from the PKCS #11 layer.  The result of
          * loading device key and certificate is placed in a separate variable
@@ -1007,6 +1009,9 @@ BaseType_t TLS_Connect( void * pvContext )
     mbedtls_x509_crt_free( &pxCtx->xMbedX509CA );
     mbedtls_x509_crt_free( &pxCtx->xMbedX509Cli );
 
+    #if KEY_WITHOUT_PKCS11
+    mbedtls_pk_free( &pxCtx->xMbedPkCtx );
+    #endif
     return xResult;
 }
 
