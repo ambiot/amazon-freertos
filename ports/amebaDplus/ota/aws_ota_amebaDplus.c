@@ -45,7 +45,7 @@ static bool aws_ota_target_hdr_get = false;
 static uint32_t ota_target_index = OTA_INDEX_2;
 static uint32_t HdrIdx = 0;
 static update_ota_target_hdr aws_ota_target_hdr;
-static update_manifest_info aws_manifest;
+update_manifest_info aws_manifest;
 static bool aws_manifest_get = false;
 
 
@@ -272,7 +272,7 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_rtl8721d(OtaFileContext_t *
     flash_t flash;
     u8 * pTempbuf;
     int rlen;
-    u32 len = aws_ota_imgsz - sizeof(update_manifest_info);
+    u32 len = aws_ota_imgsz;
     u32 addr = ota_ctx.lFileHandle;//aws_ota_target_hdr.FileImgHdr[HdrIdx].FlashAddr;
 
     if(len <= 0) {
@@ -286,6 +286,30 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_rtl8721d(OtaFileContext_t *
         goto error;
     }
 
+    /*handle manifest */
+    memcpy(&aws_ota_target_hdr.Manifest[HdrIdx], &aws_manifest, sizeof(update_manifest_info));
+    CRYPTO_SignatureVerificationUpdate(pvContext, &aws_ota_target_hdr.Manifest[HdrIdx], sizeof(update_manifest_info));
+
+    printf("[%d]manifest\n",HdrIdx);
+    for (int i = 0; i < sizeof(update_manifest_info); i++) {
+        printf("0x%x ",*((u8 *)&aws_ota_target_hdr.Manifest[HdrIdx] + i));
+    }
+    printf("\n");
+
+    len = len - sizeof(update_manifest_info);
+    /* read flash data back to check signature of the image */
+    for (i = 0; i < len; i += BUF_SIZE) {
+        rlen = (len - i) > BUF_SIZE ? BUF_SIZE : (len - i);
+        device_mutex_lock(RT_DEV_LOCK_FLASH);
+        flash_stream_read(&flash, addr - SPI_FLASH_BASE + i + sizeof(update_manifest_info), rlen, pTempbuf);
+    #if OTA_MEMDUMP
+        vMemDump(addr - SPI_FLASH_BASE + i + sizeof(update_manifest_info), pTempbuf, rlen, "PAYLOAD1");
+    #endif
+        device_mutex_unlock(RT_DEV_LOCK_FLASH);
+        CRYPTO_SignatureVerificationUpdate(pvContext, pTempbuf, rlen);
+    }
+
+#if 0
     /* read certificate first */
     /* read flash data back to check signature of the image */
     for(i=0; i < 0x1000; i += BUF_SIZE){
@@ -324,6 +348,7 @@ static OtaPalStatus_t prvSignatureVerificationUpdate_rtl8721d(OtaFileContext_t *
         device_mutex_unlock(RT_DEV_LOCK_FLASH);
         CRYPTO_SignatureVerificationUpdate(pvContext, pTempbuf, rlen);
     }
+#endif
 
 error:
     if(pTempbuf)
@@ -473,9 +498,9 @@ int32_t prvPAL_WriteBlock_rtl8721d(OtaFileContext_t *C, uint32_t ulOffset, uint8
         {
              OTA_PRINT("[OTA] manifest data arrived \n");
              //Save manifest
-             memcpy(&aws_manifest, pData+0x1000, sizeof(update_manifest_info));
+             memcpy(&aws_manifest, pData, sizeof(update_manifest_info));
              //Erase manifest for protect shutdown while ota downloading
-             memset(pData+0x1000, 0xff, sizeof(update_manifest_info));
+             memset(pData, 0xff, sizeof(update_manifest_info));
 
              printf("[%d]manifest\n",HdrIdx);
              for (int i = 0; i < sizeof(update_manifest_info); i++) {
@@ -548,8 +573,8 @@ OtaPalStatus_t prvPAL_ActivateNewImage_rtl8721d(void)
     OTA_PRINT("[OTA] FirmwareSize = %d, OtaTargetHdr.FileImgHdr.ImgLen = %d\n", aws_ota_imgsz, aws_ota_target_hdr.FileImgHdr[HdrIdx].ImgLen);
 
     /*------------- verify checksum and update signature-----------------*/
-    if(verify_ota_checksum(&aws_ota_target_hdr, ota_target_index, 0/*header index*/)){
-        if(!ota_update_manifest(&aws_ota_target_hdr, ota_target_index, 0/*header index*/)) {
+    if(verify_ota_checksum_aws(&aws_ota_target_hdr, ota_target_index, 0/*header index*/)){
+        if(!ota_update_manifest_aws(&aws_ota_target_hdr, ota_target_index, 0/*header index*/)) {
             OTA_PRINT("[OTA] [%s], change signature failed\r\n", __FUNCTION__);
             return OTA_PAL_COMBINE_ERR( OtaPalActivateFailed, 0 );
         } else {
