@@ -73,7 +73,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer. <br>
  */
-#define otaconfigLOG2_FILE_BLOCK_SIZE           13UL /* TODO */
+#define otaconfigLOG2_FILE_BLOCK_SIZE           13UL
 
 /**
  * @brief Size of the file data block message (excluding the header).
@@ -161,7 +161,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer. <br>
  */
-#define otaconfigMAX_NUM_OTA_DATA_BUFFERS       otaconfigMAX_NUM_BLOCKS_REQUEST + 1 /* TODO */
+#define otaconfigMAX_NUM_OTA_DATA_BUFFERS       otaconfigMAX_NUM_BLOCKS_REQUEST + 1
 
 /**
  * @brief Flag to enable booting into updates that have an identical or lower
