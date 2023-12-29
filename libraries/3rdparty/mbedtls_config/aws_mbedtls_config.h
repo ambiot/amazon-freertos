@@ -60,6 +60,11 @@
 #define _CRT_SECURE_NO_DEPRECATE 1
 #endif
 
+#define MBEDTLS_VERSION_CONVERT(a,b,c)	(((a) << 16) + ((b) << 8) + (c))
+#ifndef MBEDTLS_VERSION
+#define MBEDTLS_VERSION		MBEDTLS_VERSION_CONVERT(2,28,1)
+#endif
+
 /**
  * \name SECTION: System support
  *
