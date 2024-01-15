@@ -310,7 +310,7 @@
  *
  * Uncomment to get errors on using deprecated functions.
  */
-#define MBEDTLS_DEPRECATED_REMOVED
+//#define MBEDTLS_DEPRECATED_REMOVED
 
 /**
  * \def MBEDTLS_CHECK_PARAMS
