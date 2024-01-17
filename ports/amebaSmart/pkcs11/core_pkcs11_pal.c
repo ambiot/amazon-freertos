@@ -46,7 +46,7 @@
 #include "flash_api.h"
 #include <device_lock.h>
 #include "platform_stdlib.h"
-#include "platform_opts_np.h"
+#include "platform_opts.h"
 #include "aws_clientcredential.h"
 
 #define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
@@ -193,7 +193,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 {
 	/* Avoid compiler warnings about unused variables. */
 	( void ) usLength;
-	
+
     CK_OBJECT_HANDLE xHandle = 0;
 	uint32_t pcFlashAddr = 0;
 	flash_t flash;
@@ -212,7 +212,7 @@ CK_OBJECT_HANDLE PKCS11_PAL_FindObject( CK_BYTE_PTR pxLabel,
 		}
 		device_mutex_unlock(RT_DEV_LOCK_FLASH);
 	}
-		
+
     return xHandle;
 }
 
@@ -429,7 +429,7 @@ int mbedtls_hardware_poll( void * data,
 {
     rtw_get_random_bytes(output, len);
     *olen = len;
-	
+
     return 0;
 }
 #endif
