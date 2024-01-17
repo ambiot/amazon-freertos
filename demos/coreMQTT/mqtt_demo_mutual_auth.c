@@ -547,6 +547,17 @@ int RunCoreMqttMutualAuthDemo( bool awsIotMqttMode,
     {
         /****************************** Connect. ******************************/
 
+        /* Wait for Networking */
+        if( wifi_is_connected_to_ap() != 0 /*RTW_SUCCESS*/ )
+        {
+            LogInfo( ( "Waiting for the network link up event..." ) );
+
+            while( wifi_is_connected_to_ap() != 0 /*RTW_SUCCESS*/ )
+            {
+                vTaskDelay( pdMS_TO_TICKS( 1000U ) );
+            }
+        }
+
         /* Attempt to establish TLS session with MQTT broker. If connection fails,
          * retry after a timeout. Timeout value will be exponentially increased until
          * the maximum number of attempts are reached or the maximum timeout value is reached.
