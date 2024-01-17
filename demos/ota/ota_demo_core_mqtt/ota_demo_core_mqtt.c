@@ -245,7 +245,7 @@
 /**
  * @brief Priority required for OTA agent task.
  */
-#define otaexampleAGENT_TASK_PRIORITY               ( tskIDLE_PRIORITY )
+#define otaexampleAGENT_TASK_PRIORITY               ( tskIDLE_PRIORITY + 1 )
 
 /**
  * @brief The number of ticks to wait for the OTA Agent to complete the shutdown.
@@ -316,7 +316,7 @@
 /**
  * @brief Priority required for OTA statistics task.
  */
-#define MQTT_AGENT_TASK_PRIORITY                    ( tskIDLE_PRIORITY )
+#define MQTT_AGENT_TASK_PRIORITY                    ( tskIDLE_PRIORITY + 1 )
 
 /**
  * @brief The maximum amount of time in milliseconds to wait for the commands
@@ -1246,11 +1246,15 @@ static MQTTStatus_t prvMqttAgentInit( void )
     static StaticQueue_t xStaticQueueStructure;
 
     LogDebug( ( "Creating command queue." ) );
+#ifdef CONFIG_PLATFORM_AMEBAD2
+    xCommandQueue.queue = xQueueCreate( MQTT_AGENT_COMMAND_QUEUE_LENGTH,
+                                        sizeof( MQTTAgentCommand_t * ) );
+#else
     xCommandQueue.queue = xQueueCreateStatic( MQTT_AGENT_COMMAND_QUEUE_LENGTH,
                                               sizeof( MQTTAgentCommand_t * ),
                                               ucStaticQueueStorageArea,
                                               &xStaticQueueStructure );
-
+#endif
     /* Initialize the agent task pool. */
     Agent_InitializePool();
 
@@ -1897,6 +1901,17 @@ int RunOtaCoreMqttDemo( bool xAwsIotMqttMode,
 
     BaseType_t xDemoStatus = pdFAIL;
     BaseType_t xMqttInitialized = pdFALSE;
+
+    /* Wait for Networking */
+    if( wifi_is_connected_to_ap() != 0 /*RTW_SUCCESS*/ )
+    {
+        LogInfo( ( "Waiting for the network link up event..." ) );
+
+        while( wifi_is_connected_to_ap() != 0 /*RTW_SUCCESS*/ )
+        {
+            vTaskDelay( pdMS_TO_TICKS( 1000U ) );
+        }
+    }
 
     LogInfo( ( "OTA over MQTT demo, Application version %u.%u.%u",
                appFirmwareVersion.u.x.major,

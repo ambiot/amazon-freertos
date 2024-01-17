@@ -30,7 +30,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include "ota_config.h"
 #include "iot_crypto.h"
 #include "core_pkcs11.h"
-#include "platform_opts_np.h"
+#include "platform_opts.h"
 #include "osdep_service.h"
 #include "flash_api.h"
 #include <device_lock.h>

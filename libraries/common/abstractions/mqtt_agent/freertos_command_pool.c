@@ -79,10 +79,16 @@ void Agent_InitializePool( void )
     if( initStatus == QUEUE_NOT_INITIALIZED )
     {
         memset( ( void * ) commandStructurePool, 0x00, sizeof( commandStructurePool ) );
+
+#ifdef CONFIG_PLATFORM_AMEBAD2
+        commandStructMessageCtx.queue = xQueueCreate( MQTT_COMMAND_CONTEXTS_POOL_SIZE,
+                                                      sizeof( MQTTAgentCommand_t * ) );
+#else
         commandStructMessageCtx.queue = xQueueCreateStatic( MQTT_COMMAND_CONTEXTS_POOL_SIZE,
                                                             sizeof( MQTTAgentCommand_t * ),
                                                             staticQueueStorageArea,
                                                             &staticQueueStructure );
+#endif
         configASSERT( commandStructMessageCtx.queue );
 
         /* Populate the queue. */

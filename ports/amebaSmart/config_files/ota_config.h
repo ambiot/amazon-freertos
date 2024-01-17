@@ -73,7 +73,7 @@
  *
  * <b>Possible values:</b> Any unsigned 32 integer. <br>
  */
-#define otaconfigLOG2_FILE_BLOCK_SIZE           13UL
+#define otaconfigLOG2_FILE_BLOCK_SIZE           14UL
 
 /**
  * @brief Size of the file data block message (excluding the header).

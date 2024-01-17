@@ -48,7 +48,11 @@ extern int RunCoreMqttMutualAuthDemo( bool awsIotMqttMode,
                                       void * pNetworkCredentialInfo,
                                       const IotNetworkInterface_t * pNetworkInterface );
 
-
+extern int RunOtaCoreMqttDemo( bool xAwsIotMqttMode,
+                               const char * pIdentifier,
+                               void * pNetworkServerInfo,
+                               void * pNetworkCredentialInfo,
+                               const IotNetworkInterface_t * pxNetworkInterface );
 /*-----------------------------------------------------------*/
 /**
  * @brief Application runtime entry point.
@@ -63,6 +67,7 @@ int aws_main( void )
     CRYPTO_ConfigureThreading();
 
     RunCoreMqttMutualAuthDemo(0, NULL, NULL, NULL, NULL);
+    //RunOtaCoreMqttDemo(0, NULL, NULL, NULL, NULL);
 
     return 0;
 }
