@@ -48,17 +48,23 @@ extern int RunCoreMqttMutualAuthDemo( bool awsIotMqttMode,
                                       void * pNetworkCredentialInfo,
                                       const IotNetworkInterface_t * pNetworkInterface );
 
+extern int RunCoreHttpMutualAuthDemo( bool awsIotMqttMode,
+                                      const char * pIdentifier,
+                                      void * pNetworkServerInfo,
+                                      void * pNetworkCredentialInfo,
+                                      const IotNetworkInterface_t * pNetworkInterface );
+
 extern int RunDeviceShadowDemo( bool awsIotMqttMode,
-                         const char * pIdentifier,
-                         void * pNetworkServerInfo,
-                         void * pNetworkCredentialInfo,
-                         const void * pNetworkInterface );
+                                const char * pIdentifier,
+                                void * pNetworkServerInfo,
+                                void * pNetworkCredentialInfo,
+                                const void * pNetworkInterface );
 
 extern int RunDeviceDefenderDemo( bool awsIotMqttMode,
-                           const char * pIdentifier,
-                           void * pNetworkServerInfo,
-                           void * pNetworkCredentialInfo,
-                           const void * pNetworkInterface );
+                                  const char * pIdentifier,
+                                  void * pNetworkServerInfo,
+                                  void * pNetworkCredentialInfo,
+                                  const void * pNetworkInterface );
 
 
 extern int RunOtaCoreMqttDemo( bool xAwsIotMqttMode,
@@ -79,9 +85,19 @@ int aws_main( void )
 
     CRYPTO_ConfigureThreading();
 
+    //mqtt mutual auto demo
     RunCoreMqttMutualAuthDemo(0, NULL, NULL, NULL, NULL);
+
+    //http mutual auto demo
+    //RunCoreHttpMutualAuthDemo(0, NULL, NULL, NULL, NULL);
+
+    //device shadow demo
     //RunDeviceShadowDemo(0, NULL, NULL, NULL, NULL);
+
+    //device defender demo
     //RunDeviceDefenderDemo(0, NULL, NULL, NULL, NULL);
+
+    // ota over mqtt demo
     //RunOtaCoreMqttDemo(0, NULL, NULL, NULL, NULL);
 
     return 0;
