@@ -63,8 +63,6 @@
 #define FLASH_DATALEN_OFFSET   8
 #define FLASH_DATA_OFFSET     12
 
-//Amazon-FreeRTOS 1.4.6
-
 enum eObjectHandles
 {
     eInvalidHandle = 0, /* According to PKCS #11 spec, 0 is never a valid object handle. */
