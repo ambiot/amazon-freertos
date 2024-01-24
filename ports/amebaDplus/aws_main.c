@@ -35,8 +35,8 @@
 /* AWS library includes. */
 #include "iot_logging_task.h"
 #include "iot_wifi.h"
+#include "iot_crypto.h"
 #include "aws_clientcredential.h"
-#include "aws_dev_mode_key_provisioning.h"
 
 /* Logging Task Defines. */
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 15 )
