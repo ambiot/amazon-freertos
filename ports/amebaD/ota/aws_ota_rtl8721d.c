@@ -408,6 +408,7 @@ int32_t prvPAL_WriteBlock_rtl8721d(OtaFileContext_t *C, uint32_t ulOffset, uint8
 	uint32_t address = ota_ctx.lFileHandle - SPI_FLASH_BASE;
 	static uint32_t img_sign = 0;
 	uint32_t WriteLen, offset;
+	uint32_t version=0, major=0, minor=0, build=0;
 
 	if (aws_ota_target_hdr_get != true)
 	{
@@ -441,6 +442,20 @@ int32_t prvPAL_WriteBlock_rtl8721d(OtaFileContext_t *C, uint32_t ulOffset, uint8
 			printf("aws_ota_target_hdr.FileImgHdr[%d].FlashAddr=0x%08X\n",HdrIdx, aws_ota_target_hdr.FileImgHdr[HdrIdx].FlashAddr);
 			printf("aws_ota_target_hdr.ValidImgCnt=%d\n",aws_ota_target_hdr.ValidImgCnt);
 #endif
+			version = aws_ota_target_hdr.FileHdr.FwVer;
+			major = version / 1000000;
+			minor = (version - (major*1000000)) / 1000;
+			build = (version - (major*1000000) - (minor * 1000))/1;
+			if( aws_ota_target_hdr.FileHdr.FwVer <= (APP_VERSION_MAJOR*1000000 + APP_VERSION_MINOR * 1000 + APP_VERSION_BUILD))
+			{
+				OTA_PRINT("\nOTA failed!!!\n");
+				OTA_PRINT("New Firmware version(%d,%d,%d) must greater than current firmware version(%d,%d,%d)\n\n",major,minor,build,APP_VERSION_MAJOR,APP_VERSION_MINOR,APP_VERSION_BUILD);
+				return -1;
+			}
+			else
+			{
+				OTA_PRINT("New Firmware version (%d,%d,%d), current firmware version(%d,%d,%d)\n",major,minor,build,APP_VERSION_MAJOR,APP_VERSION_MINOR,APP_VERSION_BUILD);
+			}
 			aws_ota_target_hdr_get = true;
 		}
 		else
