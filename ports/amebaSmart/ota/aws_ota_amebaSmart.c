@@ -190,6 +190,13 @@ bool prvPAL_CreateFileForRx_rtl8721d(OtaFileContext_t *C)
 
     uint32_t ImgId = OTA_IMGID_APP;
 
+    flash_get_layout_info(IMG_BOOT, &IMG_ADDR[OTA_IMGID_BOOT][OTA_INDEX_1], NULL);
+    flash_get_layout_info(IMG_BOOT_OTA2, &IMG_ADDR[OTA_IMGID_BOOT][OTA_INDEX_2], NULL);
+    flash_get_layout_info(IMG_APP_OTA1, &IMG_ADDR[OTA_IMGID_APP][OTA_INDEX_1], NULL);
+    flash_get_layout_info(IMG_APP_OTA2, &IMG_ADDR[OTA_IMGID_APP][OTA_INDEX_2], NULL);
+    flash_get_layout_info(IMG_APIMG_OTA1, &IMG_ADDR[OTA_IMGID_APIMG][OTA_INDEX_1], NULL);
+    flash_get_layout_info(IMG_APIMG_OTA2, &IMG_ADDR[OTA_IMGID_APIMG][OTA_INDEX_2], NULL);
+
     if (ota_get_cur_index(ImgId) == OTA_INDEX_1)
         ota_target_index = OTA_INDEX_2;
     else
@@ -573,8 +580,8 @@ OtaPalStatus_t prvPAL_ActivateNewImage_rtl8721d(void)
     OTA_PRINT("[OTA] FirmwareSize = %d, OtaTargetHdr.FileImgHdr.ImgLen = %d\n", aws_ota_imgsz, aws_ota_target_hdr.FileImgHdr[HdrIdx].ImgLen);
 
     /*------------- verify checksum and update signature-----------------*/
-    if(verify_ota_checksum_aws(&aws_ota_target_hdr, ota_target_index, 0/*header index*/)){
-        if(!ota_update_manifest_aws(&aws_ota_target_hdr, ota_target_index, 0/*header index*/)) {
+    if(verify_ota_checksum(&aws_ota_target_hdr, ota_target_index, 0/*header index*/)){
+        if(!ota_update_manifest(&aws_ota_target_hdr, ota_target_index, 0/*header index*/)) {
             OTA_PRINT("[OTA] [%s], change signature failed\r\n", __FUNCTION__);
             return OTA_PAL_COMBINE_ERR( OtaPalActivateFailed, 0 );
         } else {
