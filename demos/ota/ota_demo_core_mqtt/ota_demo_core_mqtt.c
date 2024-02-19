@@ -245,7 +245,7 @@
 /**
  * @brief Priority required for OTA agent task.
  */
-#define otaexampleAGENT_TASK_PRIORITY               ( tskIDLE_PRIORITY + 1 )
+#define otaexampleAGENT_TASK_PRIORITY               ( tskIDLE_PRIORITY + 2 )
 
 /**
  * @brief The number of ticks to wait for the OTA Agent to complete the shutdown.
