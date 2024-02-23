@@ -170,4 +170,7 @@
  */
 #define pkcs11configLABEL_ROOT_CERTIFICATE                 "Root Cert"
 
+/* development mode - parse key from plain text code */
+#define KEY_PLAINTEXT	1
+
 #endif /* _AWS_PKCS11_CONFIG_H_ include guard. */
