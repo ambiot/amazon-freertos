@@ -487,7 +487,7 @@ static int prvReadCertificateIntoContext( TLSContext_t * pxTlsContext,
 }
 
 /*-----------------------------------------------------------*/
-#if 1 /* development mode - parse key from plain text code */
+#if defined(KEY_PLAINTEXT) && (KEY_PLAINTEXT == 1)
 static int prvInitializeClientCredential_alt( TLSContext_t * pxCtx )
 {
     BaseType_t xResult = CKR_OK;
@@ -900,7 +900,7 @@ BaseType_t TLS_Connect( void * pvContext )
          * are not loaded. This allows the TLS layer to still connect to servers
          * that do not require mutual authentication. If the server does
          * require mutual authentication, the handshake will fail. */
-#if 1 /* development mode - parse key from plain text code */
+#if defined(KEY_PLAINTEXT) && (KEY_PLAINTEXT == 1)
         xPKCSResult = prvInitializeClientCredential_alt( pxCtx );
 #else
         xPKCSResult = prvInitializeClientCredential( pxCtx );
@@ -1006,7 +1006,9 @@ BaseType_t TLS_Connect( void * pvContext )
     /* Free up allocated memory. */
     mbedtls_x509_crt_free( &pxCtx->xMbedX509CA );
     mbedtls_x509_crt_free( &pxCtx->xMbedX509Cli );
+#if defined(KEY_PLAINTEXT) && (KEY_PLAINTEXT == 1)
     mbedtls_pk_free( &pxCtx->xMbedPkCtx );
+#endif
 
     return xResult;
 }

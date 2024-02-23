@@ -37,6 +37,7 @@
 #include "iot_wifi.h"
 #include "iot_crypto.h"
 #include "aws_clientcredential.h"
+#include "core_pkcs11_config.h"
 
 /* Logging Task Defines. */
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 15 )
@@ -84,6 +85,11 @@ int aws_main( void )
                             mainLOGGING_MESSAGE_QUEUE_LENGTH );
 
     CRYPTO_ConfigureThreading();
+
+#if defined(KEY_PLAINTEXT) && (KEY_PLAINTEXT == 0)
+    // handle keys with pkcs11
+    vDevModeKeyProvisioning();
+#endif
 
     //mqtt mutual auto demo
     RunCoreMqttMutualAuthDemo(0, NULL, NULL, NULL, NULL);

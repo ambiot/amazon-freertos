@@ -51,11 +51,12 @@
 
 #define pkcs11OBJECT_CERTIFICATE_MAX_SIZE    4096
 #define pkcs11OBJECT_FLASH_CERT_PRESENT      ( 0x22ABCDEFuL ) //magic number for check flash data
-#if 0 // move to platform_opts_np.h
-#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x1DC000 ) //Flash location for CERT
-#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x1DD000 ) //Flash location for Priv Key
-#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x1DE000 ) //Flash location for Pub Key
-#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x1DF000 ) //Flash location for code verify Key
+#if 0 // move to platform_opts.h
+// Use in core_pkcs11_pal.c
+#define pkcs11OBJECT_CERT_FLASH_OFFSET       ( 0x2FC000 ) //Flash location for CERT
+#define pkcs11OBJECT_PRIV_KEY_FLASH_OFFSET   ( 0x2FD000 ) //Flash location for Priv Key
+#define pkcs11OBJECT_PUB_KEY_FLASH_OFFSET    ( 0x2FE000 ) //Flash location for Pub Key
+#define pkcs11OBJECT_VERIFY_KEY_FLASH_OFFSET ( 0x2FF000 ) //Flash location for code verify Key
 #endif
 /*
  * Flash Format
