@@ -83,41 +83,7 @@ static rtw_security_t prvConvertSecurityAbstractedToRTW( WIFISecurity_t xSecurit
 
     return ucConvertedSecurityType;
 }
-/*-----------------------------------------------------------*/
 
-static WIFISecurity_t prvConvertSecurityRTWToAbstracted( rtw_security_t ucSecurity )
-{
-    WIFISecurity_t xConvertedSecurityType = eWiFiSecurityNotSupported;
-
-    switch( ucSecurity )
-    {
-        case RTW_SECURITY_OPEN:
-            xConvertedSecurityType = eWiFiSecurityOpen;
-            break;
-
-        case RTW_SECURITY_WEP_PSK:
-        case RTW_SECURITY_WEP_SHARED:
-            xConvertedSecurityType = eWiFiSecurityWEP;
-            break;
-
-        case RTW_SECURITY_WPA_TKIP_PSK:
-        case RTW_SECURITY_WPA_AES_PSK :
-           xConvertedSecurityType = eWiFiSecurityWPA;
-           break;
-
-        case RTW_SECURITY_WPA2_AES_PSK:
-        case RTW_SECURITY_WPA2_TKIP_PSK:
-        case RTW_SECURITY_WPA2_MIXED_PSK:
-        case RTW_SECURITY_WPA_WPA2_MIXED:
-            xConvertedSecurityType = eWiFiSecurityWPA2;
-            break;
-
-        default:
-            break;
-    }
-
-    return xConvertedSecurityType;
-}
 /*-----------------------------------------------------------*/
 
 WIFIReturnCode_t WIFI_On( void )
@@ -264,7 +230,6 @@ static rtw_result_t scan_result_handler(unsigned int scanned_AP_num, void *user_
 			   (scanned_ap_info->security == RTW_SECURITY_WPA2_AES_PSK) ? "WPA2 AES" :
 			   (scanned_ap_info->security == RTW_SECURITY_WPA2_TKIP_PSK) ? "WPA2 TKIP" :
 			   (scanned_ap_info->security == RTW_SECURITY_WPA2_MIXED_PSK) ? "WPA2 Mixed" :
-			   (scanned_ap_info->security == RTW_SECURITY_WPA_WPA2_MIXED) ? "WPA/WPA2 AES" :
 			   (scanned_ap_info->security == RTW_SECURITY_WPA3_AES_PSK) ? "WPA3 AES" :
 			   "Unknown");
 		printf(" %s ", scanned_ap_info->SSID.val);
